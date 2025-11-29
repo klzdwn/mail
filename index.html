@@ -3,48 +3,46 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Styled</title>
+<title>Email Generator — Improved</title>
 <style>
   :root{
-    --bg:#f6f8fb;
-    --card:#ffffff;
-    --mut:#6b7280;
-    --primary:#1e40af;
-    --accent:#2563eb;
-    --pill:#eef2ff;
-    --soft:#f1f5f9;
-    --shadow: 0 10px 30px rgba(15,23,42,0.06);
+    --bg:#f6f8fb; --card:#fff; --mut:#64748b; --primary:#1e40af; --accent:#2563eb; --pill:#eef2ff;
+    --soft:#f1f5f9; --shadow: 0 14px 40px rgba(15,23,42,0.08);
+    --radius:14px;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#081229;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:520px;margin:18px auto;padding:14px}
-  .card{background:var(--card);border-radius:18px;padding:20px;box-shadow:var(--shadow);overflow:hidden}
+  .wrap{max-width:560px;margin:18px auto;padding:12px}
+  .card{background:var(--card);border-radius:20px;padding:18px;box-shadow:var(--shadow);overflow:hidden}
   header{display:flex;align-items:center;flex-direction:column;gap:8px;padding-bottom:6px}
-  .icon{width:56px;height:56px;border-radius:999px;background:linear-gradient(180deg,#eef6ff,#e6f0ff);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:22px}
+  .icon{width:60px;height:60px;border-radius:999px;background:linear-gradient(180deg,#eef6ff,#e6f0ff);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:22px}
   h1{margin:0;font-size:20px;color:#0f172a}
   p.lead{margin:0;color:var(--mut);font-size:13px}
-  .tabs{display:flex;gap:10px;margin-top:12px}
-  .tab{padding:10px 14px;border-radius:10px;background:var(--soft);cursor:pointer;color:#324151;border:1px solid transparent;font-weight:700}
-  .tab.active{background:var(--primary);color:#fff;box-shadow:0 8px 24px rgba(37,99,235,0.12)}
-  .section{margin-top:12px}
+  .tabs{display:flex;gap:10px;margin-top:14px}
+  .tab{padding:10px 14px;border-radius:12px;background:var(--soft);cursor:pointer;color:#334155;border:1px solid transparent;font-weight:700}
+  .tab.active{background:var(--primary);color:white;box-shadow:0 8px 24px rgba(37,99,235,0.12)}
+  .section{margin-top:14px}
   label.lbl{display:block;font-size:13px;color:#0f172a;margin-bottom:8px}
-  input[type="text"], textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #eef3fb;background:#fbfeff;font-size:15px}
+  input[type="text"], textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #eef3fb;background:#fbfeff;font-size:15px}
+  textarea{min-height:100px}
   .grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-  .method{padding:10px 14px;border-radius:10px;background:#f5f7fb;border:1px solid transparent;cursor:pointer;color:#0f172a;font-weight:700;font-size:14px}
-  .method.active{background:var(--accent);color:#fff;box-shadow:0 8px 20px rgba(37,99,235,0.12)}
+  .method{padding:12px 14px;border-radius:12px;background:#f5f7fb;border:1px solid transparent;cursor:pointer;color:#0f172a;font-weight:700;font-size:14px;transition:transform .12s, box-shadow .12s}
+  .method:active{transform:scale(.99)}
+  .method.active{background:var(--accent);color:#fff;box-shadow:0 10px 30px rgba(37,99,235,0.14)}
+  .method.big{flex:1 1 100%;padding:14px;border-radius:16px;background:#f3f6fb}
   .smalltxt{font-size:12px;color:var(--mut);margin-top:8px}
-  .actions-row{display:flex;gap:12px;margin-top:14px}
-  .btn{flex:1;padding:14px;border-radius:12px;border:none;cursor:pointer;font-weight:800;font-size:15px}
-  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 10px 28px rgba(37,99,235,0.12)}
+  .actions-row{display:flex;gap:12px;margin-top:14px;align-items:center}
+  .btn{padding:14px;border-radius:14px;border:none;cursor:pointer;font-weight:800;font-size:15px}
+  .btn.full{width:100%;display:block}
+  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 12px 30px rgba(37,99,235,0.12)}
   .btn.primary.disabled{opacity:0.45;cursor:not-allowed;box-shadow:none}
   .btn.ghost{background:#fff;border:1px solid #e6eefb;color:var(--accent)}
-  .preview{margin-top:14px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid #eef6ff;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace}
-  .footerbar{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:12px;border-top:1px solid #f0f4fb;color:var(--mut);font-size:13px}
+  .preview{margin-top:14px;padding:12px;border-radius:12px;background:#fbfdff;border:1px solid #eef6ff;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace}
+  .footerbar{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid #f0f4fb;color:var(--mut);font-size:13px}
   .linkish{color:var(--accent);cursor:pointer;text-decoration:none}
-  /* make buttons block-like on small screens */
-  @media (max-width:420px){
-    .actions-row{flex-direction:column}
-  }
+  .row{display:flex;gap:8px;align-items:center}
+  .muted{color:var(--mut)}
+  @media (max-width:420px){ .wrap{padding:10px} .method{flex:1 1 48%} }
 </style>
 </head>
 <body>
@@ -63,7 +61,7 @@
 
       <!-- SINGLE -->
       <div id="single" class="section" aria-hidden="false">
-        <div class="field" style="margin-top:6px">
+        <div class="field" style="margin-top:8px">
           <label class="lbl">Username Email</label>
           <input id="inpName" type="text" placeholder="namaanda" autocomplete="off" />
         </div>
@@ -77,28 +75,32 @@
           <div class="lbl">Pilih Metode (bisa gabungan)</div>
           <div style="font-size:13px;color:var(--mut);margin-top:6px">Metode Username:</div>
           <div class="grid" id="methodsUser">
-            <button data-method="plus" class="method">Plus (+)</button>
+            <button data-method="plus" class="method active">Plus (+)</button>
             <button data-method="dot" class="method">Titik (.)</button>
             <button data-method="upper" class="method">UPPERCASE</button>
             <button data-method="lower" class="method active">lowercase</button>
+          </div>
+
+          <div style="margin-top:8px" class="row">
+            <label class="lbl" style="flex:0 0 110px;margin:0;padding-right:6px">Custom + tag</label>
+            <input id="plusTag" type="text" placeholder="contoh: tokoku (tanpa +)" style="flex:1;padding:10px;border-radius:10px;border:1px solid #eef3fb" />
           </div>
         </div>
 
         <div style="margin-top:12px">
           <div class="lbl">Metode Domain (setelah @):</div>
           <div class="grid" id="methodsDom">
-            <button data-method="domRandom" class="method">Random Case (Uppercase + Lowercase)</button>
-            <button data-method="domAsIs" class="method active">As-is</button>
+            <button data-method="domRandom" class="method big">Random Case (Uppercase + Lowercase)</button>
+            <button data-method="domAsIs" class="method big active">As-is</button>
           </div>
         </div>
 
         <div class="smalltxt">Tekan untuk aktifkan/nonaktifkan. Bisa pilih lebih dari satu di setiap bagian.</div>
 
-        <div class="actions-row">
-          <button id="btnCreate" class="btn primary disabled" disabled>
-            <span style="display:inline-block;margin-right:8px">📋</span> Buat & Salin
+        <div style="margin-top:16px">
+          <button id="btnCreate" class="btn primary full disabled" disabled>
+            <span style="display:inline-block;margin-right:10px">📋</span> Buat & Salin
           </button>
-          <button id="btnPreview" class="btn ghost">Preview</button>
         </div>
 
         <div class="preview" id="previewBox" aria-live="polite">
@@ -107,11 +109,11 @@
         </div>
       </div>
 
-      <!-- BULK (hidden by default) -->
+      <!-- BULK -->
       <div id="bulk" class="section" style="display:none">
         <div>
           <label class="lbl">Daftar base names (satu per baris)</label>
-          <textarea id="bulkList" placeholder="rizky\nandi\ngilang" style="width:100%;padding:12px;border-radius:10px;border:1px solid #eef3fb;background:#fbfeff"></textarea>
+          <textarea id="bulkList" placeholder="rizky\nandi\ngilang" style="width:100%;padding:12px;border-radius:12px;border:1px solid #eef3fb;background:#fbfeff"></textarea>
         </div>
 
         <div style="margin-top:12px">
@@ -129,12 +131,18 @@
           </div>
         </div>
 
-        <div class="actions-row" style="margin-top:12px">
-          <button id="btnCreateBulk" class="btn primary">Buat & Salin</button>
-          <button id="btnDownloadBulk" class="btn ghost">Download .txt</button>
+        <div style="margin-top:10px" class="row">
+          <label class="lbl" style="flex:0 0 110px;margin:0;padding-right:6px">Custom + tag</label>
+          <input id="bulkPlusTag" type="text" placeholder="contoh: tokoku" style="flex:1;padding:10px;border-radius:10px;border:1px solid #eef3fb" />
         </div>
 
-        <div class="preview" style="margin-top:12px;max-height:180px;overflow:auto">
+        <div style="margin-top:14px">
+          <button id="btnCreateBulk" class="btn primary full">Buat & Salin</button>
+          <div style="height:10px"></div>
+          <button id="btnDownloadBulk" class="btn ghost full">Download .txt</button>
+        </div>
+
+        <div class="preview" style="margin-top:12px;max-height:200px;overflow:auto">
           <ol id="bulkOutput" style="padding-left:18px;margin:0"></ol>
         </div>
       </div>
@@ -146,89 +154,75 @@
 
     </div>
 
-    <div style="text-align:center;margin-top:12px;color:var(--mut);font-size:13px">Dibuat oleh Iqra</div>
+    <div style="text-align:center;margin-top:12px;color:var(--mut);font-size:13px">Dibuat oleh Iqra — disesuaikan</div>
   </main>
 
 <script>
 (function(){
-  // util
   const $ = id => document.getElementById(id);
   const toggle = el => el.classList.toggle('active');
-  const setActive = (el, on) => el.classList.toggle('active', !!on);
+  const tabSingle = $('tabSingle'), tabBulk = $('tabBulk'), single = $('single'), bulk = $('bulk');
+  tabSingle.addEventListener('click', ()=>{ tabSingle.classList.add('active'); tabBulk.classList.remove('active'); single.style.display='block'; bulk.style.display='none'; });
+  tabBulk.addEventListener('click', ()=>{ tabBulk.classList.add('active'); tabSingle.classList.remove('active'); single.style.display='none'; bulk.style.display='block'; });
 
-  // tabs
-  const tabSingle = $('tabSingle'), tabBulk = $('tabBulk');
-  const single = $('single'), bulk = $('bulk');
-  tabSingle.addEventListener('click', ()=>{
-    tabSingle.classList.add('active'); tabBulk.classList.remove('active');
-    single.style.display='block'; bulk.style.display='none';
-  });
-  tabBulk.addEventListener('click', ()=>{
-    tabBulk.classList.add('active'); tabSingle.classList.remove('active');
-    single.style.display='none'; bulk.style.display='block';
-  });
-
-  // method buttons (toggles)
-  function wireToggle(containerId){
-    const container = $(containerId);
-    container.addEventListener('click', (e)=>{
+  function wireToggle(id, radio=false){
+    const cont = $(id);
+    cont.addEventListener('click', e=>{
       const btn = e.target.closest('button[data-method]');
       if(!btn) return;
-      // for domain container, we want radio-like behaviour (domAsIs / domRandom)
-      if(containerId === 'methodsDom'){
-        Array.from(container.querySelectorAll('button[data-method]')).forEach(b=>b.classList.remove('active'));
+      if(radio){
+        Array.from(cont.querySelectorAll('button[data-method]')).forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-        return;
+      } else {
+        btn.classList.toggle('active');
       }
-      btn.classList.toggle('active');
+      updatePreview();
     });
   }
-  wireToggle('methodsUser'); wireToggle('methodsDom'); wireToggle('methodsUserBulk');
+  wireToggle('methodsUser', false);
+  wireToggle('methodsDom', true);
+  wireToggle('methodsUserBulk', false);
 
-  // inputs
-  const inpName = $('inpName'), inpDomain = $('inpDomain');
-  const previewText = $('previewText');
-  const btnCreate = $('btnCreate'), btnPreview = $('btnPreview');
-  const counterEl = $('counter'), resetLink = $('resetLink');
+  const inpName = $('inpName'), inpDomain = $('inpDomain'), plusTag = $('plusTag');
+  const previewText = $('previewText'), btnCreate = $('btnCreate'), counterEl = $('counter'), resetLink = $('resetLink');
+  const bulkList = $('bulkList'), bulkDomain = $('bulkDomain'), bulkPlusTag = $('bulkPlusTag');
+  const btnCreateBulk = $('btnCreateBulk'), btnDownloadBulk = $('btnDownloadBulk'), bulkOutput = $('bulkOutput');
 
-  // helpers for transforms
+  function readOpts(containerId){
+    const cont = $(containerId);
+    const map = {};
+    cont.querySelectorAll('button[data-method]').forEach(b => map[b.dataset.method] = b.classList.contains('active'));
+    return map;
+  }
+
   function applyDot(name){
     if(!name) return name;
-    if(name.length <= 2) return name.split('').join('.');
+    if(name.length<=2) return name.split('').join('.');
     return name.slice(0,2) + '.' + name.slice(2);
   }
-  function applyPlus(name){
+  function applyPlus(name, tag){
+    if(tag && tag.trim()){
+      const t = tag.trim().replace(/^\+/, '');
+      return name + '+' + t;
+    }
     const tags = ['shop','id','official','x','web'];
     const pick = tags[Math.floor(Math.random()*tags.length)];
     const num = Math.floor(10 + Math.random()*990);
     return name + '+' + pick + num;
   }
-  function randomCase(s){
-    return Array.from(s).map(c => Math.random() < 0.5 ? c.toLowerCase() : c.toUpperCase()).join('');
-  }
+  function randomCase(s){ return Array.from(s).map(ch => Math.random()<0.5 ? ch.toLowerCase() : ch.toUpperCase()).join(''); }
 
-  function readOptions(containerId){
-    const container = $(containerId);
-    const map = {};
-    container.querySelectorAll('button[data-method]').forEach(b=>{
-      map[b.dataset.method] = b.classList.contains('active');
-    });
-    return map;
-  }
-
-  function transform(base, opts){
+  function transformUsername(base, opts, tag){
     let u = base;
     if(opts.dot) u = applyDot(u);
-    if(opts.plus) u = applyPlus(u);
-    // casing
+    if(opts.plus) u = applyPlus(u, tag);
+    // casing priority: randomcase not used in this improved UI; upper/lower:
     if(opts.upper && !opts.lower) u = u.toUpperCase();
-    else if(opts.lower && !opts.upper) u = u.toLowerCase();
-    else if(opts.upper && opts.lower) u = u.toLowerCase();
-    return u;
+    else u = u.toLowerCase();
+    return u.replace(/\s+/g, '.');
   }
-
-  function domainTransform(domainRaw){
-    const domOpts = readOptions('methodsDom');
+  function transformDomain(domainRaw){
+    const domOpts = readOpts('methodsDom');
     if(domOpts.domRandom) return randomCase(domainRaw);
     return domainRaw;
   }
@@ -236,15 +230,13 @@
   function makeEmailOnce(){
     const base = inpName.value.trim();
     if(!base) return '';
-    const userOpts = readOptions('methodsUser');
-    const dom = inpDomain.value.trim() || 'gmail.com';
-    let user = transform(base, userOpts);
-    user = user.replace(/\s+/g, '.');
-    const domain = domainTransform(dom);
-    return user + '@' + domain;
+    const uopts = readOpts('methodsUser');
+    const dom = (inpDomain.value.trim() || 'gmail.com');
+    const username = transformUsername(base, uopts, plusTag.value);
+    const domain = transformDomain(dom);
+    return username + '@' + domain;
   }
 
-  // preview & enable create button only when name exists
   function updatePreview(){
     const e = makeEmailOnce();
     previewText.textContent = e || '-';
@@ -254,75 +246,72 @@
       btnCreate.classList.add('disabled'); btnCreate.disabled = true;
     }
   }
+
   inpName.addEventListener('input', updatePreview);
-  document.getElementById('methodsUser').addEventListener('click', updatePreview);
-  document.getElementById('methodsDom').addEventListener('click', updatePreview);
+  inpDomain.addEventListener('input', updatePreview);
+  plusTag.addEventListener('input', updatePreview);
 
-  btnPreview.addEventListener('click', updatePreview);
-
-  // create & copy: increments counter, shows toast/alert and copies
-  let seq = 0;
   btnCreate.addEventListener('click', async ()=>{
     const email = makeEmailOnce();
     if(!email) return;
-    seq += 1;
+    // increment counter
+    let seq = Number(counterEl.textContent || 0) + 1;
     counterEl.textContent = seq;
     previewText.textContent = email;
     try{
       await navigator.clipboard.writeText(email);
-      // small visual feedback - brief alert-like
-      const old = btnCreate.textContent;
-      btnCreate.textContent = 'Tersalin ✓';
-      setTimeout(()=> btnCreate.textContent = old, 1200);
+      const old = btnCreate.innerHTML;
+      btnCreate.innerHTML = 'Tersalin ✓';
+      setTimeout(()=> btnCreate.innerHTML = old, 1100);
     }catch(e){
       prompt('Salin manual:', email);
     }
   });
 
   resetLink.addEventListener('click', ()=>{
-    seq = 0; counterEl.textContent = seq;
-    // reset preview/history
-    previewText.textContent = '-';
+    counterEl.textContent = '0';
+    inpName.value = '';
+    inpDomain.value = 'gmail.com';
+    plusTag.value = '';
+    // reset toggles: default plus + lower and dom as-is
+    document.querySelectorAll('#methodsUser .method').forEach(b=>b.classList.remove('active'));
+    document.querySelector('#methodsUser button[data-method=\"plus\"]').classList.add('active');
+    document.querySelector('#methodsUser button[data-method=\"lower\"]').classList.add('active');
+    document.querySelectorAll('#methodsDom .method').forEach(b=>b.classList.remove('active'));
+    document.querySelector('#methodsDom button[data-method=\"domAsIs\"]').classList.add('active');
+    updatePreview();
   });
 
   // BULK
-  const bulkList = $('bulkList'), bulkDomain = $('bulkDomain'), btnCreateBulk = $('btnCreateBulk'), btnDownloadBulk = $('btnDownloadBulk'), bulkOutput = $('bulkOutput');
   btnCreateBulk.addEventListener('click', async ()=>{
     const lines = bulkList.value.split('\\n').map(s=>s.trim()).filter(Boolean);
-    if(lines.length === 0){ alert('Masukkan minimal 1 nama di daftar.'); return; }
-    const opts = readOptions('methodsUserBulk');
-    const dom = (bulkDomain.value || 'gmail.com').trim();
+    if(lines.length===0){ alert('Masukkan minimal 1 nama di daftar.'); return; }
+    const opts = readOpts('methodsUserBulk');
+    const dom = (bulkDomain.value.trim() || 'gmail.com');
+    const tag = bulkPlusTag.value;
     const results = lines.map(base=>{
-      let u = base;
-      if(opts.dot) u = applyDot(u);
-      if(opts.plus) u = applyPlus(u);
-      if(opts.upper && !opts.lower) u = u.toUpperCase();
-      else if(opts.lower && !opts.upper) u = u.toLowerCase();
-      else if(opts.upper && opts.lower) u = u.toLowerCase();
-      u = u.replace(/\s+/g, '.');
+      const u = transformUsername(base, opts, tag);
       return u + '@' + dom;
     });
     bulkOutput.innerHTML = '';
-    results.forEach(r => {
-      const li = document.createElement('li'); li.textContent = r; bulkOutput.appendChild(li);
-    });
+    results.forEach(r=>{ const li = document.createElement('li'); li.textContent = r; bulkOutput.appendChild(li); });
     try{
       await navigator.clipboard.writeText(results.join('\\n'));
       alert('Tersalin ' + results.length + ' alamat ke clipboard.');
     }catch(e){
-      alert('Gagal salin otomatis — gunakan tombol Download .txt');
+      alert('Gagal salin otomatis — gunakan tombol Download .txt.');
     }
   });
 
   btnDownloadBulk.addEventListener('click', ()=>{
     const items = Array.from(bulkOutput.querySelectorAll('li')).map(li=>li.textContent);
-    if(items.length === 0){ alert('Tidak ada hasil untuk didownload. Buat dulu.'); return; }
+    if(items.length===0){ alert('Tidak ada hasil untuk di-download. Buat dulu.'); return; }
     const blob = new Blob([items.join('\\n')], {type:'text/plain'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = 'emails.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
   });
 
-  // initial update
+  // init
   updatePreview();
 })();
 </script>
