@@ -3,194 +3,153 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Clean Modern UI</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Email Generator — Improved UI/UX</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --page-bg: #f6f8fb;
-    --card-bg: #ffffff;
-    --mut: #6b7280;
-    --accent: #2563eb;        /* primary accent */
-    --accent-soft: #dbeafe;   /* subtle accent background */
-    --surface-border: rgba(16,24,40,0.04);
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --mut:#6b7280;
+    --accent:#2563eb;
+    --accent-2:#2563eb;
+    --soft:#f8fbff;
     --danger:#ef4444;
-    --danger-bg: #fff1f2;
-    --shadow-sm: 0 6px 20px rgba(16,24,40,0.06);
+    --success:#16a34a;
+    --surface-border: rgba(16,24,40,0.06);
     --shadow-md: 0 18px 40px rgba(16,24,40,0.08);
-    --radius: 12px;
+    --radius:12px;
   }
 
-  /* Base reset */
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;
-    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background: linear-gradient(180deg, var(--page-bg), #eef4fb);
-    color:#071233;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    padding:24px;
+    margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    -webkit-font-smoothing:antialiased;background:linear-gradient(180deg,#f6f9ff,#f2f6fb);
+    color:#071233;padding:28px;display:flex;justify-content:center;
   }
 
-  /* Layout */
-  .wrap{max-width:720px;margin:24px auto;padding:16px;display:grid;grid-template-columns:1fr;gap:18px}
+  .container{width:100%;max-width:720px}
   .card{
-    background:var(--card-bg);
-    border-radius:var(--radius);
-    padding:18px;
-    border:1px solid var(--surface-border);
-    box-shadow:var(--shadow-md);
-    overflow:visible;
+    background:var(--card);border-radius:var(--radius);padding:20px;border:1px solid var(--surface-border);
+    box-shadow:var(--shadow-md);overflow:visible;
   }
 
-  header{display:flex;gap:12px;align-items:center}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:6px}
   .logo{
-    width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,#f8fbff,#eef6ff);
-    display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:20px;
-    border:1px solid var(--surface-border);
-    box-shadow: 0 8px 20px rgba(16,24,40,0.04);
+    width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,#eef8ff,#f5faff);
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);
+    border:1px solid var(--surface-border);font-size:18px;
   }
-  .title{
-    display:flex;flex-direction:column;
-  }
-  h1{margin:0;font-size:18px}
-  p.lead{margin:2px 0 0;color:var(--mut);font-size:13px}
+  .title h1{margin:0;font-size:18px}
+  .title p{margin:4px 0 0;color:var(--mut);font-size:13px}
 
-  /* Form */
-  .form-row{margin-top:12px}
-  label{display:block;margin-bottom:6px;font-weight:700;color:#0b1220}
-  input[type="text"], textarea{
-    width:100%;
-    padding:10px 12px;
-    border-radius:10px;
-    border:1px solid var(--surface-border);
-    background: linear-gradient(180deg,#fff,#fbfdff);
-    font-size:14px;color:#071233;
-    box-shadow: 0 6px 14px rgba(16,24,40,0.03) inset;
+  .row{margin-top:12px}
+  label{display:block;font-weight:700;font-size:13px;margin-bottom:8px;color:#0b1220}
+
+  input,textarea{
+    width:100%;padding:12px;border-radius:10px;border:1px solid var(--surface-border);
+    font-size:14px;background:linear-gradient(180deg,#fff,#fbfdff);color:#071233;
+    box-shadow: 0 8px 18px rgba(16,24,40,0.03) inset;
   }
   input::placeholder, textarea::placeholder{color:#9aa6bf}
 
-  /* small polite warning */
-  .warn{
-    margin-top:8px;font-size:13px;color:var(--danger);
-    background:var(--danger-bg);padding:10px;border-radius:10px;display:none;border:1px solid rgba(239,68,68,0.06);
+  /* inline validation messages */
+  .hint{font-size:13px;color:var(--mut);margin-top:8px}
+  .error{
+    margin-top:8px;padding:10px;border-radius:10px;background:#fff5f5;color:var(--danger);
+    border:1px solid rgba(239,68,68,0.06);display:none;font-size:13px;
   }
 
-  /* method buttons */
-  .grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .grid{display:flex;flex-wrap:wrap;gap:10px}
   .method{
-    flex:1 1 48%;
-    min-height:44px;
-    padding:10px 12px;
-    border-radius:10px;
-    background:#fbfdff;
-    border:1px solid var(--surface-border);
-    font-weight:700;color:#071233;font-size:13px;text-align:center;cursor:pointer;
-    transition:all .12s ease;
-    box-shadow: 0 8px 18px rgba(16,24,40,0.03);
+    flex:1 1 48%;min-height:44px;padding:10px;border-radius:10px;background:#fbfdff;border:1px solid var(--surface-border);
+    font-weight:800;font-size:13px;color:#071233;text-align:center;cursor:pointer;box-shadow:0 8px 16px rgba(16,24,40,0.03);
+    transition:transform .12s, box-shadow .12s, background .12s;
   }
   .method:hover{transform:translateY(-3px)}
   .method.active{
-    background: linear-gradient(90deg, var(--accent-soft), #e6f0ff);
-    color:var(--accent);
-    border: 1px solid rgba(37,99,235,0.18);
-    box-shadow: 0 12px 28px rgba(37,99,235,0.05);
+    background: linear-gradient(90deg,#dbeafe,#e6f0ff);
+    color:var(--accent);border:1px solid rgba(37,99,235,0.16);
+    box-shadow:0 14px 36px rgba(37,99,235,0.06);
   }
 
-  .note{margin-top:8px;font-size:12px;color:var(--mut)}
-
-  /* Preview box */
-  .preview{
-    margin-top:14px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid #eef6ff;font-size:14px;color:#071233;
-    box-shadow:var(--shadow-sm);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  /* Button style (SIZE/spacing KEPT) */
+  .btn-area{position:relative;margin-top:16px}
+  .btn{
+    width:100%;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s,box-shadow .12s;
   }
-
-  /* Buttons - KEEP sizes (padding) same */
-  .btn-area{position:relative;margin-top:14px}
-  .btn{width:100%;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s, box-shadow .12s}
   .btn.primary{
-    background: linear-gradient(180deg,var(--accent),#1e56d6);
-    color:white;
-    box-shadow: 0 10px 30px rgba(37,99,235,0.16);
-    border: 1px solid rgba(255,255,255,0.06);
+    background:linear-gradient(180deg,var(--accent),#1e56d6);color:white;box-shadow:0 10px 30px rgba(37,99,235,0.14);
   }
-  .btn.primary:hover{ transform:translateY(-3px); box-shadow: 0 18px 42px rgba(37,99,235,0.14); }
-  .btn.primary:active{ transform:translateY(1px); }
+  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 18px 42px rgba(37,99,235,0.14)}
+  .btn.primary:active{transform:translateY(1px)}
 
-  .btn.ghost{
-    background:#fff;border:1px solid var(--surface-border);color:var(--accent);
+  .btn.secondary{
+    background:#fff;border:1px solid var(--surface-border);color:var(--accent);padding:10px;border-radius:10px;
   }
 
-  /* copy badge (slide in from right) */
+  .preview{
+    margin-top:14px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfdff);
+    border:1px solid #eef6ff;font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:#071233;font-size:14px;
+    box-shadow:0 10px 28px rgba(16,24,40,0.04);
+  }
+
+  /* copy badge */
   .copy-badge{
     position:absolute;top:-56px;right:0;transform:translateX(110%);opacity:0;
     background:#ffffff;padding:10px 14px;border-radius:10px;display:flex;gap:10px;align-items:center;
     border:1px solid var(--surface-border);box-shadow:0 12px 28px rgba(16,24,40,0.06);
     transition:transform .28s cubic-bezier(.22,.9,.25,1), opacity .18s ease;pointer-events:none;white-space:nowrap;font-weight:700;color:#071233;
   }
-  .copy-badge.show{ transform:translateX(0); opacity:1; }
+  .copy-badge.show{transform:translateX(0);opacity:1}
+  .copy-badge .check{width:22px;height:22px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-weight:900}
 
-  .copy-badge .check{
-    width:22px;height:22px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:13px;
-  }
-
-  /* confetti */
-  .confetti-wrap{position:absolute;top:-18px;right:22px;width:1px;height:1px;pointer-events:none;overflow:visible}
+  .confetti-wrap{position:absolute;top:-18px;right:22px;width:1px;height:1px;pointer-events:none}
   .confetti-piece{position:absolute;left:0;top:0;width:8px;height:8px;border-radius:2px;opacity:0;transform:translateY(0) scale(1);will-change:transform,opacity}
 
-  @keyframes confettiFly {
-    0%{opacity:1;transform:translate(0,0) rotate(0) scale(1)}
-    60%{opacity:1}
-    100%{opacity:0;transform:translate(var(--tx), var(--ty)) rotate(360deg) scale(.7)}
-  }
+  @keyframes confettiFly{0%{opacity:1;transform:translate(0,0) rotate(0) scale(1)}60%{opacity:1}100%{opacity:0;transform:translate(var(--tx), var(--ty)) rotate(360deg) scale(.7)}}
 
-  /* footer */
-  .footerbar{text-align:center;margin-top:12px;font-size:13px;color:var(--mut)}
+  .footer{margin-top:14px;text-align:center;color:var(--mut);font-size:13px}
 
-  /* small screens */
+  /* focus accessible */
+  button:focus,input:focus,textarea:focus{outline:3px solid rgba(37,99,235,0.10);outline-offset:3px}
+
   @media (max-width:520px){
-    .wrap{padding:10px}
     .method{min-height:42px}
     .copy-badge{top:-50px}
-  }
-
-  /* focus accessibility */
-  button:focus, input:focus, textarea:focus{
-    outline: 3px solid rgba(37,99,235,0.12);
-    outline-offset:3px;
   }
 </style>
 </head>
 <body>
-  <main class="wrap" aria-live="polite">
-    <section class="card" role="application" aria-label="Email generator — modern clean">
+  <div class="container">
+    <div class="card" role="application" aria-label="Email generator improved UI">
       <header>
         <div class="logo" aria-hidden="true">EG</div>
         <div class="title">
           <h1>Email Generator</h1>
-          <p class="lead">Buat varian email cepat — hasil muncul setelah klik Buat & Salin</p>
+          <p class="lead">Antarmuka baru — rapi, modern, dan gampang dipakai. Hasil muncul setelah klik <strong>Buat & Salin</strong>.</p>
         </div>
       </header>
 
       <!-- Username -->
-      <div class="form-row">
+      <div class="row">
         <label for="inpName">Username Email</label>
         <input id="inpName" placeholder="namaanda" autocomplete="off" />
-        <div id="warnName" class="warn">⚠️ Isi Username terlebih dahulu sebelum klik Buat & Salin</div>
+        <div id="warnName" class="error">⚠️ Isi Username terlebih dahulu sebelum klik Buat & Salin</div>
       </div>
 
       <!-- Domain -->
-      <div class="form-row">
+      <div class="row">
         <label for="inpDomain">Domain Email</label>
         <input id="inpDomain" value="gmail.com" />
+        <div class="hint">Tuliskan domain (mis. gmail.com). Opsi "Random Case" dapat mengacak huruf besar/kecil domain.</div>
       </div>
 
-      <!-- Methods -->
-      <div class="form-row">
-        <label>Metode Username (bisa gabungan)</label>
-        <div class="grid" id="methodsUser">
+      <!-- Methods (username) -->
+      <div class="row">
+        <label>Metode Username (gabungkan sesuai kebutuhan)</label>
+        <div id="methodsUser" class="grid" aria-hidden="false">
           <button class="method active" data-method="plus">Plus (+)</button>
           <button class="method" data-method="dot">Titik (.)</button>
           <button class="method" data-method="upper">UPPERCASE</button>
@@ -198,63 +157,63 @@
         </div>
       </div>
 
-      <div class="form-row">
-        <label for="plusTag">Custom + tag</label>
+      <!-- Custom + tag (wajib saat Plus aktif) -->
+      <div class="row">
+        <label for="plusTag">Custom + tag <small style="color:var(--mut);font-weight:600">(wajib jika Plus aktif)</small></label>
         <input id="plusTag" placeholder="contoh: tokoku (tanpa +)" />
+        <div id="plusError" class="error" style="display:none">⚠️ Kolom +tag wajib diisi saat opsi Plus (+) aktif.</div>
       </div>
 
-      <div class="form-row">
+      <!-- Methods (domain) — As-is removed: only Random Case toggle remains -->
+      <div class="row">
         <label>Metode Domain</label>
-        <div class="grid" id="methodsDom">
-          <button class="method" data-method="domRandom">Random Case</button>
-          <button class="method active" data-method="domAsIs">As-is</button>
+        <div id="methodsDom" class="grid">
+          <button class="method" data-method="domRandom">Random Case (acak besar/kecil)</button>
+          <!-- 'As-is' intentionally removed per request -->
         </div>
       </div>
 
-      <!-- Buttons + badge -->
+      <!-- Buttons -->
       <div class="btn-area">
         <div id="copyBadge" class="copy-badge" aria-hidden="true">
-          <span class="check">✓</span>
-          <span id="copyBadgeText">Tersalin!</span>
+          <div class="check">✓</div>
+          <div id="copyBadgeText">Tersalin!</div>
         </div>
 
-        <div class="confetti-wrap" id="confettiWrap" aria-hidden="true"></div>
+        <div id="confettiWrap" class="confetti-wrap" aria-hidden="true"></div>
 
         <button id="btnCreate" class="btn primary" title="Buat & Salin">📋 Buat & Salin</button>
       </div>
 
       <!-- Preview -->
-      <div class="preview" id="previewBox">
+      <div class="preview" id="previewBox" aria-live="polite">
         <div style="font-size:12px;color:var(--mut)">Email yang dibuat:</div>
         <div id="previewText" style="margin-top:8px">-</div>
       </div>
 
-      <div class="footerbar">Nomor urut: <strong id="counter">0</strong></div>
-    </section>
-  </main>
+      <div class="footer">Nomor urut: <strong id="counter">0</strong></div>
+    </div>
+  </div>
 
 <script>
-/*
-  Behavior preserved:
-  - Don't show result until user clicks "Buat & Salin"
-  - Copy first (clipboard API + fallback), then show preview and increment counter
-  - Warning shows if username empty (on input & on click)
-  - Slide-in copy badge (from right)
-  - Confetti spawn
-  - IDs preserved for easy integration
+/* Behavior:
+ - Preview only after successful copy
+ - If Plus (+) active -> plusTag required (validated before copy)
+ - As-is domain button removed (only domRandom available)
+ - IDs preserved
 */
 
 (function(){
   const $ = id => document.getElementById(id);
 
-  // elements
   const inpName = $('inpName'), inpDomain = $('inpDomain'), plusTag = $('plusTag');
   const methodsUser = $('methodsUser'), methodsDom = $('methodsDom');
-  const warnName = $('warnName'), btnCreate = $('btnCreate'), previewText = $('previewText'), counterEl = $('counter');
+  const warnName = $('warnName'), plusError = $('plusError');
+  const btnCreate = $('btnCreate'), previewText = $('previewText'), counterEl = $('counter');
   const copyBadge = $('copyBadge'), copyBadgeText = $('copyBadgeText');
   const confettiWrap = $('confettiWrap');
 
-  // toggles for method buttons
+  // Toggle helper (multi-select for user methods)
   function wireToggle(container, radio=false){
     container.addEventListener('click', e=>{
       const btn = e.target.closest('button[data-method]');
@@ -268,59 +227,67 @@
     });
   }
   wireToggle(methodsUser, false);
-  wireToggle(methodsDom, true);
+  wireToggle(methodsDom, false); // domRandom toggles on/off
 
-  // show/hide warn based on input
-  inpName.addEventListener('input', ()=>{
+  // show/hide username warning
+  inpName.addEventListener('input', ()=> {
     warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none';
   });
 
-  // helpers: read options, transforms
+  // helper: read options
   function readOpts(container){
     const out = {};
-    Array.from(container.querySelectorAll('button[data-method]')).forEach(b => out[b.dataset.method] = b.classList.contains('active'));
+    Array.from(container.querySelectorAll('button[data-method]')).forEach(b=> out[b.dataset.method] = b.classList.contains('active'));
     return out;
   }
 
-  function applyDot(name){
-    if(name.length <= 2) return name.split('').join('.');
-    return name.slice(0,2) + '.' + name.slice(2);
+  // transforms
+  function applyDot(n){ if(n.length<=2) return n.split('').join('.'); return n.slice(0,2) + '.' + n.slice(2); }
+  function applyPlus(n, tag){
+    if(!tag || !tag.trim()) return null; // indicate missing tag
+    const t = tag.trim().replace(/^\+/, '');
+    return n + '+' + t;
   }
-  function applyPlus(name, tag){
-    if(tag && tag.trim()) return name + '+' + tag.trim().replace(/^\+/, '');
-    const picks = ['id','shop','official','web'];
-    return name + '+' + picks[Math.floor(Math.random()*picks.length)] + Math.floor(10 + Math.random()*990);
-  }
-  function randomCase(s){
-    return Array.from(s).map(ch => Math.random()<0.5 ? ch.toLowerCase() : ch.toUpperCase()).join('');
-  }
+  function randomCase(s){ return Array.from(s).map(c => Math.random() < 0.5 ? c.toLowerCase() : c.toUpperCase()).join(''); }
 
   function transformUsername(base, opts, tag){
     let u = base;
     if(opts.dot) u = applyDot(u);
-    if(opts.plus) u = applyPlus(u, tag);
+    if(opts.plus){
+      const plusApplied = applyPlus(u, tag);
+      if(plusApplied === null) return null; // signal missing tag
+      u = plusApplied;
+    }
     if(opts.upper && !opts.lower) u = u.toUpperCase();
     else u = u.toLowerCase();
     return u.replace(/\s+/g, '.');
   }
 
-  function domainTransform(domainRaw, domOpts){
-    if(domOpts.domRandom) return randomCase(domainRaw);
-    return domainRaw;
+  function domainTransform(domain, domOpts){
+    if(domOpts.domRandom) return randomCase(domain);
+    return domain;
   }
 
-  // build email (but DO NOT auto-display)
+  // build email (returns null if validation fails, or '' if no base)
   function makeEmail(){
     const base = inpName.value.trim();
     if(!base) return '';
     const uopts = readOpts(methodsUser);
     const domOpts = readOpts(methodsDom);
+
+    // enforce plusTag if plus selected
     const username = transformUsername(base, uopts, plusTag.value);
-    const domain = domainTransform((inpDomain.value.trim() || 'gmail.com'), domOpts);
+    if(username === null){
+      // missing tag when plus active
+      return null;
+    }
+
+    const domainRaw = (inpDomain.value.trim() || 'gmail.com');
+    const domain = domainTransform(domainRaw, domOpts);
     return username + '@' + domain;
   }
 
-  // robust copy: navigator.clipboard then fallback textarea+execCommand
+  // robust copy
   async function copyToClipboard(text){
     if(!text) return false;
     try{
@@ -337,8 +304,7 @@
       ta.style.position = 'fixed';
       ta.style.left = '-9999px';
       document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
+      ta.focus(); ta.select();
       const ok = document.execCommand('copy');
       document.body.removeChild(ta);
       return ok;
@@ -349,30 +315,30 @@
   }
 
   // badge show/hide
-  function showBadge(msg){
+  function showCopyBadge(msg){
     copyBadgeText.textContent = msg || 'Tersalin!';
     copyBadge.classList.add('show');
     copyBadge.setAttribute('aria-hidden','false');
     clearTimeout(copyBadge._t);
-    copyBadge._t = setTimeout(()=>{ copyBadge.classList.remove('show'); copyBadge.setAttribute('aria-hidden','true'); }, 1400);
+    copyBadge._t = setTimeout(()=>{ copyBadge.classList.remove('show'); copyBadge.setAttribute('aria-hidden','true'); }, 1500);
   }
 
-  // confetti spawn (subtle)
+  // confetti spawn
   function spawnConfetti(){
     while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild);
     const pieces = 10;
-    const colors = ['#2563eb','#60a5fa','#7c3aed','#06b6d4'];
+    const colors = ['#2563eb','#60a5fa','#7c3aed','#06b6d4','#f59e0b'];
     for(let i=0;i<pieces;i++){
       const el = document.createElement('div');
       el.className = 'confetti-piece';
       el.style.background = colors[Math.floor(Math.random()*colors.length)];
       const angle = (Math.random()*120 - 60);
-      const dist = 50 + Math.random()*80;
+      const dist = 40 + Math.random()*100;
       const tx = Math.cos(angle * Math.PI/180) * dist;
       const ty = Math.sin(angle * Math.PI/180) * dist + (20 + Math.random()*30);
       el.style.setProperty('--tx', tx.toFixed(1) + 'px');
       el.style.setProperty('--ty', ty.toFixed(1) + 'px');
-      el.style.left = '0'; el.style.top = '0';
+      el.style.left = '0px'; el.style.top = '0px';
       const delay = Math.random()*0.08;
       el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${delay}s forwards`;
       confettiWrap.appendChild(el);
@@ -380,34 +346,55 @@
     }
   }
 
-  // subtle pulse for button when copy successful
-  function pulseButton(btnEl){
-    btnEl.animate([
+  // small pulse for button
+  function pulseButton(el){
+    el.animate([
       { transform:'scale(1)', boxShadow:'0 10px 30px rgba(37,99,235,0.12)' },
       { transform:'scale(1.02)', boxShadow:'0 18px 44px rgba(37,99,235,0.16)' },
       { transform:'scale(1)', boxShadow:'0 10px 30px rgba(37,99,235,0.12)' }
     ], { duration:360, easing:'cubic-bezier(.22,.9,.25,1)' });
   }
 
-  // main click: copy first, then show preview and increment counter
+  // click handler: validate + copy -> show preview & counter
   let seq = 0;
   btnCreate.addEventListener('click', async ()=>{
-    const email = makeEmail();
-    if(!email){
+    // reset inline errors
+    warnName.style.display = 'none';
+    plusError.style.display = 'none';
+
+    if(inpName.value.trim() === ''){
       warnName.style.display = 'block';
       inpName.focus();
-      // small shake for feedback
-      btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1});
+      btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:200,iterations:1});
+      return;
+    }
+
+    // check plus requirement
+    const uopts = readOpts(methodsUser);
+    if(uopts.plus && (!plusTag.value || plusTag.value.trim() === '')){
+      plusError.style.display = 'block';
+      plusTag.focus();
+      // subtle shake
+      plusTag.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1});
+      return;
+    }
+
+    const email = makeEmail();
+
+    // makeEmail returns null when plus missing (covered above) or '' if base missing (covered)
+    if(email === '' || email === null){
+      // shouldn't reach here, but just in case
+      warnName.style.display = 'block';
       return;
     }
 
     const ok = await copyToClipboard(email);
     if(ok){
-      showBadge('Tersalin!');
+      showCopyBadge('Tersalin!');
       spawnConfetti();
       pulseButton(btnCreate);
     } else {
-      showBadge('Salin manual');
+      showCopyBadge('Salin manual');
     }
 
     seq += 1;
@@ -415,8 +402,9 @@
     previewText.textContent = email;
   });
 
-  // init: hide warn
+  // initial hide errors
   warnName.style.display = 'none';
+  plusError.style.display = 'none';
 })();
 </script>
 </body>
