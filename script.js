@@ -1,190 +1,315 @@
-// script.js — plusOptions support, no floating CTA, domain placeholder only
+// script.js — cleaned + plusOptions aware generateList
 (function(){
   const $ = id => document.getElementById(id);
+  const baseInput = $('base');
+  const suffixInput = $('suffix');
+  const extrasInput = $('extras');
+  const dotsInput = $('dots');
+  const domainsInput = $('domains');
+  const limitInput = $('limit');
+  const generateBtn = $('generate');
+  const resetBtn = $('reset');
+  const output = $('output');
+  const countEl = $('count');
+  const copyBtn = $('copy');
+  const downloadBtn = $('download');
+  const createBtn = $('btnCreate');
 
-  const form = $('egForm');
-  const inpName = $('inpName'), inpDomain = $('inpDomain'), plusTag = $('plusTag');
-  const methodsUser = $('methodsUser'), methodsDom = $('methodsDom');
-  const warnName = $('warnName'), warnDomain = $('warnDomain');
-  const btnCreate = $('btnCreate'), previewText = $('previewText'), counterEl = $('counter');
-  const copyBadge = $('copyBadge'), copyBadgeText = $('copyBadgeText');
-  const confettiWrap = $('confettiWrap');
-  const themeToggle = $('themeToggle'), themeIcon = $('themeIcon');
+  // plusOptions elements (optional)
+  const plusOptions = $('plusOptions');
+  const plusLen = $('plusLen');
+  const plusLenVal = $('plusLenVal');
+  const plusTagInput = $('plusTag');
 
-  const plusOptions = $('plusOptions'), plusLen = $('plusLen'), plusLenVal = $('plusLenVal');
+  function parseList(s){
+    return (s || '').split(',').map(x=>x.trim()).filter(Boolean);
+  }
 
-  // Theme handling (persist)
-  const THEME_KEY = 'eg_theme';
-  function applyTheme(t){ if(t==='dark') document.body.classList.add('dark'); else document.body.classList.remove('dark'); themeIcon.textContent = (t==='dark')?'🌙':'☀️'; themeToggle.setAttribute('aria-pressed', t==='dark'); }
-  function loadTheme(){ const s = localStorage.getItem(THEME_KEY); if(s) return s; return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'; }
-  function saveTheme(t){ localStorage.setItem(THEME_KEY,t); }
-  applyTheme(loadTheme());
-  themeToggle.addEventListener('click', ()=>{ const now = document.body.classList.contains('dark')?'dark':'light'; const next = now==='dark'?'light':'dark'; applyTheme(next); saveTheme(next); });
+  function makeDotVariants(name){
+    if(!name) return [];
+    return [ name.split('').join('.') ];
+  }
 
-  if(form) form.addEventListener('submit', e => { e.preventDefault(); return false; });
+  // read which method toggles are active (plus/dot/upper/lower)
+  function readMethodFlags(){
+    const m = {};
+    const btns = document.querySelectorAll('#methodsUser .method');
+    btns.forEach(b => { if(b.dataset && b.dataset.method) m[b.dataset.method] = b.classList.contains('active'); });
+    return m;
+  }
 
-  // toggle method buttons
-  function wireToggle(container){
-    if(!container) return;
-    container.addEventListener('click', e=>{
-      const btn = e.target.closest('button[data-method]');
-      if(!btn) return;
-      e.preventDefault();
-      const active = btn.classList.toggle('active');
-      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  // ensure domain entries start with '@'
+  function normalizeDomains(arr){
+    if(!arr || !arr.length) return ['@gmail.com'];
+    return arr.map(d => {
+      d = d.trim();
+      if(!d) return '';
+      return d.startsWith('@') ? d : ('@' + d);
+    }).filter(Boolean);
+  }
 
-      // show/hide plus options when plus toggled
-      if(btn.dataset.method === 'plus' && plusOptions){
-        if(btn.classList.contains('active')){
-          plusOptions.style.display = '';
-          plusOptions.setAttribute('aria-hidden','false');
-        } else {
-          plusOptions.style.display = 'none';
-          plusOptions.setAttribute('aria-hidden','true');
-        }
+  function generateList(){
+    const base = (baseInput && baseInput.value || '').trim();
+    if(!base) return [];
+    const suffix = (suffixInput && suffixInput.value || '').trim();
+    const extras = parseList(extrasInput && extrasInput.value);
+    const domains = normalizeDomains(parseList(domainsInput && domainsInput.value));
+    const useDots = !!(dotsInput && dotsInput.checked);
+    const limit = Math.max(1, Number(limitInput && limitInput.value) || 200);
+
+    const methods = readMethodFlags(); // { plus:bool, dot:bool, upper:bool, lower:bool }
+
+    // build core username forms (without domain)
+    const core = new Set();
+
+    // base + suffix and base.suffix
+    core.add(base + (suffix || ''));
+    core.add(base + '.' + (suffix || ''));
+
+    // dotted-variant of base if requested (eg: a.b.c)
+    if(useDots || methods.dot){
+      makeDotVariants(base).forEach(v => core.add(v + (suffix || '')));
+    }
+
+    // extras appended (like 01, _id, etc)
+    extras.forEach(e => {
+      core.add(base + (suffix || '') + e);
+      core.add(base + '.' + (suffix || '') + e);
+      if(useDots || methods.dot) makeDotVariants(base).forEach(v => core.add(v + (suffix || '') + e));
+    });
+
+    // convert Set to array and enforce limit on core permutations
+    const cores = Array.from(core).slice(0, limit);
+
+    // helper: apply plus (use global apply if provided)
+    function applyPlusIfNeeded(name){
+      if(!methods.plus) return name;
+      const tagValue = (plusTagInput && plusTagInput.value) ? plusTagInput.value : '';
+      if(window && typeof window.__applyPlus === 'function'){
+        try { return window.__applyPlus(name, tagValue); } catch(e){ /* fallback */ }
+      }
+      // fallback simple: +idNN
+      const nn = String(Math.floor(10 + Math.random()*90));
+      return name + '+id' + nn;
+    }
+
+    // final assembly with domains and case handling
+    const out = [];
+    cores.forEach(c => {
+      // produce both no-plus and plus variants depending on method
+      const candidates = [];
+      candidates.push(c);
+      if(methods.plus){
+        candidates.push(applyPlusIfNeeded(c));
+      }
+
+      candidates.forEach(candidate => {
+        // apply casing
+        let finalName;
+        if(methods.upper && !methods.lower) finalName = candidate.toUpperCase();
+        else finalName = candidate.toLowerCase();
+
+        // replace whitespace with dot
+        finalName = finalName.replace(/\s+/g, '.');
+
+        // attach domains
+        domains.forEach(d => out.push(finalName + d));
+      });
+    });
+
+    // cap total output
+    return out.slice(0, 5000);
+  }
+
+  function render(list){
+    if(countEl) countEl.textContent = `(${list.length})`;
+    if(!output) return;
+    if(list.length === 0){
+      output.textContent = 'No results yet. Klik Generate.';
+      return;
+    }
+    const ol = document.createElement('ol');
+    list.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      li.style.wordBreak = 'break-all';
+      ol.appendChild(li);
+    });
+    output.innerHTML = '';
+    output.appendChild(ol);
+  }
+
+  if(generateBtn){
+    generateBtn.addEventListener('click', ()=>{
+      const res = generateList();
+      render(res);
+    });
+  }
+
+  if(resetBtn){
+    resetBtn.addEventListener('click', ()=>{
+      if(baseInput) baseInput.value = '';
+      if(suffixInput) suffixInput.value = 'ber';
+      if(extrasInput) extrasInput.value = '01,99,2025,_id,x,official,88';
+      if(domainsInput) domainsInput.value = '@gmail.com,@googlemail.com';
+      if(limitInput) limitInput.value = 200;
+      if(dotsInput) dotsInput.checked = false;
+      if(output) output.textContent = 'No results yet. Klik Generate.';
+      if(countEl) countEl.textContent = '(0)';
+      if(plusOptions) plusOptions.style.display = 'none';
+      if(plusOptions){
+        plusOptions.querySelectorAll('button[data-plusmode]').forEach(b => b.classList.remove('active'));
+        const def = plusOptions.querySelector('button[data-plusmode="mix"]') || plusOptions.querySelector('button[data-plusmode="numbers"]');
+        if(def) def.classList.add('active');
+        if(plusLen){ plusLen.value = plusLen.getAttribute('min') || 12; if(plusLenVal) plusLenVal.textContent = plusLen.value; }
       }
     });
   }
-  wireToggle(methodsUser); wireToggle(methodsDom);
 
-  // plusOptions controls
-  if(plusOptions){
+  async function copyTextToClipboard(text){
+    if(!text) return false;
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    }catch(e){
+      console.warn('clipboard API failed', e);
+    }
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return !!ok;
+    }catch(err){
+      console.warn('fallback copy failed', err);
+      return false;
+    }
+  }
+
+  if(copyBtn){
+    copyBtn.addEventListener('click', async ()=>{
+      const text = Array.from((output && output.querySelectorAll('li')) || []).map(li=>li.textContent).join('\n');
+      if(!text) return alert('Tidak ada yang disalin.');
+      let ok = false;
+      try{
+        ok = await copyTextToClipboard(text);
+        if(ok) alert('Copied ' + text.split('\n').length + ' addresses to clipboard.');
+        else prompt('Copy manual:', text);
+      }catch(err){
+        prompt('Copy manual:', text);
+      }
+
+      const cta = createBtn || document.querySelector('.btn.primary');
+      if(cta && ok){
+        cta.classList.add('active');
+        clearTimeout(cta._rem);
+        cta._rem = setTimeout(()=> cta.classList.remove('active'), 900);
+      }
+    });
+  }
+
+  if(downloadBtn){
+    downloadBtn.addEventListener('click', ()=>{
+      const text = Array.from((output && output.querySelectorAll('li')) || []).map(li=>li.textContent).join('\n');
+      if(!text) return alert('Tidak ada hasil untuk di-download.');
+      const blob = new Blob([text], {type:'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'usernames.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+  }
+
+  if(output) output.textContent = 'No results yet. Klik Generate.';
+
+  // remove floating behaviour if present
+  (function(){
+    const btnArea = document.querySelector('.btn-area');
+    if(btnArea){
+      btnArea.classList.remove('sticky');
+      btnArea.style.position = '';
+      btnArea.style.bottom = '';
+      btnArea.style.left = '';
+      btnArea.style.right = '';
+    }
+  })();
+
+  // UI cleanup on load/pageshow
+  (function(){
+    function clearUIState(){
+      document.querySelectorAll('.method.active').forEach(b => b.classList.remove('active'));
+      const defaultPlus = document.querySelector('.method[data-method="plus"]');
+      const defaultLower = document.querySelector('.method[data-method="lower"]');
+      if(defaultPlus) defaultPlus.classList.add('active');
+      if(defaultLower) defaultLower.classList.add('active');
+      const cta = createBtn || document.querySelector('.btn.primary');
+      if(cta) cta.classList.remove('active');
+
+      if(plusOptions){
+        const plusBtn = document.querySelector('.method[data-method="plus"]');
+        if(plusBtn && plusBtn.classList.contains('active')) plusOptions.style.display = '';
+        else plusOptions.style.display = 'none';
+      }
+
+      if(document.activeElement && document.activeElement.tagName === 'BUTTON'){
+        try { document.activeElement.blur(); } catch(e){}
+      }
+    }
+    window.addEventListener('pageshow', () => setTimeout(clearUIState, 40));
+    setTimeout(clearUIState, 40);
+  })();
+
+  // plusOptions wiring (mode buttons & slider)
+  (function(){
+    if(!plusOptions) return;
     plusOptions.addEventListener('click', (e)=>{
-      const b = e.target.closest('button[data-plusmode]');
-      if(!b) return;
+      const btn = e.target.closest('button[data-plusmode]');
+      if(!btn) return;
       e.preventDefault();
-      Array.from(plusOptions.querySelectorAll('button[data-plusmode]')).forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
+      plusOptions.querySelectorAll('button[data-plusmode]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
     });
     if(plusLen && plusLenVal){
       plusLenVal.textContent = plusLen.value;
       plusLen.addEventListener('input', ()=> plusLenVal.textContent = plusLen.value);
     }
-  }
-
-  // validate inputs live
-  if(inpName) inpName.addEventListener('input', ()=> { if(warnName) warnName.style.display = inpName.value.trim()==='' ? 'block' : 'none'; });
-  if(inpDomain) inpDomain.addEventListener('input', ()=> { if(warnDomain) warnDomain.style.display = inpDomain.value.trim()==='' ? 'block' : 'none'; });
-
-  // plus helpers
-  function randStr(len, chars){
-    let s=''; for(let i=0;i<len;i++) s += chars.charAt(Math.floor(Math.random()*chars.length)); return s;
-  }
-  function readPlusMode(){
-    if(!plusOptions) return 'mix';
-    const btn = plusOptions.querySelector('button[data-plusmode].active'); return btn ? btn.dataset.plusmode : 'mix';
-  }
-  window.__applyPlus = function(name, tagValue){
-    if(tagValue && tagValue.trim()){
-      const clean = tagValue.trim().replace(/^\+/, '');
-      return name + '+' + clean;
+    // show/hide based on user toggling plus method
+    const methodsUser = document.getElementById('methodsUser');
+    if(methodsUser){
+      methodsUser.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button[data-method]');
+        if(!btn) return;
+        setTimeout(()=>{
+          const plusBtn = methodsUser.querySelector('button[data-method="plus"]');
+          if(plusBtn && plusBtn.classList.contains('active')) plusOptions.style.display = '';
+          else plusOptions.style.display = 'none';
+        }, 10);
+      });
+      // initial state
+      setTimeout(()=>{
+        const plusBtn = methodsUser.querySelector('button[data-method="plus"]');
+        if(plusBtn && plusBtn.classList.contains('active')) plusOptions.style.display = '';
+        else plusOptions.style.display = 'none';
+      }, 40);
     }
-    const mode = readPlusMode();
-    const len = Math.max(1, (plusLen && Number(plusLen.value)) || 12);
-    if(mode === 'numbers') return name + '+' + randStr(len, '0123456789');
-    if(mode === 'letters') return name + '+' + randStr(len, 'abcdefghijklmnopqrstuvwxyz');
-    return name + '+' + randStr(len, 'abcdefghijklmnopqrstuvwxyz0123456789');
-  };
+  })();
 
-  // reading method options
-  function readOpts(container){
-    const out = {};
-    if(!container) return out;
-    Array.from(container.querySelectorAll('button[data-method]')).forEach(b => out[b.dataset.method] = b.classList.contains('active'));
-    return out;
-  }
-  function applyDot(name){
-    if(!name) return name;
-    if(name.length <= 2) return name.split('').join('.');
-    return name.slice(0,2) + '.' + name.slice(2);
-  }
-  function transformUsername(base){
-    const opts = readOpts(methodsUser);
-    let u = base;
-    if(opts.dot) u = applyDot(u);
-    if(opts.plus) u = window.__applyPlus(u, plusTag ? plusTag.value : '');
-    if(opts.upper && !opts.lower) u = u.toUpperCase();
-    else u = u.toLowerCase();
-    return u.replace(/\s+/g,'.');
-  }
-
-  function generateOne(){
-    const base = (inpName && inpName.value||'').trim(); if(!base) return '';
-    const domain = (inpDomain && inpDomain.value||'').trim();
-    const username = transformUsername(base);
-    return username + (domain ? '@' + domain : '');
-  }
-
-  async function copyToClipboard(text){
-    if(!text) return false;
-    try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; } }catch(e){ console.warn(e); }
-    try{ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.focus(); ta.select(); const ok=document.execCommand('copy'); document.body.removeChild(ta); return !!ok; }catch(e){return false;}
-  }
-
-  // create button behavior
-  let seq = 0;
-  if(btnCreate){
-    btnCreate.classList.remove('active');
-    btnCreate.addEventListener('click', async function(ev){
-      // visual feedback only for trusted events
+  // CTA visual active only on real clicks
+  (function(){
+    const cta = createBtn || document.querySelector('.btn.primary');
+    if(!cta) return;
+    cta.classList.remove('active');
+    cta.addEventListener('click', (ev) => {
       if(ev && ev.isTrusted){
-        this.classList.add('active');
-        this.setAttribute('aria-pressed','true');
-        clearTimeout(this._rem); this._rem = setTimeout(()=>{ this.classList.remove('active'); this.setAttribute('aria-pressed','false'); }, 1200);
+        cta.classList.add('active');
+        clearTimeout(cta._rem);
+        cta._rem = setTimeout(()=> cta.classList.remove('active'), 900);
       }
-
-      if(warnName) warnName.style.display='none';
-      if(warnDomain) warnDomain.style.display='none';
-
-      const nameVal = inpName.value.trim();
-      const domVal = inpDomain.value.trim();
-      if(!nameVal){ if(warnName) warnName.style.display='block'; inpName.focus(); return; }
-      if(!domVal){ if(warnDomain) warnDomain.style.display='block'; inpDomain.focus(); return; }
-
-      const email = generateOne();
-      if(!email) return;
-
-      const ok = await copyToClipboard(email);
-      if(ok){
-        if(copyBadge){ copyBadgeText.textContent='Tersalin!'; copyBadge.classList.add('show'); setTimeout(()=>copyBadge.classList.remove('show'),1400); }
-        if(confettiWrap){
-          while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild);
-          const colors = ['#54b8ff','#3fb0ff','#06b6d4','#f59e0b','#7c3aed'];
-          for(let i=0;i<8;i++){
-            const el = document.createElement('div'); el.className='confetti-piece'; el.style.background = colors[Math.floor(Math.random()*colors.length)];
-            const angle = (Math.random()*120 - 60); const dist = 50 + Math.random()*60;
-            const tx = Math.cos(angle * Math.PI/180) * dist; const ty = Math.sin(angle * Math.PI/180) * dist + 30*Math.random();
-            el.style.setProperty('--tx', tx.toFixed(1)+'px'); el.style.setProperty('--ty', ty.toFixed(1)+'px');
-            el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${Math.random()*0.12}s forwards`;
-            confettiWrap.appendChild(el);
-            setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 1400);
-          }
-        }
-      } else {
-        if(copyBadge){ copyBadgeText.textContent='Salin manual'; copyBadge.classList.add('show'); setTimeout(()=>copyBadge.classList.remove('show'),1400); }
-      }
-
-      if(previewText) previewText.textContent = email;
-      seq += 1; if(counterEl) counterEl.textContent = seq;
     });
-  }
+  })();
 
-  // initial UI state
-  function initUI(){
-    if(plusOptions){ plusOptions.style.display = 'none'; plusOptions.setAttribute('aria-hidden','true'); }
-    if(warnName) warnName.style.display='none';
-    if(warnDomain) warnDomain.style.display='none';
-    if(previewText) previewText.textContent='-';
-    if(counterEl) counterEl.textContent = '0';
-    document.querySelectorAll('#methodsUser .method, #methodsDom .method').forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
-    if(plusOptions && !plusOptions.querySelector('button.active')){
-      const def = plusOptions.querySelector('button[data-plusmode="mix"]') || plusOptions.querySelector('button[data-plusmode="numbers"]');
-      if(def) def.classList.add('active');
-    }
-    if(plusLen && plusLenVal) plusLenVal.textContent = plusLen.value;
-  }
-  window.addEventListener('pageshow', initUI);
-  window.addEventListener('load', initUI);
-  setTimeout(initUI, 40);
-
-})();
+})(); // end IIFE
