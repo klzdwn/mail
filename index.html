@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Inputs appear as buttons + preview lower</title>
+<title>Email Generator — Large Input Style</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -13,12 +13,9 @@
     --ink:#0b1220;
     --primary:#2563eb;
     --primary-2:#1f7efb;
-    --soft:#eef6ff;
     --border: rgba(16,24,40,0.06);
     --shadow-lg: 0 28px 70px rgba(15,23,42,0.08);
-    --radius:16px;
-    --danger:#ef4444;
-    --success:#16a34a;
+    --radius:18px;
   }
 
   *{box-sizing:border-box}
@@ -32,25 +29,23 @@
     padding:28px;
     display:flex;
     justify-content:center;
-    overflow-x:hidden; /* jaga supaya gak bisa digeser ke samping */
+    overflow-x:hidden;
   }
 
   .wrap{width:100%;max-width:980px;padding:8px}
 
   .card{
     background:var(--card);
-    border-radius:var(--radius);
+    border-radius:22px;
     padding:18px;
     border:1px solid var(--border);
     box-shadow:var(--shadow-lg);
     overflow:visible;
     display:grid;
-    grid-template-columns: 1fr;
+    grid-template-columns:1fr;
     gap:18px;
   }
-  @media(min-width:920px){
-    .card{grid-template-columns: 1fr 360px; align-items:start;}
-  }
+  @media(min-width:920px){ .card{grid-template-columns:1fr 360px;align-items:start} }
 
   .header{display:flex;gap:12px;align-items:center}
   .logo{width:72px;height:72px;border-radius:14px;background:linear-gradient(180deg,#eef6ff,#f7fbff);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--primary);font-size:20px;border:1px solid var(--border);box-shadow:0 12px 30px rgba(37,99,235,0.04);flex:0 0 72px}
@@ -59,61 +54,44 @@
   .titlewrap p{margin:0;color:var(--mut);font-size:13px}
 
   .form{display:flex;flex-direction:column;gap:12px}
-  label{display:block;margin-bottom:6px;font-weight:700;color:var(--ink);font-size:14px}
+  label{display:block;margin-bottom:8px;font-weight:800;color:var(--ink);font-size:18px}
 
-  /* =========================
-     INPUT - tampil seperti tombol
-     ========================= */
+  /* === BIG "button-like" input style requested === */
   input[type="text"], textarea{
     width:100%;
-    /* tampil seperti tombol: padding besar, radius besar, gradient ringan */
-    padding:14px 16px;
-    border-radius:14px;
-    border:1px solid rgba(16,24,40,0.06);
-    background: linear-gradient(180deg,#fbfdff,#f7fbff);
-    font-size:16px;
+    padding:20px 20px;             /* besar untuk tap area */
+    border-radius:18px;            /* bulat seperti screenshot */
+    border:1px solid rgba(16,24,40,0.07);
+    background:linear-gradient(180deg,#fff,#fbfdff);
+    font-size:28px;                /* FONT BESAR sesuai screenshot */
+    line-height:1;
     color:var(--ink);
-    box-shadow: 0 8px 18px rgba(16,24,40,0.02) inset;
-    transition:box-shadow .12s, transform .08s;
-    /* tetap cursor text agar user tahu ini input */
-    cursor:text;
+    box-shadow:0 8px 18px rgba(16,24,40,0.02) inset;
+    transition:box-shadow .12s, transform .06s;
+    height:64px;                   /* pastikan ukuran konsisten */
   }
-  input::placeholder{color:#9aa6bf}
-  input:focus, textarea:focus{box-shadow:0 20px 48px rgba(37,99,235,0.07);transform:translateY(-1px);outline:none}
-  .hint{font-size:13px;color:var(--mut)}
+  input::placeholder{color:#c7d0dc;font-size:28px}
+  input:focus, textarea:focus{box-shadow:0 22px 48px rgba(37,99,235,0.08);transform:translateY(-1px);outline:none}
+
+  .hint{font-size:13px;color:var(--mut);margin-top:6px}
 
   .method-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--border);box-shadow:0 10px 26px rgba(15,23,42,0.03)}
-  .grid{display:flex;flex-wrap:wrap;gap:10px}
-  .method{flex:1 1 calc(50% - 10px);min-height:44px;padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border);font-weight:800;font-size:13px;color:var(--ink);text-align:center;cursor:pointer;transition:transform .12s, box-shadow .12s, background .12s}
-  .method:hover{transform:translateY(-4px)}
-  .method.active{background: linear-gradient(90deg,var(--soft), #e8f3ff);color:var(--primary);border:1px solid rgba(37,99,235,0.12);box-shadow:0 16px 36px rgba(37,99,235,0.04)}
+  .grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .method{flex:1 1 calc(50% - 10px);min-height:44px;padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border);font-weight:800;font-size:13px;color:var(--ink);text-align:center;cursor:pointer}
+  .method.active{background:linear-gradient(90deg,#eef6ff,#e8f3ff);color:var(--primary);box-shadow:0 16px 36px rgba(37,99,235,0.04)}
 
   .row-inline{display:flex;flex-direction:column;gap:8px}
   @media(min-width:920px){
     .row-inline{flex-direction:row;align-items:center;gap:14px}
-    .row-inline label{width:160px;flex:0 0 160px;margin-bottom:0}
+    .row-inline label{width:180px;flex:0 0 180px;margin-bottom:0}
     .row-inline .field{flex:1}
   }
 
   .btn-area{position:relative;margin-top:8px}
   .btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s,box-shadow .12s}
-  /* TOMBOL TETAP TIDAK DIUBAH ukuran/padding-nya */
-  .btn.primary{background: linear-gradient(90deg,var(--primary),var(--primary-2));color:white;border:1px solid rgba(255,255,255,0.06);box-shadow: 0 18px 56px rgba(37,99,235,0.18);}
-
+  .btn.primary{background: linear-gradient(90deg,var(--primary),#1f7efb);color:white;border:1px solid rgba(255,255,255,0.06);box-shadow:0 18px 56px rgba(37,99,235,0.18)}
   .side{display:flex;flex-direction:column;gap:12px}
-  /* =========================
-     PREVIEW: naikkan padding top sedikit agar teks "Email yang dibuat" lebih ke bawah
-     ========================= */
-  .preview{
-    padding:22px 16px; /* sedikit lebih ruang atas */
-    border-radius:14px;
-    background:linear-gradient(180deg,#fff,#fbfdff);
-    border:1px solid #eef6ff;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;
-    color:var(--ink);
-    font-size:14px;
-    box-shadow:0 18px 40px rgba(16,24,40,0.04);
-  }
+  .preview{padding:22px 16px;border-radius:14px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #eef6ff;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--ink);font-size:14px;box-shadow:0 18px 40px rgba(16,24,40,0.04)}
   .meta{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fbfdff,#f7fbff);border:1px solid var(--border);font-size:13px;color:var(--mut)}
 
   .copy-badge{position:absolute;top:-72px;right:0;transform:translateX(120%);opacity:0;background:#fff;padding:10px 16px;border-radius:14px;display:flex;gap:12px;align-items:center;border:1px solid var(--border);box-shadow:0 18px 40px rgba(15,23,42,0.06);transition:transform .32s cubic-bezier(.22,.9,.25,1), opacity .22s ease;pointer-events:none;white-space:nowrap;font-weight:800;color:var(--ink)}
@@ -124,31 +102,24 @@
   .confetti-piece{position:absolute;left:0;top:0;width:8px;height:8px;border-radius:3px;opacity:0;transform:translateY(0) scale(1);will-change:transform,opacity}
   @keyframes confettiFly{0%{opacity:1;transform:translate(0,0) rotate(0) scale(1)}60%{opacity:1}100%{opacity:0;transform:translate(var(--tx), var(--ty)) rotate(360deg) scale(.7)}}
 
-  .error{display:none;margin-top:8px;padding:10px;border-radius:10px;background:#fff5f5;color:var(--danger);border:1px solid rgba(239,68,68,0.06);font-size:13px}
-  .footer{margin-top:6px;text-align:center;color:var(--mut);font-size:13px}
-
-  @media(max-width:919px){
-    .logo{width:56px;height:56px}
-    .method{flex-basis:100%}
-  }
+  .error{display:none;margin-top:8px;padding:10px;border-radius:10px;background:#fff5f5;color:#ef4444;border:1px solid rgba(239,68,68,0.06);font-size:13px}
+  @media(max-width:919px){ .logo{width:56px;height:56px} .method{flex-basis:100%} }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card" role="application" aria-label="Email generator refined layout">
+    <div class="card" role="application" aria-label="Email generator big-input">
 
-      <!-- LEFT: header + form -->
       <div>
         <div class="header">
           <div class="logo" aria-hidden="true">EG</div>
           <div class="titlewrap">
             <h1>Email Generator</h1>
-            <p class="lead">Tata letak disegarkan: lebih rapi, kompak, dan modern — fitur tetap sama.</p>
+            <p class="lead">Tampilan diperbarui: input besar & jelas — fitur tetap sama.</p>
           </div>
         </div>
 
         <form class="form" onsubmit="return false;" aria-label="Form email generator">
-          <!-- username (sekarang tampil seperti tombol/input besar) -->
           <div class="row-inline">
             <label for="inpName">Username Email</label>
             <div class="field">
@@ -157,14 +128,12 @@
             </div>
           </div>
 
-          <!-- domain (sekarang tampil seperti tombol/input besar) -->
           <div>
             <label for="inpDomain">Domain Email</label>
             <input id="inpDomain" value="gmail.com" />
             <div class="hint">Contoh: gmail.com — pilih Random Case bila ingin acak kapitalisasi domain.</div>
           </div>
 
-          <!-- methods -->
           <div class="method-card">
             <label>Metode Username (gabungkan sesuai kebutuhan)</label>
             <div id="methodsUser" class="grid" aria-hidden="false">
@@ -175,14 +144,12 @@
             </div>
           </div>
 
-          <!-- plus tag -->
           <div>
             <label for="plusTag">Custom + tag <small style="color:var(--mut);font-weight:600">(opsional)</small></label>
             <input id="plusTag" placeholder="contoh: tokoku (tanpa +)" />
             <div class="hint">Jika kosong & Plus (+) aktif → generator menambahkan tag default <code>+idNN</code>.</div>
           </div>
 
-          <!-- domain methods -->
           <div class="method-card">
             <label>Metode Domain</label>
             <div id="methodsDom" class="grid">
@@ -190,7 +157,6 @@
             </div>
           </div>
 
-          <!-- CTA -->
           <div class="btn-area">
             <div id="copyBadge" class="copy-badge" aria-hidden="true">
               <div class="check">✓</div>
@@ -207,7 +173,6 @@
         </form>
       </div>
 
-      <!-- RIGHT: preview + meta -->
       <aside class="side" aria-label="Preview dan info">
         <div class="preview" id="previewBox" aria-live="polite">
           <div style="font-size:12px;color:var(--mut)">Email yang dibuat:</div>
@@ -232,7 +197,6 @@
   </div>
 
 <script>
-/* Behavior preserved & IDs unchanged */
 (function(){
   const $ = id => document.getElementById(id);
   const inpName = $('inpName'), inpDomain = $('inpDomain'), plusTag = $('plusTag');
@@ -257,9 +221,7 @@
   wireToggle(methodsUser, false);
   wireToggle(methodsDom, false);
 
-  inpName.addEventListener('input', () => {
-    warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none';
-  });
+  inpName.addEventListener('input', () => { warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none'; });
 
   function readOpts(container){
     const out = {};
@@ -267,23 +229,9 @@
     return out;
   }
 
-  function applyDot(name){
-    if(name.length <= 2) return name.split('').join('.');
-    return name.slice(0,2) + '.' + name.slice(2);
-  }
-
-  function applyPlus(name, tag){
-    if(tag && tag.trim()){
-      const clean = tag.trim().replace(/^\+/, '');
-      return name + '+' + clean;
-    }
-    const nn = String(Math.floor(10 + Math.random()*90));
-    return name + '+id' + nn;
-  }
-
-  function randomCase(s){
-    return Array.from(s).map(ch => Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase()).join('');
-  }
+  function applyDot(name){ if(name.length <= 2) return name.split('').join('.'); return name.slice(0,2) + '.' + name.slice(2); }
+  function applyPlus(name, tag){ if(tag && tag.trim()){ const clean = tag.trim().replace(/^\+/, ''); return name + '+' + clean; } const nn = String(Math.floor(10 + Math.random()*90)); return name + '+id' + nn; }
+  function randomCase(s){ return Array.from(s).map(ch => Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase()).join(''); }
 
   function transformUsername(base, opts, tag){
     let u = base;
@@ -294,10 +242,7 @@
     return u.replace(/\s+/g, '.');
   }
 
-  function domainTransform(domain, domOpts){
-    if(domOpts.domRandom) return randomCase(domain);
-    return domain;
-  }
+  function domainTransform(domain, domOpts){ if(domOpts.domRandom) return randomCase(domain); return domain; }
 
   function makeEmail(){
     const base = inpName.value.trim();
@@ -311,99 +256,37 @@
 
   async function copyToClipboard(text){
     if(!text) return false;
-    try{
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        await navigator.clipboard.writeText(text);
-        return true;
-      }
-    }catch(e){
-      console.warn('clipboard API failed', e);
-    }
-    try{
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.focus(); ta.select();
-      const ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      return ok;
-    }catch(err){
-      console.warn('fallback copy failed', err);
-      return false;
-    }
+    try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; } }catch(e){ console.warn('clipboard API failed', e); }
+    try{ const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px'; document.body.appendChild(ta); ta.focus(); ta.select(); const ok = document.execCommand('copy'); document.body.removeChild(ta); return ok; }catch(err){ console.warn('fallback copy failed', err); return false; }
   }
 
-  function showCopyBadge(msg){
-    copyBadgeText.textContent = msg || 'Tersalin!';
-    copyBadge.classList.add('show');
-    copyBadge.setAttribute('aria-hidden','false');
-    clearTimeout(copyBadge._t);
-    copyBadge._t = setTimeout(()=>{ copyBadge.classList.remove('show'); copyBadge.setAttribute('aria-hidden','true'); }, 1500);
-  }
+  function showCopyBadge(msg){ copyBadgeText.textContent = msg || 'Tersalin!'; copyBadge.classList.add('show'); copyBadge.setAttribute('aria-hidden','false'); clearTimeout(copyBadge._t); copyBadge._t = setTimeout(()=>{ copyBadge.classList.remove('show'); copyBadge.setAttribute('aria-hidden','true'); }, 1500); }
 
   function spawnConfetti(){
     while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild);
-    const pieces = 12;
-    const colors = ['#2563eb','#1f7efb','#06b6d4','#f59e0b','#7c3aed'];
+    const pieces = 12; const colors = ['#2563eb','#1f7efb','#06b6d4','#f59e0b','#7c3aed'];
     for(let i=0;i<pieces;i++){
-      const el = document.createElement('div');
-      el.className = 'confetti-piece';
-      el.style.background = colors[Math.floor(Math.random()*colors.length)];
-      const angle = (Math.random()*120 - 60);
-      const dist = 50 + Math.random()*90;
-      const tx = Math.cos(angle * Math.PI/180) * dist;
-      const ty = Math.sin(angle * Math.PI/180) * dist + (30 + Math.random()*30);
-      el.style.setProperty('--tx', tx.toFixed(1) + 'px');
-      el.style.setProperty('--ty', ty.toFixed(1) + 'px');
-      el.style.left = '0px'; el.style.top = '0px';
-      const delay = Math.random()*0.12;
-      el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${delay}s forwards`;
-      confettiWrap.appendChild(el);
+      const el = document.createElement('div'); el.className='confetti-piece'; el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      const angle = (Math.random()*120 - 60); const dist = 50 + Math.random()*90; const tx = Math.cos(angle * Math.PI/180) * dist; const ty = Math.sin(angle * Math.PI/180) * dist + (30 + Math.random()*30);
+      el.style.setProperty('--tx', tx.toFixed(1) + 'px'); el.style.setProperty('--ty', ty.toFixed(1) + 'px'); el.style.left='0px'; el.style.top='0px';
+      const delay = Math.random()*0.12; el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${delay}s forwards`; confettiWrap.appendChild(el);
       setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 1400 + delay*1000);
     }
   }
 
-  function pulseButton(btnEl){
-    btnEl.animate([
-      { transform:'scale(1)', boxShadow:'0 12px 36px rgba(14,74,173,0.12)' },
-      { transform:'scale(1.02)', boxShadow:'0 20px 64px rgba(14,74,173,0.16)' },
-      { transform:'scale(1)', boxShadow:'0 12px 36px rgba(14,74,173,0.12)' }
-    ], {duration:420, easing:'cubic-bezier(.22,.9,.25,1)'});
-  }
+  function pulseButton(btnEl){ btnEl.animate([{ transform:'scale(1)', boxShadow:'0 12px 36px rgba(14,74,173,0.12)' },{ transform:'scale(1.02)', boxShadow:'0 20px 64px rgba(14,74,173,0.16)' },{ transform:'scale(1)', boxShadow:'0 12px 36px rgba(14,74,173,0.12)' }], {duration:420, easing:'cubic-bezier(.22,.9,.25,1)'}); }
 
   let seq = 0;
   btnCreate.addEventListener('click', async ()=>{
     warnName.style.display = 'none';
-    if(inpName.value.trim() === ''){
-      warnName.style.display = 'block';
-      inpName.focus();
-      btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1});
-      return;
-    }
-
+    if(inpName.value.trim() === ''){ warnName.style.display = 'block'; inpName.focus(); btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1}); return; }
     const email = makeEmail();
-    if(!email){
-      warnName.style.display = 'block';
-      return;
-    }
-
+    if(!email){ warnName.style.display = 'block'; return; }
     const ok = await copyToClipboard(email);
-    if(ok){
-      showCopyBadge('Tersalin!');
-      spawnConfetti();
-      pulseButton(btnCreate);
-    } else {
-      showCopyBadge('Salin manual');
-    }
-
-    seq += 1;
-    counterEl.textContent = seq;
-    previewText.textContent = email;
+    if(ok){ showCopyBadge('Tersalin!'); spawnConfetti(); pulseButton(btnCreate); } else { showCopyBadge('Salin manual'); }
+    seq += 1; counterEl.textContent = seq; previewText.textContent = email;
   });
 
-  // init
   warnName.style.display = 'none';
 })();
 </script>
