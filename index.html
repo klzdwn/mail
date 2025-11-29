@@ -3,55 +3,88 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Fix: warnings + labels + input sizes</title>
+<title>Email Generator — Light / Dark Mode</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f5f7fb;
-    --card:#ffffff;
-    --mut:#6b7280;
-    --ink:#0b1220;
-    --primary:#2563eb;
-    --primary-2:#1f7efb;
-    --soft:#eef6ff;
+    /* Light mode variables (default) */
+    --bg: #f6f9ff;
+    --card: #ffffff;
+    --mut: #6b7280;
+    --ink: #0b1220;
+    --primary: #2563eb;
+    --primary-2: #1f7efb;
+    --soft: #eef6ff;
     --border: rgba(16,24,40,0.06);
     --shadow-lg: 0 28px 70px rgba(15,23,42,0.08);
-    --radius:16px;
-    --danger:#ef4444;
-    --success:#16a34a;
+    --radius: 16px;
+    --danger: #ef4444;
+    --success: #16a34a;
   }
 
-  *, *::before, *::after { box-sizing: border-box; }
-  html,body{height:100%;margin:0;padding:0;overflow-x:hidden;}
+  /* Dark overrides when body has .dark */
+  body.dark{
+    --bg: #0b1220;
+    --card: #071026;
+    --mut: #94a3b8;
+    --ink: #e6eefc;
+    --primary: #5cc1ff;
+    --primary-2: #3db0ff;
+    --soft: rgba(92,193,255,0.06);
+    --border: rgba(255,255,255,0.06);
+    --shadow-lg: 0 28px 70px rgba(0,0,0,0.5);
+  }
+
+  *, *::before, *::after{box-sizing:border-box}
+  html,body{height:100%;margin:0;padding:0;overflow-x:hidden}
   body{
     font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
     -webkit-font-smoothing:antialiased;
-    background: linear-gradient(180deg,#f6f9ff,#eef4fb);
+    background: linear-gradient(180deg,var(--bg),transparent);
     color:var(--ink);
     padding:18px 12px;
-    display:flex;justify-content:center;touch-action:pan-y;
+    display:flex;
+    justify-content:center;
+    transition: background .26s ease, color .18s ease;
   }
 
-  .wrap{width:100%;max-width:980px;padding:8px;margin:0 auto}
+  .wrap{width:100%;max-width:980px;padding:8px}
   .card{
-    background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid var(--border);
-    box-shadow:var(--shadow-lg);overflow:visible;display:grid;grid-template-columns:1fr;gap:18px;min-width:0;
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:18px;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow-lg);
+    overflow:visible;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:18px;
+    transition: background .26s ease, border-color .26s ease, box-shadow .26s ease;
+    min-width:0;
   }
   @media(min-width:920px){ .card{grid-template-columns:1fr 360px;align-items:start} }
 
-  .header{display:flex;gap:12px;align-items:center}
-  .logo{width:72px;height:72px;border-radius:14px;background:linear-gradient(180deg,#eef6ff,#f7fbff);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--primary);font-size:20px;border:1px solid var(--border);box-shadow:0 12px 30px rgba(37,99,235,0.04);flex:0 0 72px}
+  .header{display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .header-left{display:flex;gap:12px;align-items:center}
+  .logo{width:72px;height:72px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--primary);font-size:20px;border:1px solid var(--border);box-shadow:0 12px 30px rgba(37,99,235,0.04);flex:0 0 72px}
   .titlewrap{display:flex;flex-direction:column;gap:6px}
   .titlewrap h1{margin:0;font-size:20px}
   .titlewrap p{margin:0;color:var(--mut);font-size:13px}
 
+  /* theme toggle button */
+  .theme-toggle{
+    display:flex;align-items:center;gap:8px;padding:8px;border-radius:12px;border:1px solid var(--border);background:transparent;cursor:pointer;
+  }
+  .theme-toggle .ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;background:linear-gradient(180deg,#fff,#fbfdff);box-shadow:0 8px 18px rgba(16,24,40,0.02)}
+  body.dark .theme-toggle .ico{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))}
+
   .form{display:flex;flex-direction:column;gap:12px}
   label{display:block;margin-top:8px;margin-bottom:6px;font-weight:700;color:var(--ink);font-size:14px}
 
-  /* INPUTS: ukuran area tetap besar for tapping, but font smaller so text not huge */
+  /* INPUTS: larger tap area but text smaller to avoid huge text */
   input[type="text"], textarea{
-    width:100%;max-width:100%;padding:16px 18px;height:56px;border-radius:14px;border:1px solid rgba(16,24,40,0.08);
-    background: linear-gradient(180deg,#ffffff,#fbfdff);font-size:18px;font-weight:500;color:var(--ink);
+    width:100%;max-width:100%;padding:16px 18px;height:56px;border-radius:14px;border:1px solid var(--border);
+    background: linear-gradient(180deg,var(--card),#fbfdff);font-size:18px;font-weight:500;color:var(--ink);
     box-shadow: 0 8px 18px rgba(16,24,40,0.02) inset;transition:box-shadow .12s, transform .06s;cursor:text;line-height:1.1;
   }
   input::placeholder{color:#c7d0dc;font-size:18px;opacity:1}
@@ -59,11 +92,11 @@
 
   .hint{font-size:13px;color:var(--mut)}
 
-  .method-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--border);box-shadow:0 10px 26px rgba(15,23,42,0.03)}
+  .method-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,var(--card),#fbfdff);border:1px solid var(--border);box-shadow:0 10px 26px rgba(15,23,42,0.03)}
   .grid{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
-  .method{flex:1 1 calc(50% - 10px);min-width:0;height:44px;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid var(--border);font-weight:800;font-size:13px;color:var(--ink);text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s, box-shadow .12s, background .12s;overflow:hidden}
+  .method{flex:1 1 calc(50% - 10px);min-width:0;height:44px;padding:10px 12px;border-radius:10px;background:transparent;border:1px solid var(--border);font-weight:800;font-size:13px;color:var(--ink);text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s, box-shadow .12s, background .12s;overflow:hidden}
   .method:hover{transform:translateY(-4px)}
-  .method.active{background: linear-gradient(90deg,var(--soft), #e8f3ff);color:var(--primary);border:1px solid rgba(37,99,235,0.12);box-shadow:0 16px 36px rgba(37,99,235,0.04)}
+  .method.active{background: linear-gradient(90deg,var(--soft), rgba(255,255,255,0.02));color:var(--primary);border:1px solid rgba(37,99,235,0.12);box-shadow:0 16px 36px rgba(37,99,235,0.04)}
 
   .row-inline{display:flex;flex-direction:column;gap:8px}
   @media(min-width:920px){
@@ -74,17 +107,16 @@
 
   .btn-area{position:relative;margin-top:8px}
   .btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s,box-shadow .12s}
-  /* tombol tidak diubah ukuran/padding */
   .btn.primary{background: linear-gradient(90deg,var(--primary),var(--primary-2));color:white;border:1px solid rgba(255,255,255,0.06);box-shadow: 0 18px 56px rgba(37,99,235,0.18);}
 
   .side{display:flex;flex-direction:column;gap:12px}
-  .preview{padding:24px 16px;border-radius:14px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #eef6ff;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--ink);font-size:14px;box-shadow:0 18px 40px rgba(16,24,40,0.04);min-width:0}
+  .preview{padding:24px 16px;border-radius:14px;background:linear-gradient(180deg,var(--card),#fbfdff);border:1px solid rgba(255,255,255,0.02);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--ink);font-size:14px;box-shadow:0 18px 40px rgba(16,24,40,0.04);min-width:0}
   .preview .label{font-size:12px;color:var(--mut);margin-bottom:10px}
   .preview .emailTxt{font-size:15px;word-break:break-all}
 
   .meta{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fbfdff,#f7fbff);border:1px solid var(--border);font-size:13px;color:var(--mut)}
 
-  .copy-badge{position:absolute;top:-72px;right:0;transform:translateX(120%);opacity:0;background:#fff;padding:10px 16px;border-radius:14px;display:flex;gap:12px;align-items:center;border:1px solid var(--border);box-shadow:0 18px 40px rgba(15,23,42,0.06);transition:transform .32s cubic-bezier(.22,.9,.25,1), opacity .22s ease;pointer-events:none;white-space:nowrap;font-weight:800;color:var(--ink)}
+  .copy-badge{position:absolute;top:-72px;right:0;transform:translateX(120%);opacity:0;background:var(--card);padding:10px 16px;border-radius:14px;display:flex;gap:12px;align-items:center;border:1px solid var(--border);box-shadow:0 18px 40px rgba(15,23,42,0.06);transition:transform .32s cubic-bezier(.22,.9,.25,1), opacity .22s ease;pointer-events:none;white-space:nowrap;font-weight:800;color:var(--ink)}
   .copy-badge.show{transform:translateX(0);opacity:1}
   .copy-badge .check{width:30px;height:30px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:14px}
 
@@ -93,6 +125,7 @@
   @keyframes confettiFly{0%{opacity:1;transform:translate(0,0) rotate(0) scale(1)}60%{opacity:1}100%{opacity:0;transform:translate(var(--tx), var(--ty)) rotate(360deg) scale(.7)}}
 
   .error{display:none;margin-top:8px;padding:10px;border-radius:10px;background:#fff5f5;color:var(--danger);border:1px solid rgba(239,68,68,0.06);font-size:13px}
+  body.dark .error{background:#5c1f1f;color:#ffd7d7;border-color:rgba(255,255,255,0.04)}
   .footer{margin-top:6px;text-align:center;color:var(--mut);font-size:13px}
 
   @media(max-width:919px){ .logo{width:56px;height:56px} .method{flex-basis:100%} }
@@ -105,10 +138,19 @@
       <!-- LEFT: header + form -->
       <div>
         <div class="header">
-          <div class="logo" aria-hidden="true">EG</div>
-          <div class="titlewrap">
-            <h1>Email Generator</h1>
-            <p class="lead">Tata letak disegarkan: lebih rapi, kompak, dan modern — fitur tetap sama.</p>
+          <div class="header-left">
+            <div class="logo" aria-hidden="true">EG</div>
+            <div class="titlewrap">
+              <h1>Email Generator</h1>
+              <p class="lead">Tata letak disegarkan: lebih rapi, kompak, dan modern — fitur tetap sama.</p>
+            </div>
+          </div>
+
+          <!-- Theme toggle -->
+          <div>
+            <button id="themeToggle" class="theme-toggle" title="Toggle mode" aria-pressed="false" type="button">
+              <div class="ico" id="themeIcon">🌙</div>
+            </button>
           </div>
         </div>
 
@@ -199,7 +241,7 @@
   </div>
 
 <script>
-/* Behavior preserved & IDs unchanged + domain warning + no reload on Enter */
+/* Behavior preserved + theme toggle */
 (function(){
   const $ = id => document.getElementById(id);
   const form = $('egForm');
@@ -209,14 +251,41 @@
   const btnCreate = $('btnCreate'), previewText = $('previewText'), counterEl = $('counter');
   const copyBadge = $('copyBadge'), copyBadgeText = $('copyBadgeText');
   const confettiWrap = $('confettiWrap');
+  const themeToggle = $('themeToggle'), themeIcon = $('themeIcon');
 
-  // prevent any form submit default & Enter submitting
+  // Theme: load/save
+  const THEME_KEY = 'eg_theme'; // 'light' | 'dark'
+  function applyTheme(t){
+    if(t === 'dark') document.body.classList.add('dark');
+    else document.body.classList.remove('dark');
+    themeIcon.textContent = (t === 'dark') ? '🌙' : '☀️';
+    themeToggle.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+  }
+  function loadTheme(){
+    const saved = localStorage.getItem(THEME_KEY);
+    if(saved) return saved;
+    // fallback to system preference
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function saveTheme(t){
+    localStorage.setItem(THEME_KEY, t);
+  }
+  // initial
+  applyTheme(loadTheme());
+
+  themeToggle.addEventListener('click', ()=>{
+    const now = document.body.classList.contains('dark') ? 'dark' : 'light';
+    const next = now === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    saveTheme(next);
+  });
+
+  // prevent form submit & Enter default
   form.addEventListener('submit', e => { e.preventDefault(); return false; });
   [inpName, inpDomain, plusTag].forEach(el=>{
     if(!el) return;
     el.addEventListener('keydown', e=>{
-      if(e.key === 'Enter'){ e.preventDefault(); 
-        // move focus to next input for UX
+      if(e.key === 'Enter'){ e.preventDefault();
         const order = [inpName, inpDomain, plusTag];
         const idx = order.indexOf(el);
         if(idx >= 0 && idx < order.length - 1) order[idx+1].focus();
@@ -363,11 +432,9 @@
 
   let seq = 0;
   btnCreate.addEventListener('click', async ()=>{
-    // hide warnings first
     warnName.style.display = 'none';
     warnDomain.style.display = 'none';
 
-    // validate inputs
     const nameVal = inpName.value.trim();
     const domainVal = inpDomain.value.trim();
 
@@ -386,7 +453,6 @@
 
     const email = makeEmail();
     if(!email){
-      // fallback warn
       warnName.style.display = 'block';
       return;
     }
@@ -405,7 +471,7 @@
     previewText.textContent = email;
   });
 
-  // init hide
+  // init
   warnName.style.display = 'none';
   warnDomain.style.display = 'none';
 })();
