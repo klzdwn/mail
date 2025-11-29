@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gmail-style Username Generator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Gmail-style Username Generator</h1>
+      <p class="muted">Client-only. Membuat saran username yang berakhiran suffix (mis. <code>ber</code>).</p>
+    </header>
+
+    <section class="card form">
+      <label>Base name
+        <input id="base" placeholder="e.g. rizky" />
+      </label>
+
+      <label>Suffix (end)
+        <input id="suffix" value="ber" />
+      </label>
+
+      <label>Extras (comma separated)
+        <input id="extras" value="01,99,2025,_id,x,official,88" />
+      </label>
+
+      <label class="row"><input id="dots" type="checkbox" /> Add dot patterns inside base</label>
+
+      <label>Domains (comma separated)
+        <input id="domains" value="@gmail.com,@googlemail.com" />
+      </label>
+
+      <label>Max core variants
+        <input id="limit" type="number" value="200" min="1" />
+      </label>
+
+      <div class="buttons">
+        <button id="generate">Generate</button>
+        <button id="reset" class="secondary">Reset</button>
+      </div>
+
+      <p class="tip">Tip: tool ini tidak mengecek apakah alamat tersedia. Gunakan sebagai daftar saran saja.</p>
+    </section>
+
+    <section class="card results">
+      <div class="results-header">
+        <h2>Results <small id="count">(0)</small></h2>
+        <div class="actions">
+          <button id="copy">Copy all</button>
+          <button id="download">Download .txt</button>
+        </div>
+      </div>
+
+      <div id="output" class="output">No results yet. Klik Generate.</div>
+    </section>
+
+    <footer class="muted small">Made for you — upload to repo dari HP. Tidak untuk pendaftaran akun otomatis.</footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
