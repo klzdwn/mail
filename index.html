@@ -3,20 +3,21 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Clean Modern (PlusTag optional)</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<title>Email Generator — Modern Clean UX</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f6f9ff;
-    --card:#ffffff;
-    --mut:#6b7280;
-    --accent:#2563eb;
-    --accent-weak:#dbeafe;
+    --bg: #f4f7fb;
+    --card: #ffffff;
+    --mut: #6b7280;
+    --accent: #2563eb;
+    --accent-2: #1e56d6;
+    --surface: #eef6ff;
     --border: rgba(16,24,40,0.06);
-    --shadow-lg: 0 18px 40px rgba(16,24,40,0.08);
-    --radius:12px;
-    --success:#16a34a;
-    --danger:#ef4444;
+    --shadow-lg: 0 22px 48px rgba(16,24,40,0.08);
+    --radius: 14px;
+    --success: #16a34a;
+    --danger: #ef4444;
   }
 
   *{box-sizing:border-box}
@@ -25,85 +26,85 @@
     margin:0;
     font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
     -webkit-font-smoothing:antialiased;
-    background: linear-gradient(180deg,var(--bg), #eef4fb);
+    background: linear-gradient(180deg,var(--bg),#eef4fb);
     color:#071233;
     padding:28px;
     display:flex;
-    align-items:flex-start;
     justify-content:center;
   }
 
-  /* Container */
-  .wrap{width:100%;max-width:760px;padding:12px}
+  /* container */
+  .wrap{width:100%;max-width:760px}
   .card{
     background:var(--card);
     border-radius:var(--radius);
-    padding:18px;
+    padding:20px;
     border:1px solid var(--border);
     box-shadow:var(--shadow-lg);
     overflow:visible;
   }
 
-  header{display:flex;gap:12px;align-items:center}
+  /* header */
+  header{display:flex;align-items:center;gap:14px;margin-bottom:6px}
   .logo{
     width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,#f0f7ff,#eef6ff);
-    display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:18px;
-    border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:18px;border:1px solid var(--border);
     box-shadow:0 8px 20px rgba(16,24,40,0.03);
   }
   .title h1{margin:0;font-size:18px}
   .title p{margin:4px 0 0;color:var(--mut);font-size:13px}
 
-  .section{margin-top:14px}
+  /* field */
+  .section{margin-top:12px}
   label{display:block;margin-bottom:8px;font-weight:700;color:#0b1220}
-
   input[type="text"], textarea{
     width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);
     background: linear-gradient(180deg,#fff,#fbfdff);font-size:14px;color:#071233;
-    box-shadow: 0 8px 14px rgba(16,24,40,0.03) inset;
+    box-shadow:0 8px 16px rgba(16,24,40,0.03) inset;transition:box-shadow .12s, transform .08s;
   }
-  input::placeholder, textarea::placeholder{ color:#9aa6bf }
+  input::placeholder, textarea::placeholder{color:#9aa6bf}
+  input:focus, textarea:focus{box-shadow:0 12px 28px rgba(37,99,235,0.06);transform:translateY(-1px);outline:none}
 
   .hint{font-size:13px;color:var(--mut);margin-top:8px}
 
-  /* methods grid */
+  /* method buttons */
   .grid{display:flex;flex-wrap:wrap;gap:10px}
   .method{
-    flex:1 1 48%;min-height:44px;padding:10px;border-radius:10px;background:#fbfdff;border:1px solid var(--border);
-    font-weight:800;font-size:13px;color:#071233;text-align:center;cursor:pointer;box-shadow:0 8px 16px rgba(16,24,40,0.03);
+    flex:1 1 48%;min-height:44px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid var(--border);
+    font-weight:800;font-size:13px;color:#071233;text-align:center;cursor:pointer;box-shadow:0 8px 18px rgba(16,24,40,0.03);
     transition:transform .12s, box-shadow .12s, background .12s;
   }
   .method:hover{transform:translateY(-3px)}
   .method.active{
-    background: linear-gradient(90deg,var(--accent-weak), #e6f0ff);
-    color:var(--accent);border:1px solid rgba(37,99,235,0.16);
-    box-shadow:0 12px 36px rgba(37,99,235,0.05);
+    background: linear-gradient(90deg,var(--surface), #e6f3ff);
+    color:var(--accent);border:1px solid rgba(37,99,235,0.14);box-shadow:0 12px 36px rgba(37,99,235,0.05);
   }
 
-  /* buttons area (sizes unchanged) */
+  /* CTA area (sizes unchanged) */
   .btn-area{position:relative;margin-top:16px}
   .btn{
     width:100%;padding:12px;border-radius:10px;border:none;font-weight:800;font-size:14px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s, box-shadow .12s;
+    display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s, box-shadow .12s;
   }
   .btn.primary{
-    background:linear-gradient(180deg,var(--accent), #1e56d6);color:#fff;box-shadow:0 10px 30px rgba(37,99,235,0.12);
+    background: linear-gradient(180deg,var(--accent), var(--accent-2));color:#fff;box-shadow:0 12px 36px rgba(37,99,235,0.12);
   }
-  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 18px 42px rgba(37,99,235,0.14)}
+  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 22px 48px rgba(37,99,235,0.14)}
   .btn.primary:active{transform:translateY(1px)}
 
   .preview{
     margin-top:14px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfdff);
-    border:1px solid #eef6ff;font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:#071233;font-size:14px;
+    border:1px solid #eef6ff;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:#071233;font-size:14px;
     box-shadow:0 10px 28px rgba(16,24,40,0.04);
   }
 
-  /* badge slide-in */
+  /* slide-in copy badge (right->left) */
   .copy-badge{
     position:absolute;top:-56px;right:0;transform:translateX(110%);opacity:0;
     background:#ffffff;padding:10px 14px;border-radius:10px;display:flex;gap:10px;align-items:center;
     border:1px solid var(--border);box-shadow:0 12px 28px rgba(16,24,40,0.06);
-    transition:transform .28s cubic-bezier(.22,.9,.25,1), opacity .18s ease;pointer-events:none;white-space:nowrap;font-weight:700;color:#071233;
+    transition:transform .28s cubic-bezier(.22,.9,.25,1), opacity .18s ease;pointer-events:none;
+    white-space:nowrap;font-weight:800;color:#071233;
   }
   .copy-badge.show{transform:translateX(0);opacity:1}
   .copy-badge .check{width:22px;height:22px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:white;font-weight:900}
@@ -114,27 +115,24 @@
 
   .footer{margin-top:12px;text-align:center;color:var(--mut);font-size:13px}
 
-  /* inline validation (hidden by default) */
   .error{display:none;margin-top:8px;padding:10px;border-radius:10px;background:#fff5f5;color:var(--danger);border:1px solid rgba(239,68,68,0.06);font-size:13px}
 
-  /* responsive */
   @media (max-width:520px){
     .method{min-height:42px}
     .copy-badge{top:-50px}
   }
 
-  /* focus */
   button:focus,input:focus,textarea:focus{outline:3px solid rgba(37,99,235,0.10);outline-offset:3px}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card" role="application" aria-label="Email generator updated UI">
+    <div class="card" role="application" aria-label="Email generator modern">
       <header>
         <div class="logo" aria-hidden="true">EG</div>
         <div class="title">
           <h1>Email Generator</h1>
-          <p class="lead">UI/UX bersih & modern — Custom +tag bersifat **opsional** (jika diisi akan dipakai).</p>
+          <p class="lead">Antarmuka ringkas, fungsional, dan modern — hasil muncul setelah klik <strong>Buat & Salin</strong>.</p>
         </div>
       </header>
 
@@ -149,7 +147,7 @@
       <div class="section">
         <label for="inpDomain">Domain Email</label>
         <input id="inpDomain" value="gmail.com" />
-        <div class="hint">Tulis domain (mis. gmail.com). Pilih “Random Case” bila mau acak huruf besar/kecil domain.</div>
+        <div class="hint">Masukkan domain (contoh: gmail.com). Gunakan "Random Case" bila mau acak kapitalisasi domain.</div>
       </div>
 
       <!-- Username methods -->
@@ -167,10 +165,10 @@
       <div class="section">
         <label for="plusTag">Custom + tag <small style="color:var(--mut);font-weight:600">(opsional)</small></label>
         <input id="plusTag" placeholder="contoh: tokoku (tanpa +)" />
-        <div id="plusInfo" class="hint">Jika dikosongkan dan Plus (+) aktif, generator akan menambahkan tag default <code>+idNN</code>.</div>
+        <div id="plusInfo" class="hint">Jika kosong dan Plus (+) aktif → generator akan tambahkan tag default <code>+idNN</code>.</div>
       </div>
 
-      <!-- Domain methods: only Random Case option (As-is removed earlier) -->
+      <!-- Domain methods -->
       <div class="section">
         <label>Metode Domain</label>
         <div id="methodsDom" class="grid">
@@ -178,7 +176,7 @@
         </div>
       </div>
 
-      <!-- Buttons + badge -->
+      <!-- Buttons -->
       <div class="btn-area">
         <div id="copyBadge" class="copy-badge" aria-hidden="true">
           <div class="check">✓</div>
@@ -202,13 +200,11 @@
 
 <script>
 /*
-  Behavior:
-  - Custom +tag is OPTIONAL:
-    • If Plus active and plusTag filled → use provided tag (without leading +)
-    • If Plus active and plusTag empty → auto append +idNN (two digit)
-    • If Plus not active → ignore plusTag
-  - Preview appears AFTER successful copy
-  - IDs preserved for integration
+  Perilaku utama (tetap):
+  - Hasil hanya muncul setelah klik "Buat & Salin" dan copy berhasil (copy-first-then-show)
+  - Custom +tag opsional: jika diisi dipakai, jika kosong maka default +idNN dipakai kalau Plus aktif
+  - Metode tombol tetap bisa dipilih (IDs preserved)
+  - Slide-in badge (dari kanan), confetti, counter preserved
 */
 
 (function(){
@@ -220,7 +216,7 @@
   const copyBadge = $('copyBadge'), copyBadgeText = $('copyBadgeText');
   const confettiWrap = $('confettiWrap');
 
-  // wire toggles (methodsUser multi-select; methodsDom toggle on/off)
+  // toggle behavior
   function wireToggle(container, radio=false){
     container.addEventListener('click', e=>{
       const btn = e.target.closest('button[data-method]');
@@ -233,10 +229,10 @@
       }
     });
   }
-  wireToggle(methodsUser, false);
-  wireToggle(methodsDom, false);
+  wireToggle(methodsUser, false); // multi-select for username methods
+  wireToggle(methodsDom, false);  // toggle for domain random
 
-  // input feedback
+  // inline feedback for username required
   inpName.addEventListener('input', ()=> {
     warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none';
   });
@@ -254,13 +250,11 @@
   }
 
   function applyPlus(name, tag){
-    // tag optional: if provided, use it (remove leading +)
     if(tag && tag.trim()){
       const clean = tag.trim().replace(/^\+/, '');
       return name + '+' + clean;
     }
-    // otherwise generate default +idNN
-    const nn = String(Math.floor(10 + Math.random()*90));
+    const nn = String(Math.floor(10 + Math.random()*90)); // idNN
     return name + '+id' + nn;
   }
 
@@ -293,7 +287,7 @@
     return username + '@' + domain;
   }
 
-  // robust copy (clipboard api + fallback)
+  // robust copy (clipboard API + textarea fallback)
   async function copyToClipboard(text){
     if(!text) return false;
     try {
@@ -310,8 +304,7 @@
       ta.style.position = 'fixed';
       ta.style.left = '-9999px';
       document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
+      ta.focus(); ta.select();
       const ok = document.execCommand('copy');
       document.body.removeChild(ta);
       return ok;
@@ -353,7 +346,7 @@
     }
   }
 
-  // subtle button pulse
+  // button pulse
   function pulseButton(el){
     el.animate([
       { transform:'scale(1)', boxShadow:'0 10px 30px rgba(37,99,235,0.12)' },
@@ -362,22 +355,19 @@
     ], { duration:360, easing:'cubic-bezier(.22,.9,.25,1)' });
   }
 
-  // click: validate base present, copy first, then show preview & increment
+  // main click: validate base present, perform copy, then reveal preview + counter
   let seq = 0;
   btnCreate.addEventListener('click', async ()=>{
-    // clear error
     warnName.style.display = 'none';
-
     if(inpName.value.trim() === ''){
       warnName.style.display = 'block';
       inpName.focus();
-      btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220, iterations:1});
+      btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1});
       return;
     }
 
     const email = makeEmail();
     if(!email){
-      // safety: should not happen, but bail out
       warnName.style.display = 'block';
       return;
     }
@@ -396,7 +386,7 @@
     previewText.textContent = email;
   });
 
-  // init: hide error
+  // init
   warnName.style.display = 'none';
 })();
 </script>
