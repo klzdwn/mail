@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Final-ish</title>
+<title>Email Generator — Adjusted buttons</title>
 <style>
   :root{
     --bg:#f5f7fb;
@@ -13,7 +13,6 @@
     --primary:#1e40af;
     --pill:#f1f5ff;
     --shadow: 0 16px 40px rgba(15,23,42,0.06);
-    --radius:16px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -32,15 +31,44 @@
   input[type="text"], textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #eef3fb;background:#fbfeff;font-size:15px}
   textarea{min-height:110px}
   .grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-  .method{padding:12px 14px;border-radius:12px;background:#f8fafc;border:1px solid transparent;cursor:pointer;color:#0f172a;font-weight:700;font-size:14px;transition:all .12s ease}
+  /* base method style - uniform size */
+  .method{
+    padding:12px 14px;
+    min-height:48px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:12px;
+    background:#f8fafc;
+    border:1px solid transparent;
+    cursor:pointer;
+    color:#0f172a;
+    font-weight:700;
+    font-size:14px;
+    transition:all .12s ease;
+    flex:1 1 48%;
+    box-sizing:border-box;
+  }
   .method.active{background:var(--accent);color:#fff;box-shadow:0 10px 30px rgba(37,99,235,0.14);transform:translateY(-2px)}
-  .method.big{flex:1 1 100%;padding:14px;border-radius:14px}
+  /* ensure the 'big' class doesn't change sizing anymore */
+  .method.big{flex:1 1 48%;padding:12px 14px;min-height:48px;border-radius:12px}
   .smalltxt{font-size:12px;color:var(--mut);margin-top:8px}
-  .btn{padding:14px;border-radius:14px;border:none;cursor:pointer;font-weight:800;font-size:15px;transition:all .12s ease}
+  .btn{padding:12px;border-radius:12px;border:none;cursor:pointer;font-weight:800;font-size:15px;transition:all .12s ease}
   .btn.full{width:100%;display:block}
-  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 14px 36px rgba(37,99,235,0.12)}
-  .btn.primary.disabled{background:#e6eefb;color:#9fb0df;cursor:not-allowed;box-shadow:none}
-  .btn.ghost{background:#fff;border:1px solid #e6eefb;color:var(--accent)}
+  /* make create button similar height as method buttons */
+  .btn.primary{
+    background:var(--accent);
+    color:#fff;
+    box-shadow:0 14px 36px rgba(37,99,235,0.12);
+    min-height:48px;
+    padding-left:14px;
+    padding-right:14px;
+    border-radius:12px;
+  }
+  .btn.primary.disabled{
+    background:#e6eefb;color:#9fb0df;cursor:not-allowed;box-shadow:none;
+  }
+  .btn.ghost{background:#fff;border:1px solid #e6eefb;color:var(--accent);min-height:48px;border-radius:12px;padding-left:14px;padding-right:14px}
   .preview{margin-top:14px;padding:12px;border-radius:12px;background:#fbfdff;border:1px solid #eef6ff;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace}
   .footerbar{display:flex;justify-content:center;align-items:center;margin-top:18px;padding-top:12px;border-top:1px solid #f0f4fb;color:var(--mut);font-size:13px}
   .linkish{color:var(--accent);cursor:pointer;text-decoration:none;margin-left:8px}
@@ -99,14 +127,16 @@
         <div style="margin-top:12px">
           <div class="lbl">Metode Domain (setelah @):</div>
           <div class="grid" id="methodsDom">
-            <button data-method="domRandom" class="method big" aria-pressed="false">Random Case (Upper + Lowercase)</button>
-            <button data-method="domAsIs" class="method big active" aria-pressed="true">As-is</button>
+            <!-- now Random Case and As-is have same sizing as method buttons -->
+            <button data-method="domRandom" class="method" aria-pressed="false">Random Case (Upper + Lowercase)</button>
+            <button data-method="domAsIs" class="method active" aria-pressed="true">As-is</button>
           </div>
         </div>
 
         <div class="note">Tekan untuk aktifkan/nonaktifkan. Bisa pilih lebih dari satu di setiap bagian.</div>
 
         <div style="margin-top:16px">
+          <!-- create button now matches method height/padding -->
           <button id="btnCreate" class="btn primary full btn-primary disabled" disabled aria-disabled="true">
             <span style="display:inline-block;margin-right:10px">📋</span> Buat & Salin
           </button>
@@ -161,7 +191,7 @@
       </div>
 
     </div>
-    <div style="text-align:center;margin-top:12px;color:var(--mut);font-size:13px">Dibuat oleh Iqra — versi disesuaikan</div>
+    <div style="text-align:center;margin-top:12px;color:var(--mut);font-size:13px">Dibuat oleh Iqra — Adjusted</div>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite">Tersalin ke clipboard</div>
@@ -250,6 +280,7 @@
   }
 
   function showToast(msg){
+    const toast = $('toast');
     toast.textContent = msg || 'Tersalin ke clipboard';
     toast.style.display = 'block';
     clearTimeout(toast._t);
@@ -260,19 +291,9 @@
     const e = makeEmailOnce();
     previewText.textContent = e || '-';
     if(e){
-      btnCreate.classList.remove('disabled'); btnCreate.disabled = false; btnCreate.classList.remove('btn-primary','btn-primary-disabled'); btnCreate.classList.remove('btn-primary-disabled');
-      btnCreate.classList.remove('btn-primary-disabled');
-      btnCreate.classList.remove('disabled');
-      btnCreate.classList.remove('btn-primary-disabled');
-      btnCreate.classList.remove('btn-primary');
-      // ensure proper class states: remove disabled look, add primary
-      btnCreate.classList.remove('btn-primary','disabled');
-      btnCreate.classList.add('btn-primary');
-      btnCreate.disabled = false;
-      btnCreate.setAttribute('aria-disabled','false');
+      btnCreate.classList.remove('disabled'); btnCreate.disabled = false; btnCreate.classList.remove('btn-primary','disabled'); btnCreate.setAttribute('aria-disabled','false');
     } else {
       btnCreate.classList.add('disabled'); btnCreate.disabled = true; btnCreate.setAttribute('aria-disabled','true');
-      btnCreate.classList.remove('btn-primary'); btnCreate.classList.add('btn-primary','disabled');
     }
   }
 
@@ -280,7 +301,6 @@
   inpDomain.addEventListener('input', updatePreview);
   plusTag.addEventListener('input', updatePreview);
 
-  // create once
   let seq = 0;
   btnCreate.addEventListener('click', async ()=>{
     const email = makeEmailOnce();
@@ -295,11 +315,10 @@
     }
   });
 
-  // reset behavior (keep counter centered like screenshot)
+  // reset on double-click footer
   const resetFn = ()=> {
     seq = 0; counterEl.textContent = seq;
     inpName.value = ''; inpDomain.value = 'gmail.com'; plusTag.value = '';
-    // reset toggles
     document.querySelectorAll('#methodsUser .method').forEach(b=>b.classList.remove('active'));
     document.querySelector('#methodsUser button[data-method="plus"]').classList.add('active');
     document.querySelector('#methodsUser button[data-method="lower"]').classList.add('active');
@@ -307,14 +326,9 @@
     document.querySelector('#methodsDom button[data-method="domAsIs"]').classList.add('active');
     updatePreview();
   };
+  document.querySelector('.footerbar').addEventListener('dblclick', resetFn);
 
-  // wire reset link (footer)
-  document.querySelector('.footerbar').addEventListener('click', (e)=>{
-    // if clicked anywhere on footerbar, reset
-    // but better to check specific? Keep simple: require ctrl? For now, do reset only on double-click
-  });
-
-  // bulk create
+  // bulk
   btnCreateBulk.addEventListener('click', async ()=>{
     const lines = bulkList.value.split('\n').map(s=>s.trim()).filter(Boolean);
     if(lines.length===0){ alert('Masukkan minimal 1 nama di daftar.'); return; }
@@ -343,10 +357,7 @@
     const a = document.createElement('a'); a.href = url; a.download = 'emails.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
   });
 
-  // expose reset on double-click footer to avoid accidental reset
-  document.querySelector('.footerbar').addEventListener('dblclick', resetFn);
-
-  // initial
+  // init
   updatePreview();
 })();
 </script>
