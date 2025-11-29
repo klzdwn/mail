@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Inputs appear as buttons + preview lower</title>
+<title>Email Generator — Inputs big, buttons fixed</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -32,7 +32,7 @@
     padding:28px;
     display:flex;
     justify-content:center;
-    overflow-x:hidden; /* jaga supaya gak bisa digeser ke samping */
+    overflow-x:hidden; /* cegah geser samping */
   }
 
   .wrap{width:100%;max-width:980px;padding:8px}
@@ -70,18 +70,16 @@
     font-size:14px;
   }
 
-  /* =========================
-     INPUT - diperbesar sesuai permintaan (besar, bulat, placeholder besar)
-     Hanya CSS di sini yang diubah — JS dan tombol tetap tidak disentuh
-     ========================= */
+  /* ====== INPUT (HANYA INI YANG DIPERBESAR) ====== */
+  /* Hanya selector input[type="text"] dan textarea agar tidak menyasar tombol */
   input[type="text"], textarea{
     width:100%;
-    padding:22px 24px;                /* area tap lebih besar */
-    height:68px;                      /* ketinggian konsisten seperti contoh */
-    border-radius:20px;               /* rounded besar */
+    padding:22px 24px;      /* area tap lebih besar */
+    height:68px;            /* tinggi besar sesuai permintaan */
+    border-radius:20px;     /* rounded */
     border:1px solid rgba(16,24,40,0.08);
     background: linear-gradient(180deg,#ffffff,#fbfdff);
-    font-size:26px;                   /* FONT BESAR sesuai screenshot */
+    font-size:26px;         /* font besar */
     font-weight:500;
     color:var(--ink);
     box-shadow: 0 8px 18px rgba(16,24,40,0.02) inset;
@@ -91,7 +89,7 @@
   }
   input::placeholder{
     color:#c7d0dc;
-    font-size:26px;                  /* placeholder juga besar */
+    font-size:26px;
     opacity:1;
   }
   input:focus, textarea:focus{
@@ -104,7 +102,27 @@
 
   .method-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--border);box-shadow:0 10px 26px rgba(15,23,42,0.03)}
   .grid{display:flex;flex-wrap:wrap;gap:10px}
-  .method{flex:1 1 calc(50% - 10px);min-height:44px;padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border);font-weight:800;font-size:13px;color:var(--ink);text-align:center;cursor:pointer;transition:transform .12s, box-shadow .12s, background .12s}
+
+  /* ====== PENTING: PAKU UKURAN TOMBOL METODE supaya TIDAK TERBESAR ====== */
+  .method{
+    /* flex agar responsive, namun tinggi dikunci */
+    flex:1 1 calc(50% - 10px);
+    height:44px;              /* kunci tinggi tetap */
+    min-height:44px;
+    padding:10px 12px;        /* jangan besar */
+    border-radius:10px;
+    background:#fff;
+    border:1px solid var(--border);
+    font-weight:800;
+    font-size:13px;
+    color:var(--ink);
+    text-align:center;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:transform .12s, box-shadow .12s, background .12s;
+  }
   .method:hover{transform:translateY(-4px)}
   .method.active{background: linear-gradient(90deg,var(--soft), #e8f3ff);color:var(--primary);border:1px solid rgba(37,99,235,0.12);box-shadow:0 16px 36px rgba(37,99,235,0.04)}
 
@@ -121,9 +139,6 @@
   .btn.primary{background: linear-gradient(90deg,var(--primary),var(--primary-2));color:white;border:1px solid rgba(255,255,255,0.06);box-shadow: 0 18px 56px rgba(37,99,235,0.18);}
 
   .side{display:flex;flex-direction:column;gap:12px}
-  /* =========================
-     PREVIEW: naikkan padding top sedikit agar teks "Email yang dibuat" lebih ke bawah
-     ========================= */
   .preview{
     padding:22px 16px; /* sedikit lebih ruang atas */
     border-radius:14px;
@@ -168,7 +183,7 @@
         </div>
 
         <form class="form" onsubmit="return false;" aria-label="Form email generator">
-          <!-- username (sekarang tampil seperti tombol/input besar) -->
+          <!-- username (besar) -->
           <div class="row-inline">
             <label for="inpName">Username Email</label>
             <div class="field">
@@ -177,14 +192,14 @@
             </div>
           </div>
 
-          <!-- domain (sekarang tampil seperti tombol/input besar) -->
+          <!-- domain (besar) -->
           <div>
             <label for="inpDomain">Domain Email</label>
             <input id="inpDomain" value="gmail.com" />
             <div class="hint">Contoh: gmail.com — pilih Random Case bila ingin acak kapitalisasi domain.</div>
           </div>
 
-          <!-- methods -->
+          <!-- methods (TOMBOL TETAP UKURAN) -->
           <div class="method-card">
             <label>Metode Username (gabungkan sesuai kebutuhan)</label>
             <div id="methodsUser" class="grid" aria-hidden="false">
@@ -195,7 +210,7 @@
             </div>
           </div>
 
-          <!-- plus tag -->
+          <!-- plus tag (besar) -->
           <div>
             <label for="plusTag">Custom + tag <small style="color:var(--mut);font-weight:600">(opsional)</small></label>
             <input id="plusTag" placeholder="contoh: tokoku (tanpa +)" />
