@@ -1,4 +1,4 @@
-// script.js — updated: no auto-press on reload, btn active only on real click/copy, floating CTA kept
+// script.js — cleaned: no-floating, no auto-press, CTA active only on real click/copy
 (function(){
   const $ = id => document.getElementById(id);
   const baseInput = $('base');
@@ -13,6 +13,7 @@
   const countEl = $('count');
   const copyBtn = $('copy');
   const downloadBtn = $('download');
+  const createBtn = $('btnCreate'); // if present in your markup
 
   function parseList(s){
     return (s || '').split(',').map(x=>x.trim()).filter(Boolean);
@@ -20,8 +21,7 @@
 
   function makeDotVariants(name){
     if(!name) return [];
-    const chars = name.split('');
-    return [chars.join('.')];
+    return [ name.split('').join('.') ];
   }
 
   function generateList(){
@@ -58,7 +58,8 @@
     if(countEl) countEl.textContent = `(${list.length})`;
     if(!output) return;
     if(list.length === 0){
-      output.textContent = 'No results yet. Klik Generate.'; return;
+      output.textContent = 'No results yet. Klik Generate.';
+      return;
     }
     const ol = document.createElement('ol');
     list.forEach(item => {
@@ -67,7 +68,8 @@
       li.style.wordBreak = 'break-all';
       ol.appendChild(li);
     });
-    output.innerHTML = ''; output.appendChild(ol);
+    output.innerHTML = '';
+    output.appendChild(ol);
   }
 
   if(generateBtn){
@@ -128,12 +130,13 @@
       }catch(err){
         prompt('Copy manual:', text);
       }
-      // visual feedback: make CTA active only on successful copy or real user click
-      const cta = document.querySelector('.btn.primary');
+
+      // add visual active only when copy succeeded
+      const cta = createBtn || document.querySelector('.btn.primary');
       if(cta && ok){
         cta.classList.add('active');
         clearTimeout(cta._rem);
-        cta._rem = setTimeout(()=> cta.classList.remove('active'), 1400);
+        cta._rem = setTimeout(()=> cta.classList.remove('active'), 900);
       }
     });
   }
@@ -148,115 +151,66 @@
     });
   }
 
+  // default message
   if(output) output.textContent = 'No results yet. Klik Generate.';
 
-  /* FLOATING CTA: muncul hanya saat fokus / keyboard */
+  // --- REMOVE floating behaviour: ensure no sticky class and no related listeners ---
   (function(){
     const btnArea = document.querySelector('.btn-area');
-    if(!btnArea) return;
-    const inputs = Array.from(document.querySelectorAll('input[type="text"], textarea'));
-    let blurTimeout = null;
-    function setSticky(on){
-      if(on) btnArea.classList.add('sticky');
-      else btnArea.classList.remove('sticky');
+    if(btnArea){
+      btnArea.classList.remove('sticky');
+      // remove inline style that might have been applied by previous code
+      btnArea.style.position = '';
+      btnArea.style.bottom = '';
+      btnArea.style.left = '';
+      btnArea.style.right = '';
     }
-    inputs.forEach(inp => {
-      inp.addEventListener('focus', ()=>{
-        clearTimeout(blurTimeout);
-        setTimeout(()=> setSticky(true), 80);
-      });
-      inp.addEventListener('blur', ()=>{
-        clearTimeout(blurTimeout);
-        blurTimeout = setTimeout(()=> setSticky(false), 250);
-      });
-    });
-    // keyboard heuristic
-    let lastHeight = window.innerHeight;
-    window.addEventListener('resize', () => {
-      const h = window.innerHeight;
-      if(h < lastHeight - 100) setSticky(true);
-      else if(h > lastHeight + 80) setSticky(false);
-      lastHeight = h;
-    });
+
+    // If any floating-related listeners exist elsewhere, we don't try to remove unknown handlers.
+    // But defensively ensure window resize won't toggle sticky here.
+    // (No-op)
   })();
 
-
-  /* SAFEGUARDS: avoid auto-active / auto-sticky on page load or bfcache restore */
+  // --- UI state cleanup on load/pageshow (avoid browser restoring pressed/focus) ---
   (function(){
-    // remove any autofocus attribute (prevents immediate focus)
-    document.querySelectorAll('[autofocus]').forEach(el => el.removeAttribute('autofocus'));
-
-    // clear sticky and .active states after pageshow (covers bfcache)
     function clearUIState(){
-      // remove sticky container class so button tidak melayang pada load/restore
-      const btnArea = document.querySelector('.btn-area');
-      if(btnArea) btnArea.classList.remove('sticky');
-
-      // normalize method buttons: remove all active then set intended defaults explicitly
+      // normalize method buttons
       document.querySelectorAll('.method.active').forEach(b => b.classList.remove('active'));
       const defaultPlus = document.querySelector('.method[data-method="plus"]');
       const defaultLower = document.querySelector('.method[data-method="lower"]');
       if(defaultPlus) defaultPlus.classList.add('active');
       if(defaultLower) defaultLower.classList.add('active');
 
-      // CTA should not be active by default
-      const cta = document.querySelector('.btn.primary');
+      // CTA not active by default
+      const cta = createBtn || document.querySelector('.btn.primary');
       if(cta) cta.classList.remove('active');
 
-      // blur any focused button (browser sometimes restores focus)
+      // blur focused button (if any)
       if(document.activeElement && document.activeElement.tagName === 'BUTTON'){
         try { document.activeElement.blur(); } catch(e){}
       }
     }
 
-    // run shortly after load and on pageshow
     window.addEventListener('pageshow', () => setTimeout(clearUIState, 40));
     setTimeout(clearUIState, 40);
+  })();
 
-    // only allow CTA visual activation for real user interaction:
-    const ctaBtn = document.querySelector('.btn.primary');
-    if(ctaBtn){
-      // remove existing active
-      ctaBtn.classList.remove('active');
+  // --- Make CTA become blue only on real user clicks (visual feedback) ---
+  (function(){
+    const cta = createBtn || document.querySelector('.btn.primary');
+    if(!cta) return;
 
-      // only add .active if the click event is trusted (user-initiated)
-      ctaBtn.addEventListener('click', (ev) => {
-        if(ev && ev.isTrusted){
-          ctaBtn.classList.add('active');
-          clearTimeout(ctaBtn._rem);
-          ctaBtn._rem = setTimeout(()=> ctaBtn.classList.remove('active'), 1400);
-        } else {
-          // If not trusted (programmatic), don't set active class (but still allow app logic elsewhere)
-        }
-      });
-    }
+    // Ensure it starts non-active
+    cta.classList.remove('active');
 
-    // prevent programmatic focus/press from triggering unwanted UI on load:
-    // only necessary if other scripts attempt to auto-click; if so, this avoids visual activation.
-    // We DO NOT block programmatic click entirely (some app logic may rely on it).
-    const nativeClick = HTMLElement.prototype.click;
-    let allowSynthetic = false;
-    // once user interacts, allow synthetic clicks to behave normally
-    function userInteracted(){ allowSynthetic = true; window.removeEventListener('pointerdown', userInteracted); window.removeEventListener('keydown', userInteracted); }
-    window.addEventListener('pointerdown', userInteracted);
-    window.addEventListener('keydown', userInteracted);
-
-    HTMLElement.prototype.click = function(...args){
-      // if it's the CTA and user hasn't interacted, dispatch a non-visual click event (no focus/active)
-      if(this && this.id === 'btnCreate' && !allowSynthetic){
-        try {
-          const ev = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true });
-          return this.dispatchEvent(ev);
-        } catch (e) {
-          return nativeClick.apply(this, args);
-        }
+    // Add click visual feedback (user-initiated)
+    cta.addEventListener('click', (ev) => {
+      if(ev && ev.isTrusted){
+        cta.classList.add('active');
+        clearTimeout(cta._rem);
+        cta._rem = setTimeout(()=> cta.classList.remove('active'), 900);
       }
-      return nativeClick.apply(this, args);
-    };
-
-    window.addEventListener('beforeunload', ()=>{
-      try { HTMLElement.prototype.click = nativeClick; } catch(e){}
     });
   })();
 
-})(); // end main IIFE
+})(); // end IIFE
