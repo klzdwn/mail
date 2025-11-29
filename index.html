@@ -329,6 +329,49 @@
 
   warnName.style.display = 'none'; warnDomain.style.display = 'none';
 })();
+  /* Floating CTA behavior: tetap muncul di atas keyboard saat user fokus ke input.
+   - pasokan: tambahkan class 'sticky' ke .btn-area saat ada fokus input / keyboard on
+   - cabut setelah blur (dengan delay kecil supaya klik tombol masih terdeteksi)
+*/
+(function(){
+  const btnArea = document.querySelector('.btn-area');
+  const inputs = Array.from(document.querySelectorAll('input[type="text"], textarea'));
+  let blurTimeout = null;
+
+  function setSticky(on){
+    if(!btnArea) return;
+    if(on) btnArea.classList.add('sticky');
+    else btnArea.classList.remove('sticky');
+  }
+
+  // fokus -> tunjukkan sticky
+  inputs.forEach(inp => {
+    inp.addEventListener('focus', ()=> {
+      clearTimeout(blurTimeout);
+      // delay sedikit untuk menghindari flicker saat berpindah input
+      setTimeout(()=> setSticky(true), 60);
+    });
+
+    // blur -> sembunyikan sticky setelah delay kecil (biar user masih bisa klik tombol)
+    inp.addEventListener('blur', ()=> {
+      clearTimeout(blurTimeout);
+      blurTimeout = setTimeout(()=> setSticky(false), 250);
+    });
+  });
+
+  // juga buka sticky saat user men-swipe/scroll ke bagian bawah (opsional)
+  window.addEventListener('resize', ()=> {
+    // pada banyak browser mobile, resize dipicu saat keyboard muncul
+    if(window.innerHeight < 600) { // threshold kasar untuk deteksi keyboard
+      setSticky(true);
+    } else {
+      setSticky(false);
+    }
+  });
+
+  // Pastikan tombol sticky tidak menghilangkan akses ke elemen lain:
+  // tetap gunakan pointer-events: none di container, enable hanya di tombol.
+})();
 </script>
 </body>
 </html>
