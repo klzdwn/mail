@@ -1,64 +1,324 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Gmail-style Username Generator</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Email Generator — Single file</title>
+<style>
+  :root{
+    --bg:#f3f6fb; --card:#ffffff; --muted:#64748b; --primary:#1e40af; --muted-2:#e6eefb;
+    --pill:#eef2ff; --accent:#2563eb;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial; margin:0; background:var(--bg); color:#0f172a; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:520px;margin:18px auto;padding:16px}
+  .card{background:var(--card); border-radius:12px; padding:20px; box-shadow:0 8px 30px rgba(2,6,23,0.06)}
+  header{display:flex;align-items:center;flex-direction:column;gap:6px}
+  .icon{width:56px;height:56px;border-radius:999px;background:linear-gradient(180deg,#eff6ff,#e0f2fe);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:22px}
+  h1{margin:0;font-size:20px;color:#0b1220}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+  .tabs{display:flex;gap:8px;margin-top:14px}
+  .tab{padding:8px 14px;border-radius:10px;background:var(--pill);cursor:pointer;color:#334155;border:1px solid transparent}
+  .tab.active{background:var(--primary);color:white;box-shadow:0 6px 18px rgba(37,99,235,0.12)}
+  .field{margin-top:12px}
+  label{font-size:13px;color:#0f172a;display:block;margin-bottom:6px}
+  input[type="text"], textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef6;background:#fbfeff}
+  textarea{min-height:120px;resize:vertical}
+  .grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .method{padding:10px 12px;border-radius:10px;background:#f1f5f9;border:1px solid transparent;cursor:pointer;color:#0f172a;font-weight:600;font-size:13px}
+  .method.active{background:var(--primary);color:#fff;box-shadow:0 6px 18px rgba(37,99,235,0.12)}
+  .generate{margin-top:14px;display:flex;gap:10px}
+  .btn{flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;background:var(--primary);color:#fff;font-weight:700}
+  .btn.secondary{background:#fff;color:var(--primary);border:1px solid #e6eefb}
+  .preview{margin-top:14px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid #eef2ff;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace}
+  .small{font-size:12px;color:var(--muted);margin-top:8px}
+  .footer{margin-top:12px;text-align:center;color:var(--muted);font-size:12px}
+  .actions{display:flex;gap:8px;align-items:center}
+  .count{font-weight:700;margin-left:6px}
+  /* responsive */
+  @media (max-width:420px){ .wrap{padding:10px} .method{flex:1 1 45%} }
+</style>
 </head>
 <body>
-  <main class="container">
-    <header>
-      <h1>Gmail-style Username Generator</h1>
-      <p class="muted">Client-only. Membuat saran username yang berakhiran suffix (mis. <code>ber</code>).</p>
-    </header>
+  <main class="wrap">
+    <div class="card">
+      <header>
+        <div class="icon">✉️</div>
+        <h1>Email Generator</h1>
+        <p class="lead">Buat varian email dengan berbagai metode</p>
+      </header>
 
-    <section class="card form">
-      <label>Base name
-        <input id="base" placeholder="e.g. rizky" />
-      </label>
-
-      <label>Suffix (end)
-        <input id="suffix" value="ber" />
-      </label>
-
-      <label>Extras (comma separated)
-        <input id="extras" value="01,99,2025,_id,x,official,88" />
-      </label>
-
-      <label class="row"><input id="dots" type="checkbox" /> Add dot patterns inside base</label>
-
-      <label>Domains (comma separated)
-        <input id="domains" value="@gmail.com,@googlemail.com" />
-      </label>
-
-      <label>Max core variants
-        <input id="limit" type="number" value="200" min="1" />
-      </label>
-
-      <div class="buttons">
-        <button id="generate">Generate</button>
-        <button id="reset" class="secondary">Reset</button>
+      <div class="tabs" role="tablist" aria-label="Mode">
+        <button id="tabSingle" class="tab active" role="tab">Satu</button>
+        <button id="tabBulk" class="tab" role="tab">Banyak</button>
       </div>
 
-      <p class="tip">Tip: tool ini tidak mengecek apakah alamat tersedia. Gunakan sebagai daftar saran saja.</p>
-    </section>
-
-    <section class="card results">
-      <div class="results-header">
-        <h2>Results <small id="count">(0)</small></h2>
-        <div class="actions">
-          <button id="copy">Copy all</button>
-          <button id="download">Download .txt</button>
+      <div id="singlePane" style="margin-top:12px">
+        <div class="field">
+          <label>Username Email</label>
+          <input id="username" type="text" placeholder="mis. kalz" value="kalz" />
         </div>
+
+        <div class="field">
+          <label>Domain Email (tanpa @)</label>
+          <input id="domain" type="text" placeholder="mis. gmail.com" value="gmail.com" />
+        </div>
+
+        <div class="field">
+          <label>Pilih Metode (bisa gabungan)</label>
+          <div class="grid" id="methodsUsername">
+            <button data-method="plus" class="method">Plus (+)</button>
+            <button data-method="dot" class="method">Titik (.)</button>
+            <button data-method="upper" class="method">UPPERCASE</button>
+            <button data-method="lower" class="method active">lowercase</button>
+            <button data-method="randomcase" class="method">RandomCase</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Metode Domain (setelah @)</label>
+          <div class="grid" id="methodsDomain">
+            <button data-method="domainRandomCase" class="method">Random Case (Upper + Lowercase)</button>
+            <button data-method="domainAsIs" class="method active">As-is</button>
+          </div>
+        </div>
+
+        <div class="generate">
+          <button id="createCopy" class="btn">Buat & Salin</button>
+          <button id="previewBtn" class="btn secondary">Preview</button>
+        </div>
+
+        <div class="preview" id="previewBox" aria-live="polite" style="margin-top:12px">
+          Email yang dibuat: <div id="resultText" style="margin-top:8px">-</div>
+        </div>
+
+        <div class="small">Tekan untuk aktifkan/nonaktifkan. Bisa pilih lebih dari satu di setiap bagian.</div>
       </div>
 
-      <div id="output" class="output">No results yet. Klik Generate.</div>
-    </section>
+      <div id="bulkPane" style="display:none; margin-top:12px">
+        <div class="field">
+          <label>Daftar base names (satu per baris)</label>
+          <textarea id="bulkList" placeholder="contoh:&#10;rizky&#10;andi&#10;gilang"></textarea>
+        </div>
 
-    <footer class="muted small">Made for you — upload to repo dari HP. Tidak untuk pendaftaran akun otomatis.</footer>
+        <div class="field">
+          <label>Domain (default gmail.com)</label>
+          <input id="bulkDomain" type="text" placeholder="gmail.com" value="gmail.com" />
+        </div>
+
+        <div class="field">
+          <label>Pilih Metode (username)</label>
+          <div class="grid" id="methodsUsernameBulk">
+            <button data-method="plus" class="method">Plus (+)</button>
+            <button data-method="dot" class="method">Titik (.)</button>
+            <button data-method="upper" class="method">UPPERCASE</button>
+            <button data-method="lower" class="method active">lowercase</button>
+            <button data-method="randomcase" class="method">RandomCase</button>
+          </div>
+        </div>
+
+        <div class="generate">
+          <button id="createBulk" class="btn">Buat & Salin Semua</button>
+          <button id="downloadBulk" class="btn secondary">Download .txt</button>
+        </div>
+
+        <div class="preview" id="bulkPreview" style="margin-top:12px; max-height:220px; overflow:auto">
+          <ol id="bulkResultList" style="padding-left:18px;margin:0;color:#0b1220"></ol>
+        </div>
+
+        <div class="small">Hasil akan disalin ke clipboard (jika diizinkan) dan bisa di-download.</div>
+      </div>
+
+      <div class="footer">Dibuat cepat — gunakan untuk saran username. Tidak untuk pendaftaran otomatis.</div>
+    </div>
   </main>
 
-  <script src="script.js"></script>
+<script>
+(function(){
+  // helpers
+  const $ = id => document.getElementById(id);
+  const toggleBtn = (btn) => btn.classList.toggle('active');
+  const isActive = (btn) => btn.classList.contains('active');
+
+  // tabs
+  const tabSingle = $('tabSingle'), tabBulk = $('tabBulk'), singlePane = $('singlePane'), bulkPane = $('bulkPane');
+  tabSingle.addEventListener('click', ()=>{ tabSingle.classList.add('active'); tabBulk.classList.remove('active'); singlePane.style.display='block'; bulkPane.style.display='none'; });
+  tabBulk.addEventListener('click', ()=>{ tabBulk.classList.add('active'); tabSingle.classList.remove('active'); singlePane.style.display='none'; bulkPane.style.display='block'; });
+
+  // username methods (single)
+  const methodsUsername = document.getElementById('methodsUsername');
+  methodsUsername.addEventListener('click', e => {
+    if(e.target && e.target.dataset && e.target.dataset.method){
+      toggleBtn(e.target);
+    }
+  });
+
+  // domain methods
+  const methodsDomain = document.getElementById('methodsDomain');
+  methodsDomain.addEventListener('click', e => {
+    if(e.target && e.target.dataset && e.target.dataset.method){
+      // make it behave like radio for domain (either As-is or RandomCase) but allow toggling
+      const all = methodsDomain.querySelectorAll('.method');
+      all.forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+    }
+  });
+
+  // bulk username methods
+  const methodsUsernameBulk = document.getElementById('methodsUsernameBulk');
+  methodsUsernameBulk.addEventListener('click', e=>{
+    if(e.target && e.target.dataset && e.target.dataset.method){
+      toggleBtn(e.target);
+    }
+  });
+
+  // core transforms
+  function applyDot(base){
+    if(!base) return base;
+    // simple: insert dot after second character if length>2, otherwise between chars
+    if(base.length <= 2) return base.split('').join('.');
+    return base.slice(0,2) + '.' + base.slice(2);
+  }
+
+  function applyPlus(base){
+    // append +random short tag (letters or numbers)
+    const tags = ['shop','id','official','x','web','mail'];
+    const pick = tags[Math.floor(Math.random()*tags.length)];
+    const num = Math.floor(10 + Math.random()*990); // 2-3 digits
+    return base + '+' + pick + num;
+  }
+
+  function applyRandomCase(str){
+    return Array.from(str).map(ch => Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase()).join('');
+  }
+
+  function transformUsername(base, opts){
+    if(!base) return '';
+    let u = base;
+
+    // order: dot -> plus appended variants -> case transforms
+    if(opts.dot) u = applyDot(u);
+    if(opts.plus) u = applyPlus(u);
+
+    // case: if both upper and lower selected, prefer randomcase; if randomcase selected, use it
+    if(opts.randomcase) {
+      u = applyRandomCase(u);
+    } else if(opts.upper && !opts.lower) {
+      u = u.toUpperCase();
+    } else if(opts.lower && !opts.upper) {
+      u = u.toLowerCase();
+    } else if(opts.upper && opts.lower){
+      // conflicting: prefer lowercase (like screenshot shows lowercase active by default)
+      u = u.toLowerCase();
+    }
+    return u;
+  }
+
+  function transformDomain(domain, opts){
+    if(!domain) return '';
+    if(opts.domainRandomCase) return applyRandomCase(domain);
+    return domain;
+  }
+
+  // single create & copy
+  const createCopy = $('createCopy');
+  const previewBtn = $('previewBtn');
+  const usernameInput = $('username');
+  const domainInput = $('domain');
+  const resultText = $('resultText');
+
+  function readUsernameOpts(){
+    const map = {};
+    const buttons = methodsUsername.querySelectorAll('.method');
+    buttons.forEach(b => map[b.dataset.method] = b.classList.contains('active'));
+    return map;
+  }
+  function readDomainOpts(){
+    const buttons = methodsDomain.querySelectorAll('.method');
+    const map = {domainRandomCase:false, domainAsIs:false};
+    buttons.forEach(b => map[b.dataset.method] = b.classList.contains('active'));
+    return map;
+  }
+
+  function makeOneEmail(){
+    const base = usernameInput.value.trim();
+    const domainRaw = domainInput.value.trim() || 'gmail.com';
+    const uopts = readUsernameOpts();
+    const dopts = readDomainOpts();
+    const username = transformUsername(base, uopts);
+    const domain = transformDomain(domainRaw, {domainRandomCase: dopts.domainRandomCase});
+    // clean: if username contains spaces, replace with dot
+    const finalUser = username.replace(/\s+/g, '.');
+    return finalUser + '@' + domain;
+  }
+
+  previewBtn.addEventListener('click', ()=>{
+    const email = makeOneEmail();
+    resultText.textContent = email;
+  });
+
+  createCopy.addEventListener('click', async ()=>{
+    const email = makeOneEmail();
+    resultText.textContent = email;
+    try{
+      await navigator.clipboard.writeText(email);
+      alert('Tersalin: ' + email);
+    }catch(e){
+      // fallback
+      prompt('Salin manual:', email);
+    }
+  });
+
+  // bulk create
+  const createBulk = $('createBulk');
+  const downloadBulk = $('downloadBulk');
+  const bulkList = $('bulkList');
+  const bulkDomain = $('bulkDomain');
+  const bulkResultList = $('bulkResultList');
+
+  function readUsernameOptsBulk(){
+    const map = {};
+    const buttons = methodsUsernameBulk.querySelectorAll('.method');
+    buttons.forEach(b => map[b.dataset.method] = b.classList.contains('active'));
+    return map;
+  }
+
+  createBulk.addEventListener('click', async ()=>{
+    const lines = bulkList.value.split('\n').map(s=>s.trim()).filter(Boolean);
+    if(lines.length===0){ alert('Masukkan minimal satu nama di daftar.'); return; }
+    const domain = (bulkDomain.value || 'gmail.com').trim();
+    const uopts = readUsernameOptsBulk();
+    const results = [];
+    for(const base of lines){
+      const username = transformUsername(base, uopts);
+      results.push(username.replace(/\s+/g,'.') + '@' + domain);
+    }
+    // render
+    bulkResultList.innerHTML = '';
+    results.forEach(r => { const li = document.createElement('li'); li.textContent = r; bulkResultList.appendChild(li); });
+    // copy to clipboard
+    const text = results.join('\\n');
+    try{
+      await navigator.clipboard.writeText(text);
+      alert('Tersalin ' + results.length + ' alamat ke clipboard.');
+    }catch(e){
+      // fallback: offer download
+      alert('Gagal salin otomatis — gunakan tombol Download .txt.');
+    }
+  });
+
+  downloadBulk.addEventListener('click', ()=>{
+    const items = Array.from(bulkResultList.querySelectorAll('li')).map(li => li.textContent);
+    if(items.length===0){ alert('Tidak ada hasil untuk di-download. Buat dulu.'); return; }
+    const blob = new Blob([items.join('\\n')], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'emails.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+
+  // initial preview
+  resultText.textContent = makeOneEmail();
+
+})();
+</script>
 </body>
 </html>
