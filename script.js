@@ -1,4 +1,4 @@
-// script.js — updated: no auto-press on reload, btn active on click/copy, floating CTA kept
+// script.js — updated: no auto-press on reload, btn active only on real click/copy, floating CTA kept
 (function(){
   const $ = id => document.getElementById(id);
   const baseInput = $('base');
@@ -118,14 +118,22 @@
 
   if(copyBtn){
     copyBtn.addEventListener('click', async ()=>{
-      // collect list items (if any)
       const text = Array.from((output && output.querySelectorAll('li')) || []).map(li=>li.textContent).join('\n');
       if(!text) return alert('Tidak ada yang disalin.');
+      let ok = false;
       try{
-        await navigator.clipboard.writeText(text);
-        alert('Copied ' + text.split('\n').length + ' addresses to clipboard.');
+        ok = await copyTextToClipboard(text);
+        if(ok) alert('Copied ' + text.split('\n').length + ' addresses to clipboard.');
+        else prompt('Copy manual:', text);
       }catch(err){
         prompt('Copy manual:', text);
+      }
+      // visual feedback: make CTA active only on successful copy or real user click
+      const cta = document.querySelector('.btn.primary');
+      if(cta && ok){
+        cta.classList.add('active');
+        clearTimeout(cta._rem);
+        cta._rem = setTimeout(()=> cta.classList.remove('active'), 1400);
       }
     });
   }
@@ -140,24 +148,18 @@
     });
   }
 
-  // initial render
   if(output) output.textContent = 'No results yet. Klik Generate.';
 
-  /* ============================
-     FLOATING BUTTON SYSTEM (keep)
-     ============================ */
+  /* FLOATING CTA: muncul hanya saat fokus / keyboard */
   (function(){
     const btnArea = document.querySelector('.btn-area');
     if(!btnArea) return;
-
     const inputs = Array.from(document.querySelectorAll('input[type="text"], textarea'));
     let blurTimeout = null;
-
     function setSticky(on){
       if(on) btnArea.classList.add('sticky');
       else btnArea.classList.remove('sticky');
     }
-
     inputs.forEach(inp => {
       inp.addEventListener('focus', ()=>{
         clearTimeout(blurTimeout);
@@ -168,8 +170,7 @@
         blurTimeout = setTimeout(()=> setSticky(false), 250);
       });
     });
-
-    // detect keyboard mobile (resize heuristic)
+    // keyboard heuristic
     let lastHeight = window.innerHeight;
     window.addEventListener('resize', () => {
       const h = window.innerHeight;
@@ -180,70 +181,82 @@
   })();
 
 
-  /* ============================
-     FIX: avoid "automatic" active states on load
-     - remove any lingering :active / .active from buttons
-     - blur buttons if focused due to session restore
-     - ensure create button only becomes active on user-click (or successful copy)
-     ============================ */
+  /* SAFEGUARDS: avoid auto-active / auto-sticky on page load or bfcache restore */
   (function(){
-    // remove .active from method buttons and CTA on load (safety)
-    function clearActiveStates(){
+    // remove any autofocus attribute (prevents immediate focus)
+    document.querySelectorAll('[autofocus]').forEach(el => el.removeAttribute('autofocus'));
+
+    // clear sticky and .active states after pageshow (covers bfcache)
+    function clearUIState(){
+      // remove sticky container class so button tidak melayang pada load/restore
+      const btnArea = document.querySelector('.btn-area');
+      if(btnArea) btnArea.classList.remove('sticky');
+
+      // normalize method buttons: remove all active then set intended defaults explicitly
       document.querySelectorAll('.method.active').forEach(b => b.classList.remove('active'));
-      // if your UI expects some default active method, set it explicitly instead of relying on browser restore
       const defaultPlus = document.querySelector('.method[data-method="plus"]');
       const defaultLower = document.querySelector('.method[data-method="lower"]');
       if(defaultPlus) defaultPlus.classList.add('active');
       if(defaultLower) defaultLower.classList.add('active');
 
+      // CTA should not be active by default
       const cta = document.querySelector('.btn.primary');
       if(cta) cta.classList.remove('active');
 
-      // blur any focused button (some browsers restore pressed/focused element on reload)
+      // blur any focused button (browser sometimes restores focus)
       if(document.activeElement && document.activeElement.tagName === 'BUTTON'){
-        document.activeElement.blur();
+        try { document.activeElement.blur(); } catch(e){}
       }
     }
 
-    // run after a tick so browser restore states have settled
-    window.addEventListener('pageshow', () => {
-      // pageshow also fires on bfcache restore; clear states there too
-      setTimeout(clearActiveStates, 40);
-    });
+    // run shortly after load and on pageshow
+    window.addEventListener('pageshow', () => setTimeout(clearUIState, 40));
+    setTimeout(clearUIState, 40);
 
-    // also on initial load
-    setTimeout(clearActiveStates, 40);
-
-    // make CTA become active only when user clicks it or on successful copy
+    // only allow CTA visual activation for real user interaction:
     const ctaBtn = document.querySelector('.btn.primary');
     if(ctaBtn){
-      // ensure it doesn't have "active" by default
+      // remove existing active
       ctaBtn.classList.remove('active');
 
-      // existing click behavior might be implemented elsewhere; wrap to toggle visual active state
-      ctaBtn.addEventListener('click', async (ev) => {
-        // quick guard: only toggle visual state, do not trigger generation logic here
-        // add .active immediately to give feedback
-        ctaBtn.classList.add('active');
-
-        // remove .active after a short delay so style returns (unless you want it persistent)
-        clearTimeout(ctaBtn._rem);
-        ctaBtn._rem = setTimeout(()=> ctaBtn.classList.remove('active'), 1400);
+      // only add .active if the click event is trusted (user-initiated)
+      ctaBtn.addEventListener('click', (ev) => {
+        if(ev && ev.isTrusted){
+          ctaBtn.classList.add('active');
+          clearTimeout(ctaBtn._rem);
+          ctaBtn._rem = setTimeout(()=> ctaBtn.classList.remove('active'), 1400);
+        } else {
+          // If not trusted (programmatic), don't set active class (but still allow app logic elsewhere)
+        }
       });
-
-      // if you prefer to show active only on successful copy, listen on copy events:
-      // example: when copy happens (copyBtn handler above), set active for short time
-      if(copyBtn){
-        copyBtn.addEventListener('click', ()=>{
-          const btn = document.querySelector('.btn.primary');
-          if(!btn) return;
-          btn.classList.add('active');
-          clearTimeout(btn._rem);
-          btn._rem = setTimeout(()=> btn.classList.remove('active'), 1400);
-        });
-      }
     }
+
+    // prevent programmatic focus/press from triggering unwanted UI on load:
+    // only necessary if other scripts attempt to auto-click; if so, this avoids visual activation.
+    // We DO NOT block programmatic click entirely (some app logic may rely on it).
+    const nativeClick = HTMLElement.prototype.click;
+    let allowSynthetic = false;
+    // once user interacts, allow synthetic clicks to behave normally
+    function userInteracted(){ allowSynthetic = true; window.removeEventListener('pointerdown', userInteracted); window.removeEventListener('keydown', userInteracted); }
+    window.addEventListener('pointerdown', userInteracted);
+    window.addEventListener('keydown', userInteracted);
+
+    HTMLElement.prototype.click = function(...args){
+      // if it's the CTA and user hasn't interacted, dispatch a non-visual click event (no focus/active)
+      if(this && this.id === 'btnCreate' && !allowSynthetic){
+        try {
+          const ev = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true });
+          return this.dispatchEvent(ev);
+        } catch (e) {
+          return nativeClick.apply(this, args);
+        }
+      }
+      return nativeClick.apply(this, args);
+    };
+
+    window.addEventListener('beforeunload', ()=>{
+      try { HTMLElement.prototype.click = nativeClick; } catch(e){}
+    });
   })();
 
-  // end of main IIFE
-})();
+})(); // end main IIFE
