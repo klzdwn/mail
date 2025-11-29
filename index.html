@@ -59,27 +59,47 @@
   .titlewrap p{margin:0;color:var(--mut);font-size:13px}
 
   .form{display:flex;flex-direction:column;gap:12px}
-  label{display:block;margin-bottom:6px;font-weight:700;color:var(--ink);font-size:14px}
+
+  /* label spacing adjusted: turun sedikit agar lebih rapi */
+  label{
+    display:block;
+    margin-top:8px;      /* turun sedikit */
+    margin-bottom:4px;   /* jarak ke input diperkecil */
+    font-weight:700;
+    color:var(--ink);
+    font-size:14px;
+  }
 
   /* =========================
-     INPUT - tampil seperti tombol
+     INPUT - diperbesar sesuai permintaan (besar, bulat, placeholder besar)
+     Hanya CSS di sini yang diubah — JS dan tombol tetap tidak disentuh
      ========================= */
   input[type="text"], textarea{
     width:100%;
-    /* tampil seperti tombol: padding besar, radius besar, gradient ringan */
-    padding:14px 16px;
-    border-radius:14px;
-    border:1px solid rgba(16,24,40,0.06);
-    background: linear-gradient(180deg,#fbfdff,#f7fbff);
-    font-size:16px;
+    padding:22px 24px;                /* area tap lebih besar */
+    height:68px;                      /* ketinggian konsisten seperti contoh */
+    border-radius:20px;               /* rounded besar */
+    border:1px solid rgba(16,24,40,0.08);
+    background: linear-gradient(180deg,#ffffff,#fbfdff);
+    font-size:26px;                   /* FONT BESAR sesuai screenshot */
+    font-weight:500;
     color:var(--ink);
     box-shadow: 0 8px 18px rgba(16,24,40,0.02) inset;
-    transition:box-shadow .12s, transform .08s;
-    /* tetap cursor text agar user tahu ini input */
+    transition:box-shadow .12s, transform .06s;
     cursor:text;
+    line-height:1;
   }
-  input::placeholder{color:#9aa6bf}
-  input:focus, textarea:focus{box-shadow:0 20px 48px rgba(37,99,235,0.07);transform:translateY(-1px);outline:none}
+  input::placeholder{
+    color:#c7d0dc;
+    font-size:26px;                  /* placeholder juga besar */
+    opacity:1;
+  }
+  input:focus, textarea:focus{
+    box-shadow:0 22px 48px rgba(37,99,235,0.08);
+    transform:translateY(-1px);
+    outline:none;
+  }
+
   .hint{font-size:13px;color:var(--mut)}
 
   .method-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--border);box-shadow:0 10px 26px rgba(15,23,42,0.03)}
