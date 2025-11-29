@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Slide-in Copied</title>
+<title>Email Generator — Username Warning</title>
 <style>
   :root{
     --bg:#f5f7fb;
@@ -12,233 +12,217 @@
     --accent:#2563eb;
     --accent-strong:#1e40af;
     --soft:#f8fafc;
-    --shadow: 0 10px 22px rgba(15,23,42,0.05);
+    --shadow:0 10px 22px rgba(15,23,42,0.05);
+    --danger:#e11d48;
+    --danger-bg:#ffe4e9;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#05122a;-webkit-font-smoothing:antialiased}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#05122a}
   .wrap{max-width:560px;margin:12px auto;padding:8px}
-  .card{background:var(--card);border-radius:14px;padding:10px;box-shadow:var(--shadow);overflow:hidden}
+  .card{background:var(--card);border-radius:14px;padding:10px;box-shadow:var(--shadow)}
   header{text-align:center}
-  .icon{width:42px;height:42px;margin:0 auto 6px;border-radius:50%;background:#eaf2ff;display:flex;align-items:center;justify-content:center;color:#1e40af}
+  .icon{width:42px;height:42px;border-radius:50%;background:#eaf2ff;display:flex;align-items:center;justify-content:center;font-size:18px;color:#1e40af}
   h1{font-size:17px;margin:0;font-weight:800}
   p.lead{font-size:12px;margin:4px 0;color:var(--mut)}
-  label{font-weight:700;font-size:12px;margin-bottom:4px;display:block;color:#111}
-  input,textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #dce3ee;font-size:13px}
-  textarea{min-height:80px}
+  label{font-weight:700;font-size:12px;margin-bottom:4px;display:block}
+
+  input,textarea{
+    width:100%;padding:8px;border-radius:8px;
+    border:1px solid #dce3ee;font-size:13px;background:#fff
+  }
+
+  /* WARNING STYLE */
+  .warn{
+    margin-top:4px;
+    font-size:12px;
+    color:var(--danger);
+    background:var(--danger-bg);
+    padding:6px 10px;
+    border-radius:6px;
+    display:none;
+  }
+
   .grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-  .method{flex:1 1 48%;padding:6px 10px;min-height:40px;background:#f3f6fc;border-radius:8px;border:1px solid #dfe6f3;font-size:12px;font-weight:700;cursor:pointer;text-align:center}
+  .method{
+    flex:1 1 48%;padding:6px 10px;min-height:40px;background:#f3f6fc;border-radius:8px;
+    border:1px solid #dfe6f3;font-size:12px;font-weight:700;cursor:pointer;text-align:center
+  }
   .method.active{background:var(--accent);color:white;border-color:var(--accent)}
   .preview{background:#fbfdff;border:1px solid #e3e9f5;padding:8px;border-radius:8px;margin-top:10px;font-size:13px}
   .footerbar{text-align:center;margin-top:12px;font-size:12px;color:#667085}
 
-  /* button area */
-  .btn{width:100%;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 10px 26px rgba(37,99,235,0.10)}
-  .btn.ghost{background:#fff;border:1px solid #dce3ee;color:var(--accent)}
-  .btn-area{position:relative;display:block} /* relative parent for sliding badge */
+  .btn{
+    width:100%;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px
+  }
+  .btn.primary{background:var(--accent);color:white;box-shadow:0 10px 26px rgba(37,99,235,0.10)}
 
-  /* sliding badge (from right -> left) */
+  /* slide copy badge */
+  .btn-area{position:relative;margin-top:14px}
   .copy-badge{
-    position:absolute;
-    top:-48px; /* appears above button */
-    right:0;
-    transform:translateX(110%); /* start off-screen right */
+    position:absolute;top:-48px;right:0;
+    transform:translateX(110%);
     opacity:0;
     background:linear-gradient(180deg,var(--accent-strong),var(--accent));
-    color:#fff;
-    padding:8px 12px;
-    border-radius:10px;
-    display:inline-flex;
-    gap:8px;
-    align-items:center;
+    color:#fff;padding:8px 12px;border-radius:10px;
+    display:flex;align-items:center;gap:8px;
     box-shadow:0 12px 30px rgba(30,64,175,0.16);
-    transition:transform .32s cubic-bezier(.22,.9,.25,1), opacity .22s ease;
-    pointer-events:none;
-    white-space:nowrap;
-    font-weight:800;
-    font-size:14px;
+    transition:.3s cubic-bezier(.22,.9,.25,1);
+    font-weight:800;font-size:14px;white-space:nowrap;pointer-events:none;
   }
-  .copy-badge.show{
-    transform:translateX(0); /* slide into place */
-    opacity:1;
-  }
-  /* small check icon circle */
+  .copy-badge.show{transform:translateX(0);opacity:1}
   .copy-badge .check{
-    width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-weight:900;
-  }
-
-  /* for bulk button badge variant (reuse) */
-  .btn.small{padding:8px;font-size:13px}
-
-  @media (max-width:420px){
-    .copy-badge{top:-44px;font-size:13px;padding:6px 10px}
+    width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,0.22);
+    display:flex;align-items:center;justify-content:center;font-weight:900
   }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <header>
-        <div class="icon">✉️</div>
-        <h1>Email Generator</h1>
-        <p class="lead">Buat varian email dengan berbagai metode</p>
-      </header>
+<div class="wrap">
+  <div class="card">
+    <header>
+      <div class="icon">✉️</div>
+      <h1>Email Generator</h1>
+      <p class="lead">Buat varian email dengan berbagai metode</p>
+    </header>
 
-      <label>Username Email</label>
-      <input id="inpName" placeholder="namaanda">
+    <!-- Username -->
+    <label>Username Email</label>
+    <input id="inpName" placeholder="namaanda">
+    <div id="warnName" class="warn">⚠️ Isi Username terlebih dahulu sebelum klik Buat & Salin</div>
 
-      <label style="margin-top:8px">Domain Email</label>
-      <input id="inpDomain" value="gmail.com">
+    <!-- Domain -->
+    <label style="margin-top:10px">Domain Email</label>
+    <input id="inpDomain" value="gmail.com">
 
-      <label style="margin-top:10px">Metode Username:</label>
-      <div class="grid" id="methodsUser">
-        <button class="method active" data-method="plus">Plus (+)</button>
-        <button class="method" data-method="dot">Titik (.)</button>
-        <button class="method" data-method="upper">UPPERCASE</button>
-        <button class="method active" data-method="lower">lowercase</button>
-      </div>
-
-      <label style="margin-top:8px">Custom + tag</label>
-      <input id="plusTag" placeholder="contoh: tokoku (tanpa +)">
-
-      <label style="margin-top:10px">Metode Domain:</label>
-      <div class="grid" id="methodsDom">
-        <button class="method" data-method="domRandom">Random Case</button>
-        <button class="method active" data-method="domAsIs">As-is</button>
-      </div>
-
-      <!-- button area with badge -->
-      <div class="btn-area" style="margin-top:14px">
-        <div id="copyBadge" class="copy-badge" aria-hidden="true">
-          <span class="check">✔</span>
-          <span id="copyBadgeText">Tersalin!</span>
-        </div>
-
-        <button id="btnCreate" class="btn primary" title="Buat & Salin">📋 Buat & Salin</button>
-      </div>
-
-      <div class="preview" style="margin-top:12px">
-        <div style="font-size:12px;color:#667085">Email yang dibuat:</div>
-        <div id="previewText" style="margin-top:6px">-</div>
-      </div>
-
-      <div class="footerbar" style="margin-top:12px">Nomor urut: <b id="counter">0</b></div>
+    <label style="margin-top:12px">Metode Username:</label>
+    <div class="grid" id="methodsUser">
+      <button class="method active" data-method="plus">Plus (+)</button>
+      <button class="method" data-method="dot">Titik (.)</button>
+      <button class="method" data-method="upper">UPPERCASE</button>
+      <button class="method active" data-method="lower">lowercase</button>
     </div>
+
+    <label style="margin-top:10px">Custom + tag</label>
+    <input id="plusTag" placeholder="contoh: tokoku (tanpa +)">
+
+    <label style="margin-top:12px">Metode Domain:</label>
+    <div class="grid" id="methodsDom">
+      <button class="method" data-method="domRandom">Random Case</button>
+      <button class="method active" data-method="domAsIs">As-is</button>
+    </div>
+
+    <!-- Button Area + badge -->
+    <div class="btn-area">
+      <div id="copyBadge" class="copy-badge">
+        <span class="check">✔</span> <span id="copyBadgeText">Tersalin!</span>
+      </div>
+      <button id="btnCreate" class="btn primary">📋 Buat & Salin</button>
+    </div>
+
+    <div class="preview">
+      <div style="font-size:12px;color:#667085">Email yang dibuat:</div>
+      <div id="previewText" style="margin-top:6px">-</div>
+    </div>
+
+    <div class="footerbar">Nomor urut: <b id="counter">0</b></div>
+
   </div>
+</div>
 
 <script>
 (function(){
-  const $ = id => document.getElementById(id);
-  const inpName = $('inpName'), inpDomain = $('inpDomain'), plusTag = $('plusTag');
-  const methodsUser = document.getElementById('methodsUser'), methodsDom = document.getElementById('methodsDom');
-  const btnCreate = $('btnCreate'), previewText = $('previewText'), counterEl = $('counter');
-  const copyBadge = $('copyBadge'), copyBadgeText = $('copyBadgeText');
+  const $ = id=>document.getElementById(id);
 
-  // toggle helpers
+  const inpName=$('inpName'), inpDomain=$('inpDomain'), plusTag=$('plusTag');
+  const warnName=$('warnName'), btnCreate=$('btnCreate');
+  const previewText=$('previewText'), counter=$('counter');
+  const copyBadge=$('copyBadge');
+
+  const methodsUser=$('methodsUser'), methodsDom=$('methodsDom');
+
   function wireToggle(container, radio=false){
     container.addEventListener('click', e=>{
       const btn = e.target.closest('button[data-method]');
       if(!btn) return;
       if(radio){
-        Array.from(container.querySelectorAll('button[data-method]')).forEach(b=>b.classList.remove('active'));
+        container.querySelectorAll('.method').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-      } else {
-        btn.classList.toggle('active');
-      }
+      } else btn.classList.toggle('active');
     });
   }
-  wireToggle(methodsUser, false);
-  wireToggle(methodsDom, true);
+  wireToggle(methodsUser,false);
+  wireToggle(methodsDom,true);
+
+  inpName.addEventListener('input',()=>{
+    warnName.style.display = inpName.value.trim()==='' ? 'block' : 'none';
+  });
 
   function readOpts(container){
-    const out = {};
-    Array.from(container.querySelectorAll('button[data-method]')).forEach(b=>{
-      out[b.dataset.method] = b.classList.contains('active');
-    });
-    return out;
+    const o={};
+    container.querySelectorAll('button[data-method]').forEach(b=>o[b.dataset.method]=b.classList.contains('active'));
+    return o;
   }
 
-  function applyDot(n){ if(n.length<=2) return n.split('').join('.'); return n.slice(0,2)+'.'+n.slice(2); }
-  function applyPlus(n, tag){ if(tag && tag.trim()!=='') return n + '+' + tag.trim().replace(/^\+/, ''); return n + '+id'; }
-  function randomCase(s){ return [...s].map(c => Math.random()<0.5 ? c.toLowerCase() : c.toUpperCase()).join(''); }
-  function transformUsername(base, opts, tag){
-    let u = base;
-    if(opts.dot) u = applyDot(u);
-    if(opts.plus) u = applyPlus(u, tag);
-    if(opts.upper && !opts.lower) u = u.toUpperCase();
-    else u = u.toLowerCase();
-    return u.replace(/\s+/g,'.');
-  }
-  function domainTransform(domain, domOpts){ if(domOpts.domRandom) return randomCase(domain); return domain; }
+  function applyDot(n){return n.length<=2?n.split('').join('.'):n.slice(0,2)+'.'+n.slice(2);}
+  function applyPlus(n,tag){return tag.trim()?n+'+'+tag.trim().replace(/^\+/,''):n+'+id';}
+  function randomCase(s){return [...s].map(c=>Math.random()<0.5?c.toLowerCase():c.toUpperCase()).join('');}
 
-  function makeEmail(){
-    const name = inpName.value.trim();
-    if(!name) return '';
-    const opts = readOpts(methodsUser);
-    const domOpts = readOpts(methodsDom);
-    const username = transformUsername(name, opts, plusTag.value);
-    const domain = domainTransform((inpDomain.value.trim()||'gmail.com'), domOpts);
-    return username + '@' + domain;
+  function make(){
+    const n=inpName.value.trim();
+    if(!n) return '';
+    const uO=readOpts(methodsUser), dO=readOpts(methodsDom);
+    let u=n;
+    if(uO.dot) u=applyDot(u);
+    if(uO.plus) u=applyPlus(u,plusTag.value);
+    if(uO.upper&&!uO.lower) u=u.toUpperCase(); else u=u.toLowerCase();
+    u=u.replace(/\s+/g,'.');
+    let d=inpDomain.value.trim()||'gmail.com';
+    if(dO.domRandom) d=randomCase(d);
+    return u+'@'+d;
   }
 
-  // robust copy
-  async function copyToClipboard(text){
-    if(!text) return false;
-    try {
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        await navigator.clipboard.writeText(text);
-        return true;
-      }
-    } catch(e){ console.warn('navigator.clipboard failed', e); }
-    try {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      const ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      return ok;
-    } catch(e) { console.warn('fallback copy failed', e); return false; }
+  async function copyTxt(t){
+    try{
+      await navigator.clipboard.writeText(t);
+      return true;
+    }catch(e){
+      try{
+        const ta=document.createElement('textarea');
+        ta.value=t;
+        document.body.appendChild(ta);
+        ta.select();
+        const ok=document.execCommand('copy');
+        ta.remove();
+        return ok;
+      }catch(e2){return false;}
+    }
   }
 
-  // show slide-in badge from right -> left, then hide
-  function showCopyBadge(text){
-    copyBadgeText.textContent = text || 'Tersalin!';
+  function showBadge(msg){
+    $('copyBadgeText').textContent=msg;
     copyBadge.classList.add('show');
-    copyBadge.setAttribute('aria-hidden','false');
     clearTimeout(copyBadge._t);
-    copyBadge._t = setTimeout(()=> {
-      copyBadge.classList.remove('show');
-      copyBadge.setAttribute('aria-hidden','true');
-    }, 1500);
+    copyBadge._t=setTimeout(()=>copyBadge.classList.remove('show'),1500);
   }
 
-  // button click: copy then show preview & increment
-  let count = 0;
-  btnCreate.addEventListener('click', async ()=>{
-    const email = makeEmail();
+  let count=0;
+
+  btnCreate.onclick=async()=>{
+    const email=make();
     if(!email){
-      // quick shake (optional) or alert
-      btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1});
+      warnName.style.display='block';
+      inpName.focus();
       return;
     }
-    const ok = await copyToClipboard(email);
-    // show badge slide-in regardless of ok (but message differs)
-    if(ok){
-      showCopyBadge('Tersalin!');
-    } else {
-      showCopyBadge('Salin manual');
-    }
-    // then update preview & counter
-    count += 1;
-    counterEl.textContent = count;
-    previewText.textContent = email;
-  });
+    const ok=await copyTxt(email);
+    showBadge(ok?'Tersalin!':'Salin manual');
+    previewText.textContent=email;
+    counter.textContent=++count;
+  };
 
 })();
 </script>
+
 </body>
 </html>
