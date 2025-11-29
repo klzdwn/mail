@@ -379,5 +379,43 @@
   });
 })();
 </script>
+  <!-- Reset awal + hentikan auto-click setelah reload -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try {
+    // 1) Hapus semua kelas 'active' pada tombol metode (user akan memilih sendiri)
+    document.querySelectorAll('#methodsUser .method, #methodsDom .method').forEach(btn=>{
+      btn.classList.remove('active');
+      // hapus atribut autofocus jika ada
+      if(btn.hasAttribute && btn.hasAttribute('autofocus')) btn.removeAttribute('autofocus');
+    });
+
+    // 2) Reset preview & counter agar tampak fresh
+    const preview = document.getElementById('previewText');
+    const counter = document.getElementById('counter');
+    if(preview) preview.textContent = '-';
+    if(counter) counter.textContent = '0';
+
+    // 3) sembunyikan peringatan bila muncul
+    ['warnName','warnDomain'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.style.display = 'none';
+    });
+
+    // 4) pastikan form tidak melakukan submit default (double-safety)
+    const f = document.getElementById('egForm') || document.querySelector('form');
+    if(f) f.addEventListener('submit', function(e){ e.preventDefault(); return false; });
+
+    // 5) optional safety: remove any inline onclick="...click()" or auto dispatches
+    //    (tidak mengubah tombol, hanya mencegah pemicu click pada load)
+    //    - jika ada skrip lain yang memanggil .click() pada load, sulit deteksi otomatis.
+    //    - namun kita atur flag global agar script lain bisa cek: window.__eg_no_autoclick = true;
+    window.__eg_no_autoclick = true;
+
+  } catch(err) {
+    console.warn('Init reset failed', err);
+  }
+});
+</script>
 </body>
 </html>
