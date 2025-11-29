@@ -1,4 +1,4 @@
-// script.js — cleaned: no-floating, no auto-press, CTA active only on real click/copy
+// script.js — cleaned + plusOptions support
 (function(){
   const $ = id => document.getElementById(id);
   const baseInput = $('base');
@@ -14,6 +14,12 @@
   const copyBtn = $('copy');
   const downloadBtn = $('download');
   const createBtn = $('btnCreate'); // if present in your markup
+
+  // plusOptions elements (optional: if not present, code will ignore)
+  const plusOptions = $('plusOptions');      // container div for plus options
+  const plusLen = $('plusLen');              // range input for length
+  const plusLenVal = $('plusLenVal');        // display for length
+  // plus mode buttons inside plusOptions should have data-plusmode="numbers"|"letters"|"mix"
 
   function parseList(s){
     return (s || '').split(',').map(x=>x.trim()).filter(Boolean);
@@ -89,9 +95,19 @@
       if(dotsInput) dotsInput.checked = false;
       if(output) output.textContent = 'No results yet. Klik Generate.';
       if(countEl) countEl.textContent = '(0)';
+      // hide plusOptions on reset
+      if(plusOptions) plusOptions.style.display = 'none';
+      // reset plus mode selection
+      if(plusOptions){
+        plusOptions.querySelectorAll('button[data-plusmode]').forEach(b => b.classList.remove('active'));
+        const def = plusOptions.querySelector('button[data-plusmode="mix"]') || plusOptions.querySelector('button[data-plusmode="numbers"]');
+        if(def) def.classList.add('active');
+        if(plusLen){ plusLen.value = plusLen.getAttribute('min') || 8; if(plusLenVal) plusLenVal.textContent = plusLen.value; }
+      }
     });
   }
 
+  // clipboard util
   async function copyTextToClipboard(text){
     if(!text) return false;
     try{
@@ -154,24 +170,19 @@
   // default message
   if(output) output.textContent = 'No results yet. Klik Generate.';
 
-  // --- REMOVE floating behaviour: ensure no sticky class and no related listeners ---
+  // remove floating behaviour if present
   (function(){
     const btnArea = document.querySelector('.btn-area');
     if(btnArea){
       btnArea.classList.remove('sticky');
-      // remove inline style that might have been applied by previous code
       btnArea.style.position = '';
       btnArea.style.bottom = '';
       btnArea.style.left = '';
       btnArea.style.right = '';
     }
-
-    // If any floating-related listeners exist elsewhere, we don't try to remove unknown handlers.
-    // But defensively ensure window resize won't toggle sticky here.
-    // (No-op)
   })();
 
-  // --- UI state cleanup on load/pageshow (avoid browser restoring pressed/focus) ---
+  // UI cleanup on load/pageshow
   (function(){
     function clearUIState(){
       // normalize method buttons
@@ -181,11 +192,18 @@
       if(defaultPlus) defaultPlus.classList.add('active');
       if(defaultLower) defaultLower.classList.add('active');
 
-      // CTA not active by default
+      // CTA not active
       const cta = createBtn || document.querySelector('.btn.primary');
       if(cta) cta.classList.remove('active');
 
-      // blur focused button (if any)
+      // hide plusOptions initially unless plus active
+      if(plusOptions){
+        const plusBtn = document.querySelector('.method[data-method="plus"]');
+        if(plusBtn && plusBtn.classList.contains('active')) plusOptions.style.display = '';
+        else plusOptions.style.display = 'none';
+      }
+
+      // blur focused button
       if(document.activeElement && document.activeElement.tagName === 'BUTTON'){
         try { document.activeElement.blur(); } catch(e){}
       }
@@ -195,15 +213,92 @@
     setTimeout(clearUIState, 40);
   })();
 
+  // --- PLUS OPTIONS: wiring + generator helpers ---
+  (function(){
+    // helpers
+    function randStr(len, charset){
+      let s = '';
+      for(let i=0;i<len;i++) s += charset.charAt(Math.floor(Math.random()*charset.length));
+      return s;
+    }
+    function randNumbers(len){ return randStr(len, '0123456789'); }
+    function randLetters(len){ return randStr(len, 'abcdefghijklmnopqrstuvwxyz'); }
+    function randMix(len){ return randStr(len, 'abcdefghijklmnopqrstuvwxyz0123456789'); }
+
+    // read selected plus mode
+    function readPlusMode(){
+      if(!plusOptions) return 'mix';
+      const btn = plusOptions.querySelector('button[data-plusmode].active');
+      return btn ? btn.dataset.plusmode : 'mix';
+    }
+
+    // expose applyPlus globally so existing transformUsername can call it
+    window.__applyPlus = function(name, tagValue){
+      // if user provided explicit tag (e.g. input plusTag) use it
+      if(tagValue && tagValue.trim()){
+        const clean = tagValue.trim().replace(/^\+/, '');
+        return name + '+' + clean;
+      }
+      const mode = readPlusMode() || 'mix';
+      let len = 12;
+      if(plusLen) len = Math.max(1, Number(plusLen.value) || 12);
+      if(mode === 'numbers') return name + '+' + randNumbers(len);
+      if(mode === 'letters') return name + '+' + randLetters(len);
+      return name + '+' + randMix(len); // mix
+    };
+
+    // wire plusOptions visibility: show when method 'plus' active
+    (function wirePlusVisibility(){
+      const methodsUser = document.getElementById('methodsUser');
+      if(!methodsUser || !plusOptions) return;
+
+      // when user clicks any method button, update visibility after toggle
+      methodsUser.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button[data-method]');
+        if(!btn) return;
+        // let other handler toggle .active first; check after small delay
+        setTimeout(()=>{
+          const plusBtn = methodsUser.querySelector('button[data-method="plus"]');
+          if(plusBtn && plusBtn.classList.contains('active')) plusOptions.style.display = '';
+          else plusOptions.style.display = 'none';
+        },10);
+      });
+
+      // initial state
+      setTimeout(()=>{
+        const plusBtn = methodsUser.querySelector('button[data-method="plus"]');
+        if(plusBtn && plusBtn.classList.contains('active')) plusOptions.style.display = '';
+        else plusOptions.style.display = 'none';
+      }, 40);
+    })();
+
+    // wire plus mode toggle buttons inside plusOptions
+    (function wirePlusModeButtons(){
+      if(!plusOptions) return;
+      plusOptions.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button[data-plusmode]');
+        if(!btn) return;
+        e.preventDefault();
+        Array.from(plusOptions.querySelectorAll('button[data-plusmode]')).forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+      // default selection
+      setTimeout(()=>{
+        if(!plusOptions.querySelector('button[data-plusmode].active')){
+          const def = plusOptions.querySelector('button[data-plusmode="mix"]') || plusOptions.querySelector('button[data-plusmode="numbers"]');
+          if(def) def.classList.add('active');
+        }
+        if(plusLen && plusLenVal) plusLenVal.textContent = plusLen.value;
+        if(plusLen) plusLen.addEventListener('input', ()=> { if(plusLenVal) plusLenVal.textContent = plusLen.value; });
+      }, 40);
+    })();
+  })();
+
   // --- Make CTA become blue only on real user clicks (visual feedback) ---
   (function(){
     const cta = createBtn || document.querySelector('.btn.primary');
     if(!cta) return;
-
-    // Ensure it starts non-active
     cta.classList.remove('active');
-
-    // Add click visual feedback (user-initiated)
     cta.addEventListener('click', (ev) => {
       if(ev && ev.isTrusted){
         cta.classList.add('active');
