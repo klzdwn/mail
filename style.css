@@ -20,3 +20,25 @@ label {
   margin-bottom: 4px;   /* lebih kecil supaya jarak lebih turun */
   margin-top: 8px;      /* bikin label agak turun */
 }
+/* ===== floating CTA: tetap terlihat di mobile (atas keyboard) ===== */
+.btn-area.sticky {
+  position:fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  max-width: 980px;
+  margin: 0 auto;
+  z-index: 1200;
+  padding: 6px 12px; /* beri sedikit padding agar tombol tidak mepet layar */
+  background: transparent; /* biarkan gaya tombol tetap sama */
+  pointer-events: none; /* container saja, tombol tetap interaktif */
+}
+.btn-area.sticky .btn {
+  pointer-events: auto; /* tombol bisa diklik */
+  box-shadow: 0 20px 48px rgba(37,99,235,0.12);
+}
+
+/* ketahanan saat ada safe-area (iPhone/X) */
+@supports(padding: max(0px)) {
+  .btn-area.sticky { bottom: max(12px, env(safe-area-inset-bottom)); }
+}
