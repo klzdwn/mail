@@ -140,9 +140,18 @@ input:focus{
   justify-content:center;
   gap:10px;
 }
+/* Tombol utama mengikuti gaya tombol kecil lainnya */
 .btn.primary{
-  background: linear-gradient(90deg,var(--primary),var(--primary-2));
-  color:white;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.btn.primary:hover{
+  background: var(--soft);
+  color: var(--primary);
+  transform: translateY(-2px);
 }
 
 .side{display:flex;flex-direction:column;gap:12px}
