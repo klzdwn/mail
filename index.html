@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Smaller input text</title>
+<title>Email Generator — Smaller input text + Floating CTA</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -46,25 +46,14 @@
   .form{display:flex;flex-direction:column;gap:12px}
   label{display:block;margin-top:8px;margin-bottom:6px;font-weight:700;color:var(--ink);font-size:14px}
 
-  /* === INPUTS ===
-     ukuran teks di sini DISMALLER sesuai permintaan:
-     - Username, Domain, Custom+tag: font-size 16 (placeholder 15)
-     - Input height tetap nyaman, but not huge
-  */
+  /* === INPUTS === */
   input[type="text"], textarea{
     width:100%; max-width:100%; padding:14px 16px; height:54px; border-radius:14px; border:1px solid var(--border);
     background:var(--card); font-size:16px; font-weight:500; color:var(--ink); box-shadow:none; transition:box-shadow .12s, transform .06s;
     cursor:text; line-height:1.15;
   }
-  /* smaller placeholder text specifically */
-  input::placeholder, textarea::placeholder{
-    color:#9aa6bf; font-size:15px; opacity:1;
-  }
-  /* dark-mode: solid dark inputs (no bright gradient) */
-  body.dark input[type="text"], body.dark textarea{
-    background:#071a2b; border:1px solid rgba(255,255,255,0.04);
-  }
-
+  input::placeholder, textarea::placeholder{ color:#9aa6bf; font-size:15px; opacity:1; }
+  body.dark input[type="text"], body.dark textarea{ background:#071a2b; border:1px solid rgba(255,255,255,0.04); }
   input:focus, textarea:focus{box-shadow:0 14px 36px rgba(37,99,235,0.06);transform:translateY(-1px);outline:none}
 
   .hint{font-size:13px;color:var(--mut)}
@@ -91,14 +80,32 @@
   .btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s,box-shadow .12s}
   .btn.primary{background: linear-gradient(90deg,var(--primary),var(--primary-2)); color:white; border:1px solid rgba(255,255,255,0.06); box-shadow: 0 18px 56px rgba(37,99,235,0.18)}
 
+  /* === TAMBAHAN: sticky floating CTA CSS (letakkan di akhir style) === */
+  .btn-area.sticky {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: 980px;
+    margin: 0 auto;
+    z-index: 1200;
+    padding: 6px 12px;
+    background: transparent;
+    pointer-events: none;
+  }
+  .btn-area.sticky .btn {
+    pointer-events: auto;
+    box-shadow: 0 20px 48px rgba(37,99,235,0.12);
+  }
+  @supports(padding: max(0px)) {
+    .btn-area.sticky { bottom: max(12px, env(safe-area-inset-bottom)); }
+  }
+
   .side{display:flex;flex-direction:column;gap:12px}
   .preview{padding:22px 16px;border-radius:14px;background:var(--card);border:1px solid var(--border);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--ink);font-size:14px;box-shadow:0 18px 40px rgba(16,24,40,0.04);min-width:0}
   body.dark .preview{ background:#071426; border:1px solid rgba(255,255,255,0.02); box-shadow:none; }
   .preview .label{font-size:12px;color:var(--mut);margin-bottom:10px}
   .preview .emailTxt{font-size:15px;word-break:break-all}
-
-  .meta{padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--border);font-size:13px;color:var(--mut)}
-  body.dark .meta{ background:#071426; border:1px solid rgba(255,255,255,0.02); color:var(--mut)}
 
   .copy-badge{position:absolute;top:-72px;right:0;transform:translateX(120%);opacity:0;background:var(--card);padding:10px 16px;border-radius:14px;display:flex;gap:12px;align-items:center;border:1px solid var(--border);box-shadow:0 18px 40px rgba(15,23,42,0.06);transition:transform .32s cubic-bezier(.22,.9,.25,1), opacity .22s ease;pointer-events:none;white-space:nowrap;font-weight:800;color:var(--ink)}
   .copy-badge.show{transform:translateX(0);opacity:1}
@@ -329,17 +336,18 @@
 
   warnName.style.display = 'none'; warnDomain.style.display = 'none';
 })();
-  /* Floating CTA behavior: tetap muncul di atas keyboard saat user fokus ke input.
-   - pasokan: tambahkan class 'sticky' ke .btn-area saat ada fokus input / keyboard on
-   - cabut setelah blur (dengan delay kecil supaya klik tombol masih terdeteksi)
+
+/* Floating CTA behavior: tetap muncul di atas keyboard saat user fokus ke input.
+   - menambahkan/menghapus class 'sticky' pada .btn-area
+   - delay kecil supaya klik tombol masih terdeteksi setelah blur
 */
 (function(){
   const btnArea = document.querySelector('.btn-area');
+  if(!btnArea) return;
   const inputs = Array.from(document.querySelectorAll('input[type="text"], textarea'));
   let blurTimeout = null;
 
   function setSticky(on){
-    if(!btnArea) return;
     if(on) btnArea.classList.add('sticky');
     else btnArea.classList.remove('sticky');
   }
@@ -348,29 +356,27 @@
   inputs.forEach(inp => {
     inp.addEventListener('focus', ()=> {
       clearTimeout(blurTimeout);
-      // delay sedikit untuk menghindari flicker saat berpindah input
       setTimeout(()=> setSticky(true), 60);
     });
 
-    // blur -> sembunyikan sticky setelah delay kecil (biar user masih bisa klik tombol)
+    // blur -> sembunyikan sticky setelah delay kecil
     inp.addEventListener('blur', ()=> {
       clearTimeout(blurTimeout);
       blurTimeout = setTimeout(()=> setSticky(false), 250);
     });
   });
 
-  // juga buka sticky saat user men-swipe/scroll ke bagian bawah (opsional)
+  // detect keyboard via resize (mobile browsers usually fire resize)
+  let lastH = window.innerHeight;
   window.addEventListener('resize', ()=> {
-    // pada banyak browser mobile, resize dipicu saat keyboard muncul
-    if(window.innerHeight < 600) { // threshold kasar untuk deteksi keyboard
+    const h = window.innerHeight;
+    if(h < lastH - 120) {
       setSticky(true);
-    } else {
+    } else if(h > lastH + 80) {
       setSticky(false);
     }
+    lastH = h;
   });
-
-  // Pastikan tombol sticky tidak menghilangkan akses ke elemen lain:
-  // tetap gunakan pointer-events: none di container, enable hanya di tombol.
 })();
 </script>
 </body>
