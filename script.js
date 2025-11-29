@@ -111,4 +111,46 @@
 
   // initial render
   output.textContent = 'No results yet. Klik Generate.';
+/* ============================
+   FLOATING BUTTON SYSTEM
+   ============================ */
+(function(){
+  const btnArea = document.querySelector('.btn-area'); 
+  if(!btnArea) return;
+
+  const inputs = Array.from(document.querySelectorAll('input[type="text"], textarea'));
+  let blurTimeout = null;
+
+  function setSticky(on){
+    if(on) btnArea.classList.add('sticky');
+    else btnArea.classList.remove('sticky');
+  }
+
+  // ketika input fokus → tombol mengambang muncul
+  inputs.forEach(inp => {
+    inp.addEventListener('focus', ()=>{
+      clearTimeout(blurTimeout);
+      setTimeout(()=> setSticky(true), 80);
+    });
+
+    inp.addEventListener('blur', ()=>{
+      clearTimeout(blurTimeout);
+      blurTimeout = setTimeout(()=> setSticky(false), 250);
+    });
+  });
+
+  // deteksi keyboard mobile (browser height mengecil)
+  let lastHeight = window.innerHeight;
+  window.addEventListener('resize', () => {
+    const h = window.innerHeight;
+    if(h < lastHeight - 100) {
+      // keyboard muncul
+      setSticky(true);
+    } else if(h > lastHeight + 80) {
+      // keyboard ditutup
+      setSticky(false);
+    }
+    lastHeight = h;
+  });
+})();
 })();
