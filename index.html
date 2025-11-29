@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Fixed buttons (no auto-press, no floating)</title>
+<title>Email Generator — Plus options</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -159,10 +159,10 @@
           <div class="method-card">
             <label>Metode Username (gabungkan sesuai kebutuhan)</label>
             <div id="methodsUser" class="grid" aria-hidden="false">
-              <button class="method" data-method="plus" type="button">Plus (+)</button>
-              <button class="method" data-method="dot" type="button">Titik (.)</button>
-              <button class="method" data-method="upper" type="button">UPPERCASE</button>
-              <button class="method" data-method="lower" type="button">lowercase</button>
+              <button class="method" data-method="plus" type="button" aria-pressed="false">Plus (+)</button>
+              <button class="method" data-method="dot" type="button" aria-pressed="false">Titik (.)</button>
+              <button class="method" data-method="upper" type="button" aria-pressed="false">UPPERCASE</button>
+              <button class="method" data-method="lower" type="button" aria-pressed="false">lowercase</button>
             </div>
           </div>
 
@@ -205,7 +205,7 @@
 
             <div id="confettiWrap" class="confetti-wrap" aria-hidden="true"></div>
 
-            <button id="btnCreate" class="btn primary" title="Buat & Salin" type="button">
+            <button id="btnCreate" class="btn primary" title="Buat & Salin" type="button" aria-pressed="false">
               <span class="btn-icon">📋</span>
               Buat & Salin
             </button>
@@ -238,12 +238,12 @@
   </div>
 
 <script>
-/* Main behaviour: theme + toggle buttons + validation + copy + plusOptions wiring.
-   - plusOptions is shown only when data-method="plus" is active.
-   - applyPlus available as window.__applyPlus and used by transformUsername.
+/* Combined behavior: theme, toggles, plusOptions wiring, generator, copy.
+   Paste this file as-is — tombol Plus akan menampilkan opsi tambahan ketika aktif.
 */
 (function(){
   const $ = id => document.getElementById(id);
+
   const form = $('egForm');
   const inpName = $('inpName'), inpDomain = $('inpDomain'), plusTag = $('plusTag');
   const methodsUser = $('methodsUser'), methodsDom = $('methodsDom');
@@ -253,70 +253,51 @@
   const confettiWrap = $('confettiWrap');
   const themeToggle = $('themeToggle'), themeIcon = $('themeIcon');
 
-  // plusOptions elements
-  const plusOptions = $('plusOptions');
-  const plusLen = $('plusLen');
-  const plusLenVal = $('plusLenVal');
+  const plusOptions = $('plusOptions'), plusLen = $('plusLen'), plusLenVal = $('plusLenVal');
 
-  // Theme persistence
+  // Theme
   const THEME_KEY = 'eg_theme';
-  function applyTheme(t){
-    if(t === 'dark') document.body.classList.add('dark');
-    else document.body.classList.remove('dark');
-    themeIcon.textContent = (t === 'dark') ? '🌙' : '☀️';
-    themeToggle.setAttribute('aria-pressed', t === 'dark');
-  }
-  function loadTheme(){
-    const s = localStorage.getItem(THEME_KEY);
-    if(s) return s;
-    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-  }
-  function saveTheme(t){ localStorage.setItem(THEME_KEY, t); }
+  function applyTheme(t){ if(t==='dark') document.body.classList.add('dark'); else document.body.classList.remove('dark'); themeIcon.textContent = (t==='dark')?'🌙':'☀️'; themeToggle.setAttribute('aria-pressed', t==='dark'); }
+  function loadTheme(){ const s = localStorage.getItem(THEME_KEY); if(s) return s; return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'; }
+  function saveTheme(t){ localStorage.setItem(THEME_KEY,t); }
   applyTheme(loadTheme());
-  themeToggle.addEventListener('click', ()=>{
-    const now = document.body.classList.contains('dark') ? 'dark' : 'light';
-    const next = now === 'dark' ? 'light' : 'dark';
-    applyTheme(next); saveTheme(next);
-  });
+  themeToggle.addEventListener('click', ()=>{ const now = document.body.classList.contains('dark')?'dark':'light'; const next = now==='dark'?'light':'dark'; applyTheme(next); saveTheme(next); });
 
-  // prevent form submit
   if(form) form.addEventListener('submit', e => { e.preventDefault(); return false; });
 
-  // Toggle method buttons (allow multiple)
+  // wire toggles (method buttons)
   function wireToggle(container){
     if(!container) return;
     container.addEventListener('click', e=>{
       const btn = e.target.closest('button[data-method]');
       if(!btn) return;
       e.preventDefault();
-      btn.classList.toggle('active');
+      const pressed = btn.classList.toggle('active');
+      btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
 
-      // if plus toggled, show/hide plusOptions
+      // show/hide plus options when plus toggled
       if(btn.dataset.method === 'plus' && plusOptions){
-        setTimeout(()=> {
-          if(btn.classList.contains('active')){
-            plusOptions.style.display = '';
-            plusOptions.setAttribute('aria-hidden','false');
-          } else {
-            plusOptions.style.display = 'none';
-            plusOptions.setAttribute('aria-hidden','true');
-          }
-        }, 8);
+        if(btn.classList.contains('active')){
+          plusOptions.style.display = '';
+          plusOptions.setAttribute('aria-hidden','false');
+        } else {
+          plusOptions.style.display = 'none';
+          plusOptions.setAttribute('aria-hidden','true');
+        }
       }
     });
   }
   wireToggle(methodsUser); wireToggle(methodsDom);
 
-  // plusOptions mode buttons (Angka/Huruf/Campur)
+  // plusOptions inner controls (mode buttons + slider)
   if(plusOptions){
     plusOptions.addEventListener('click', (e)=>{
       const b = e.target.closest('button[data-plusmode]');
       if(!b) return;
       e.preventDefault();
-      plusOptions.querySelectorAll('button[data-plusmode]').forEach(x => x.classList.remove('active'));
+      Array.from(plusOptions.querySelectorAll('button[data-plusmode]')).forEach(x=>x.classList.remove('active'));
       b.classList.add('active');
     });
-    // update display value of slider
     if(plusLen && plusLenVal){
       plusLenVal.textContent = plusLen.value;
       plusLen.addEventListener('input', ()=> plusLenVal.textContent = plusLen.value);
@@ -324,131 +305,97 @@
   }
 
   // validation warnings
-  if(inpName) inpName.addEventListener('input', ()=> warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none');
-  if(inpDomain) inpDomain.addEventListener('input', ()=> warnDomain.style.display = inpDomain.value.trim() === '' ? 'block' : 'none');
+  if(inpName) inpName.addEventListener('input', ()=> { if(warnName) warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none'; });
+  if(inpDomain) inpDomain.addEventListener('input', ()=> { if(warnDomain) warnDomain.style.display = inpDomain.value.trim() === '' ? 'block' : 'none'; });
 
-  function parseList(s){ return (s || '').split(',').map(x=>x.trim()).filter(Boolean); }
-  function makeDotVariants(name){ if(!name) return []; return [ name.split('').join('.') ]; }
+  // PLUS helpers
+  function randStr(len, chars){
+    let s=''; for(let i=0;i<len;i++) s += chars.charAt(Math.floor(Math.random()*chars.length)); return s;
+  }
+  function readPlusMode(){
+    if(!plusOptions) return 'mix';
+    const btn = plusOptions.querySelector('button[data-plusmode].active'); return btn ? btn.dataset.plusmode : 'mix';
+  }
+  window.__applyPlus = function(name, tagValue){
+    if(tagValue && tagValue.trim()){
+      const clean = tagValue.trim().replace(/^\+/, '');
+      return name + '+' + clean;
+    }
+    const mode = readPlusMode();
+    const len = Math.max(1, (plusLen && Number(plusLen.value)) || 12);
+    if(mode === 'numbers') return name + '+' + randStr(len, '0123456789');
+    if(mode === 'letters') return name + '+' + randStr(len, 'abcdefghijklmnopqrstuvwxyz');
+    return name + '+' + randStr(len, 'abcdefghijklmnopqrstuvwxyz0123456789');
+  };
 
+  // generator (simple single-output)
   function readOpts(container){
     const out = {};
-    Array.from((container || document).querySelectorAll('button[data-method]')).forEach(b => out[b.dataset.method] = b.classList.contains('active'));
+    if(!container) return out;
+    Array.from(container.querySelectorAll('button[data-method]')).forEach(b => out[b.dataset.method] = b.classList.contains('active'));
     return out;
   }
-
-  // PLUS generator helpers & global API
-  (function(){
-    function randStr(len, charset){
-      let s = '';
-      for(let i=0;i<len;i++) s += charset.charAt(Math.floor(Math.random()*charset.length));
-      return s;
-    }
-    function randNumbers(len){ return randStr(len, '0123456789'); }
-    function randLetters(len){ return randStr(len, 'abcdefghijklmnopqrstuvwxyz'); }
-    function randMix(len){ return randStr(len, 'abcdefghijklmnopqrstuvwxyz0123456789'); }
-
-    function readPlusMode(){
-      if(!plusOptions) return 'mix';
-      const btn = plusOptions.querySelector('button[data-plusmode].active');
-      return btn ? btn.dataset.plusmode : 'mix';
-    }
-
-    // expose globally so transformUsername can use it
-    window.__applyPlus = function(name, tagValue){
-      if(tagValue && tagValue.trim()){
-        const clean = tagValue.trim().replace(/^\+/, '');
-        return name + '+' + clean;
-      }
-      const mode = readPlusMode() || 'mix';
-      let len = 12;
-      if(plusLen) len = Math.max(1, Number(plusLen.value) || 12);
-      if(mode === 'numbers') return name + '+' + randNumbers(len);
-      if(mode === 'letters') return name + '+' + randLetters(len);
-      return name + '+' + randMix(len);
-    };
-  })();
-
-  function generateList(){
-    const base = (inpName && inpName.value || '').trim();
-    if(!base) return [];
-    // simple generation (kept minimal — you likely already have a more advanced generator)
-    const suffix = ''; // this simplified example doesn't use suffix field from earlier scripts
-    const extras = []; // not used here
-    const domains = (inpDomain && inpDomain.value) ? [inpDomain.value.trim()] : ['gmail.com'];
-    // create one variant to preview / copy
-    const out = [];
-    const uopts = readOpts(methodsUser);
-    let username = base;
-    if(uopts.dot){
-      username = (username.length <= 2) ? username.split('').join('.') : username.slice(0,2) + '.' + username.slice(2);
-    }
-    if(uopts.plus){
-      // use global applyPlus
-      username = window.__applyPlus(username, plusTag ? plusTag.value : '');
-    }
-    if(uopts.upper && !uopts.lower) username = username.toUpperCase();
-    else username = username.toLowerCase();
-    username = username.replace(/\s+/g, '.');
-    domains.forEach(d => out.push(username + '@' + d.trim()));
-    return out;
+  function applyDot(name){
+    if(!name) return name;
+    if(name.length <= 2) return name.split('').join('.');
+    return name.slice(0,2) + '.' + name.slice(2);
+  }
+  function transformUsername(base){
+    const opts = readOpts(methodsUser);
+    let u = base;
+    if(opts.dot) u = applyDot(u);
+    if(opts.plus) u = window.__applyPlus(u, plusTag ? plusTag.value : '');
+    if(opts.upper && !opts.lower) u = u.toUpperCase();
+    else u = u.toLowerCase();
+    return u.replace(/\s+/g,'.');
   }
 
-  function render(list){
-    const outEl = document.getElementById('output');
-    // if you don't have an #output area, we'll fallback to preview only
-    if(countEl) countEl.textContent = `(${list.length})`;
-    const preview = $('previewText');
-    if(!preview) return;
-    if(list.length === 0){
-      preview.textContent = '-';
-      return;
-    }
-    preview.textContent = list[0];
+  // render + copy
+  function generateOne(){
+    const base = (inpName && inpName.value||'').trim(); if(!base) return '';
+    const domain = (inpDomain && inpDomain.value||'').trim() || 'gmail.com';
+    const username = transformUsername(base);
+    return username + '@' + domain;
   }
-
-  // copy helper
   async function copyToClipboard(text){
     if(!text) return false;
-    try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; } }catch(e){ console.warn('clipboard API failed', e); }
-    try{
-      const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
-      document.body.appendChild(ta); ta.focus(); ta.select();
-      const ok = document.execCommand('copy'); document.body.removeChild(ta); return !!ok;
-    }catch(err){ console.warn('fallback copy failed', err); return false; }
+    try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; } }catch(e){ console.warn(e); }
+    try{ const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.focus(); ta.select(); const ok=document.execCommand('copy'); document.body.removeChild(ta); return !!ok; }catch(e){return false;}
   }
 
   // create button behavior
   let seq = 0;
   if(btnCreate){
     btnCreate.classList.remove('active');
-    btnCreate.addEventListener('click', async (ev)=>{
+    btnCreate.addEventListener('click', async function(ev){
+      // visual feedback only for real user interactions
       if(ev && ev.isTrusted){
-        btnCreate.classList.add('active');
-        clearTimeout(btnCreate._rem);
-        btnCreate._rem = setTimeout(()=> btnCreate.classList.remove('active'), 1200);
+        this.classList.add('active');
+        this.setAttribute('aria-pressed','true');
+        clearTimeout(this._rem); this._rem = setTimeout(()=>{ this.classList.remove('active'); this.setAttribute('aria-pressed','false'); }, 1200);
       }
 
+      // hide warnings
       if(warnName) warnName.style.display = 'none';
       if(warnDomain) warnDomain.style.display = 'none';
-      const nameVal = inpName.value.trim();
-      const domainVal = inpDomain.value.trim();
-      if(nameVal === ''){ if(warnName) warnName.style.display = 'block'; inpName.focus(); return; }
-      if(domainVal === ''){ if(warnDomain) warnDomain.style.display = 'block'; inpDomain.focus(); return; }
 
-      const list = generateList();
-      if(list.length === 0) return;
-      const email = list[0];
+      const nameVal = inpName.value.trim();
+      const domVal = inpDomain.value.trim();
+      if(!nameVal){ if(warnName) warnName.style.display='block'; inpName.focus(); return; }
+      if(!domVal){ if(warnDomain) warnDomain.style.display='block'; inpDomain.focus(); return; }
+
+      const email = generateOne();
+      if(!email) return;
 
       const ok = await copyToClipboard(email);
       if(ok){
-        if(copyBadge) { copyBadgeText.textContent = 'Tersalin!'; copyBadge.classList.add('show'); setTimeout(()=>copyBadge.classList.remove('show'), 1400); }
-        if(confettiWrap) {
-          // spawn simple confetti (small)
+        if(copyBadge){ copyBadgeText.textContent='Tersalin!'; copyBadge.classList.add('show'); setTimeout(()=>copyBadge.classList.remove('show'),1400); }
+        // small confetti
+        if(confettiWrap){
           while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild);
           const colors = ['#54b8ff','#3fb0ff','#06b6d4','#f59e0b','#7c3aed'];
           for(let i=0;i<8;i++){
-            const el = document.createElement('div'); el.className='confetti-piece';
-            el.style.background = colors[Math.floor(Math.random()*colors.length)];
+            const el = document.createElement('div'); el.className='confetti-piece'; el.style.background = colors[Math.floor(Math.random()*colors.length)];
             const angle = (Math.random()*120 - 60); const dist = 50 + Math.random()*60;
             const tx = Math.cos(angle * Math.PI/180) * dist; const ty = Math.sin(angle * Math.PI/180) * dist + 30*Math.random();
             el.style.setProperty('--tx', tx.toFixed(1)+'px'); el.style.setProperty('--ty', ty.toFixed(1)+'px');
@@ -458,29 +405,30 @@
           }
         }
       } else {
-        if(copyBadge) { copyBadgeText.textContent = 'Salin manual'; copyBadge.classList.add('show'); setTimeout(()=>copyBadge.classList.remove('show'), 1400); }
+        if(copyBadge){ copyBadgeText.textContent='Salin manual'; copyBadge.classList.add('show'); setTimeout(()=>copyBadge.classList.remove('show'),1400); }
       }
 
-      // render preview and increment counter
+      // preview + counter
       if(previewText) previewText.textContent = email;
       seq += 1; if(counterEl) counterEl.textContent = seq;
     });
   }
 
-  // initial UI state: hide plus options
+  // initial UI state
   function initUI(){
-    if(plusOptions) { plusOptions.style.display = 'none'; plusOptions.setAttribute('aria-hidden','true'); }
-    if(warnName) warnName.style.display = 'none';
-    if(warnDomain) warnDomain.style.display = 'none';
-    if(previewText) previewText.textContent = '-';
+    if(plusOptions){ plusOptions.style.display = 'none'; plusOptions.setAttribute('aria-hidden','true'); }
+    if(warnName) warnName.style.display='none';
+    if(warnDomain) warnDomain.style.display='none';
+    if(previewText) previewText.textContent='-';
     if(counterEl) counterEl.textContent = '0';
-    // remove any active classes (user should choose)
-    document.querySelectorAll('#methodsUser .method, #methodsDom .method').forEach(b => b.classList.remove('active'));
-    // ensure plusOptions mode defaults
+    // remove active on method buttons (user selects)
+    document.querySelectorAll('#methodsUser .method, #methodsDom .method').forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+    // ensure plusOptions mode default
     if(plusOptions && !plusOptions.querySelector('button.active')){
       const def = plusOptions.querySelector('button[data-plusmode="mix"]') || plusOptions.querySelector('button[data-plusmode="numbers"]');
       if(def) def.classList.add('active');
     }
+    if(plusLen && plusLenVal) plusLenVal.textContent = plusLen.value;
   }
   window.addEventListener('pageshow', initUI);
   window.addEventListener('load', initUI);
