@@ -309,17 +309,156 @@
   // reset on double-click footer
   const resetFn = ()=> {
     seq = 0; counterEl.textContent = seq;
-    inpName.value = ''; inpDomain.value = 'gmail.com'; plusTag.value = '';
-    document.querySelectorAll('#methodsUser .method').forEach(b=>b.classList.remove('active'));
-    document.querySelector('#methodsUser button[data-method="plus"]').classList.add('active');
-    document.querySelector('#methodsUser button[data-method="lower"]').classList.add('active');
-    document.querySelectorAll('#methodsDom .method').forEach(b=>b.classList.remove('active'));
-    document.querySelector('#methodsDom button[data-method="domAsIs"]').classList.add('active');
-    updatePreview();
-  };
-  document.querySelector('.footerbar').addEventListener('dblclick', resetFn);
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
 
-  // bulk
+  // tabs & toggles (tidak diubah)
+  const tabSingle = $('tabSingle'), tabBulk = $('tabBulk'), single = $('single'), bulk = $('bulk');
+  tabSingle.addEventListener('click', ()=>{ tabSingle.classList.add('active'); tabBulk.classList.remove('active'); tabSingle.setAttribute('aria-selected','true'); tabBulk.setAttribute('aria-selected','false'); single.style.display='block'; bulk.style.display='none'; });
+  tabBulk.addEventListener('click', ()=>{ tabBulk.classList.add('active'); tabSingle.classList.remove('active'); tabBulk.setAttribute('aria-selected','true'); tabSingle.setAttribute('aria-selected','false'); single.style.display='none'; bulk.style.display='block'; });
+
+  function wireToggle(containerId, radio=false){
+    const cont = $(containerId);
+    cont.addEventListener('click', e=>{
+      const btn = e.target.closest('button[data-method]');
+      if(!btn) return;
+      if(radio){
+        Array.from(cont.querySelectorAll('button[data-method]')).forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+        btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
+      } else {
+        const active = btn.classList.toggle('active');
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      }
+      updatePreview();
+    });
+  }
+  wireToggle('methodsUser', false);
+  wireToggle('methodsDom', true);
+  wireToggle('methodsUserBulk', false);
+
+  // elements
+  const inpName = $('inpName'), inpDomain = $('inpDomain'), plusTag = $('plusTag');
+  const previewText = $('previewText'), btnCreate = $('btnCreate'), counterEl = $('counter'), toast = $('toast');
+  const bulkList = $('bulkList'), bulkDomain = $('bulkDomain'), bulkPlusTag = $('bulkPlusTag');
+  const btnCreateBulk = $('btnCreateBulk'), btnDownloadBulk = $('btnDownloadBulk'), bulkOutput = $('bulkOutput');
+
+  function readOpts(containerId){
+    const map = {};
+    const cont = $(containerId);
+    Array.from(cont.querySelectorAll('button[data-method]')).forEach(b => map[b.dataset.method] = b.classList.contains('active'));
+    return map;
+  }
+
+  function applyDot(name){ if(!name) return name; if(name.length <= 2) return name.split('').join('.'); return name.slice(0,2) + '.' + name.slice(2); }
+  function applyPlus(name, tag){ if(tag && tag.trim()){ const t = tag.trim().replace(/^\+/, ''); return name + '+' + t; } const tags = ['shop','id','official','x','web']; const pick = tags[Math.floor(Math.random()*tags.length)]; const num = Math.floor(10 + Math.random()*990); return name + '+' + pick + num; }
+  function randomCase(s){ return Array.from(s).map(ch => Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase()).join(''); }
+
+  function transformUsername(base, opts, tag){
+    let u = base;
+    if(opts.dot) u = applyDot(u);
+    if(opts.plus) u = applyPlus(u, tag);
+    if(opts.upper && !opts.lower) u = u.toUpperCase();
+    else u = u.toLowerCase();
+    return u.replace(/\s+/g, '.');
+  }
+
+  function domainTransform(domainRaw){
+    const domOpts = readOpts('methodsDom');
+    if(domOpts.domRandom) return randomCase(domainRaw);
+    return domainRaw;
+  }
+
+  function makeEmailOnce(){
+    const base = inpName.value.trim();
+    if(!base) return '';
+    const uopts = readOpts('methodsUser');
+    const dom = (inpDomain.value.trim() || 'gmail.com');
+    const username = transformUsername(base, uopts, plusTag.value);
+    const domain = domainTransform(dom);
+    return username + '@' + domain;
+  }
+
+  // robust copy function: try clipboard API then fallback
+  async function copyToClipboard(text){
+    if(!text) return false;
+    // try navigator.clipboard first
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+        console.log('copied via navigator.clipboard');
+        return true;
+      }
+    }catch(err){
+      console.warn('navigator.clipboard failed:', err);
+    }
+    // fallback: create textarea, select, execCommand
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      // keep off-screen
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      console.log('copied via execCommand', ok);
+      return ok;
+    }catch(err){
+      console.warn('execCommand fallback failed:', err);
+      return false;
+    }
+  }
+
+  function showToast(msg){
+    const t = $('toast');
+    t.textContent = msg || 'Tersalin ke clipboard';
+    t.style.display = 'block';
+    clearTimeout(t._t);
+    t._t = setTimeout(()=>{ t.style.display='none'; }, 1200);
+  }
+
+  function updatePreview(){
+    const e = makeEmailOnce();
+    previewText.textContent = e || '-';
+    if(e){
+      btnCreate.classList.remove('disabled'); btnCreate.disabled = false; btnCreate.setAttribute('aria-disabled','false');
+    } else {
+      btnCreate.classList.add('disabled'); btnCreate.disabled = true; btnCreate.setAttribute('aria-disabled','true');
+    }
+  }
+
+  // listen to inputs to enable button reliably
+  inpName.addEventListener('input', updatePreview);
+  inpDomain.addEventListener('input', updatePreview);
+  plusTag.addEventListener('input', updatePreview);
+
+  // create click: now uses robust copyToClipboard and logs
+  let seq = 0;
+  btnCreate.addEventListener('click', async (ev)=>{
+    ev.preventDefault();
+    const email = makeEmailOnce();
+    if(!email){
+      // visual feedback
+      showToast('Isi Username dulu');
+      return;
+    }
+    seq += 1;
+    counterEl.textContent = seq;
+    previewText.textContent = email;
+    const ok = await copyToClipboard(email);
+    if(ok){
+      showToast('Tersalin: ' + email);
+    } else {
+      // fallback: show prompt with text for manual copy (works if clipboard blocked)
+      const manual = prompt('Salin manual (kopi teks):', email);
+      if(manual !== null) showToast('Gunakan paste untuk menempel');
+    }
+  });
+
+  // BULK handlers (keamanan: reuse copyToClipboard)
   btnCreateBulk.addEventListener('click', async ()=>{
     const lines = bulkList.value.split('\n').map(s=>s.trim()).filter(Boolean);
     if(lines.length===0){ alert('Masukkan minimal 1 nama di daftar.'); return; }
@@ -332,12 +471,9 @@
     });
     bulkOutput.innerHTML = '';
     results.forEach(r=>{ const li = document.createElement('li'); li.textContent = r; bulkOutput.appendChild(li); });
-    try{
-      await navigator.clipboard.writeText(results.join('\n'));
-      showToast('Tersalin ' + results.length + ' alamat');
-    }catch(e){
-      alert('Gagal salin otomatis — gunakan tombol Download .txt.');
-    }
+    const ok = await copyToClipboard(results.join('\n'));
+    if(ok) showToast('Tersalin ' + results.length + ' alamat');
+    else alert('Gagal salin otomatis — gunakan tombol Download .txt atau salin manual.');
   });
 
   btnDownloadBulk.addEventListener('click', ()=>{
@@ -348,8 +484,22 @@
     const a = document.createElement('a'); a.href = url; a.download = 'emails.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
   });
 
+  // double-click footer to reset (keamanan: reduce accidental resets)
+  const resetFn = ()=> {
+    seq = 0; counterEl.textContent = seq;
+    inpName.value = ''; inpDomain.value = 'gmail.com'; plusTag.value = '';
+    document.querySelectorAll('#methodsUser .method').forEach(b=>b.classList.remove('active'));
+    document.querySelector('#methodsUser button[data-method="plus"]').classList.add('active');
+    document.querySelector('#methodsUser button[data-method="lower"]').classList.add('active');
+    document.querySelectorAll('#methodsDom .method').forEach(b=>b.classList.remove('active'));
+    document.querySelector('#methodsDom button[data-method="domAsIs"]').classList.add('active');
+    updatePreview();
+  };
+  document.querySelector('.footerbar').addEventListener('dblclick', resetFn);
+
   // init
   updatePreview();
+  console.log('Email generator script loaded');
 })();
 </script>
 </body>
