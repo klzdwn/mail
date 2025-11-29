@@ -20,7 +20,8 @@ body.dark{
   --ink:#e8eef8;
   --mut:#a7b3c9;
   --border:rgba(255,255,255,0.07);
-  --soft:rgba(37,99,235,0.10);
+  /* soft di dark pakai warna semi-transparan, bukan gradien terang */
+  --soft: rgba(37,99,235,0.12);
 }
 
 /* GLOBAL */
@@ -38,6 +39,7 @@ body{
   overflow-x:hidden;
 }
 body.dark{
+  /* solid-ish dark background (no bright gradient) */
   background: linear-gradient(180deg,#0c131e,#0a111b);
 }
 
@@ -71,7 +73,10 @@ body.dark{
   flex:0 0 72px;
 }
 body.dark .logo{
+  /* gelap, solid background */
   background:#0c1828;
+  color:var(--primary);
+  box-shadow:none;
 }
 
 .titlewrap{display:flex;flex-direction:column;gap:6px}
@@ -111,6 +116,7 @@ input::placeholder{
   color:#c7d0dc;
 }
 body.dark input[type="text"], body.dark textarea{
+  /* solid dark inputs, tanpa gradasi terang */
   background:#0c1828;
   border:1px solid rgba(255,255,255,0.08);
   color:var(--ink);
@@ -129,12 +135,14 @@ input:focus{
 .method-card{
   padding:12px;
   border-radius:12px;
-  background:linear-gradient(180deg,#fff,#fbfdff);
+  /* ringankan gradien agar tidak terlalu kontras di dark */
+  background: linear-gradient(180deg,#fff,#fbfdff);
   border:1px solid var(--border);
-  box-shadow:0 10px 26px rgba(15,23,42,0.03)
+  box-shadow:0 10px 26px rgba(15,23,42,0.03);
 }
 body.dark .method-card{
   background:#0d1725;
+  box-shadow:none;
 }
 
 /* METHOD BUTTON */
@@ -158,18 +166,22 @@ body.dark .method-card{
 }
 body.dark .method{
   background:#0c1828;
+  border:1px solid rgba(255,255,255,0.04);
 }
 
 .method:hover{transform:translateY(-4px)}
 
 .method.active{
-  background: linear-gradient(90deg,var(--soft), #e8f3ff);
+  /* pakai solid/semi-transparent warna, bukan gradasi terang */
+  background: var(--soft);
   color:var(--primary);
   border:1px solid rgba(37,99,235,0.12);
-  box-shadow:0 16px 36px rgba(37,99,235,0.04);
+  box-shadow:0 10px 28px rgba(37,99,235,0.04);
 }
 body.dark .method.active{
-  background:rgba(37,99,235,0.15);
+  background: rgba(37,99,235,0.15);
+  color:var(--primary);
+  box-shadow:none;
 }
 
 /* CTA AREA */
@@ -191,30 +203,51 @@ body.dark .method.active{
 }
 
 /* ============================================
-   FIX TOMBOL "BUAT & SALIN" BIAR TIDAK BIRU!
+   FIX TOMBOL "BUAT & SALIN": default seperti tombol lain
    ============================================ */
 .btn.primary{
-  background:transparent !important;
-  color:var(--ink) !important;
-  border:1px solid var(--border) !important;
-  box-shadow:none !important;
-  transition:transform .12s, box-shadow .12s, background .12s !important;
+  background:transparent;
+  color:var(--ink);
+  border:1px solid var(--border);
+  box-shadow:none;
+  transition:transform .12s, box-shadow .12s, background .12s;
 }
 
 .btn.primary:hover{
-  background:var(--soft) !important;
+  background:var(--soft);
   transform:translateY(-2px);
   color:var(--primary);
 }
 
+/* Saat tombol aktif / diset oleh JS (class .active) => jadi biru */
+.btn.primary.active{
+  background: linear-gradient(90deg,var(--primary),var(--primary-2));
+  color:#fff;
+  border:1px solid rgba(255,255,255,0.06);
+  box-shadow:0 18px 56px rgba(37,99,235,0.18);
+}
+
+/* keyboard / mobile :active fallback */
+.btn.primary:active{
+  transform:translateY(0);
+}
+
+/* dark mode adjustments */
 body.dark .btn.primary{
-  background:transparent !important;
-  border:1px solid rgba(255,255,255,0.08) !important;
-  color:var(--ink) !important;
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.08);
+  color:var(--ink);
 }
 body.dark .btn.primary:hover{
-  background:rgba(37,99,235,0.15) !important;
-  color:var(--primary) !important;
+  background: rgba(37,99,235,0.12);
+  color:var(--primary);
+}
+body.dark .btn.primary.active{
+  /* di dark, aktif juga biru tapi tanpa gradasi terang */
+  background: rgba(84,184,255,0.18);
+  color:#fff;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.5);
+  border: 1px solid rgba(84,184,255,0.12);
 }
 
 /* SIDE PREVIEW */
@@ -243,7 +276,7 @@ body.dark .preview{
   z-index: 1200;
   padding: 6px 12px;
   background: transparent;
-  pointer-events: none;
+  pointer-events: none; /* container non-interaktif, tombol sendiri interaktif */
 }
 .btn-area.sticky .btn {
   pointer-events: auto;
