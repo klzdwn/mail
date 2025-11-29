@@ -13,6 +13,17 @@
   --success:#16a34a;
 }
 
+/* DARK MODE */
+body.dark{
+  --bg:#0a0f18;
+  --card:#0e1622;
+  --ink:#e8eef8;
+  --mut:#a7b3c9;
+  --border:rgba(255,255,255,0.07);
+  --soft:rgba(37,99,235,0.10);
+}
+
+/* GLOBAL */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -24,11 +35,15 @@ body{
   padding:28px;
   display:flex;
   justify-content:center;
-  overflow-x:hidden; /* cegah geser samping */
+  overflow-x:hidden;
+}
+body.dark{
+  background: linear-gradient(180deg,#0c131e,#0a111b);
 }
 
 .wrap{width:100%;max-width:980px;padding:8px}
 
+/* CARD */
 .card{
   background:var(--card);
   border-radius:var(--radius);
@@ -44,12 +59,26 @@ body{
   .card{grid-template-columns: 1fr 360px; align-items:start;}
 }
 
+/* HEADER */
 .header{display:flex;gap:12px;align-items:center}
-.logo{width:72px;height:72px;border-radius:14px;background:linear-gradient(180deg,#eef6ff,#f7fbff);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--primary);font-size:20px;border:1px solid var(--border);box-shadow:0 12px 30px rgba(37,99,235,0.04);flex:0 0 72px}
+.logo{
+  width:72px;height:72px;border-radius:14px;
+  background:linear-gradient(180deg,#eef6ff,#f7fbff);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;color:var(--primary);font-size:20px;
+  border:1px solid var(--border);
+  box-shadow:0 12px 30px rgba(37,99,235,0.04);
+  flex:0 0 72px;
+}
+body.dark .logo{
+  background:#0c1828;
+}
+
 .titlewrap{display:flex;flex-direction:column;gap:6px}
 .titlewrap h1{margin:0;font-size:20px}
 .titlewrap p{margin:0;color:var(--mut);font-size:13px}
 
+/* FORM */
 .form{display:flex;flex-direction:column;gap:12px}
 
 label{
@@ -61,7 +90,7 @@ label{
   font-size:14px;
 }
 
-/* ====== INPUT BESAR ====== */
+/* INPUT BESAR */
 input[type="text"], textarea{
   width:100%;
   padding:22px 24px;
@@ -81,7 +110,13 @@ input::placeholder{
   font-size:26px;
   color:#c7d0dc;
 }
+body.dark input[type="text"], body.dark textarea{
+  background:#0c1828;
+  border:1px solid rgba(255,255,255,0.08);
+  color:var(--ink);
+}
 
+/* HOVER INPUT */
 input:focus{
   box-shadow:0 22px 48px rgba(37,99,235,0.08);
   transform:translateY(-1px);
@@ -90,13 +125,24 @@ input:focus{
 
 .hint{font-size:13px;color:var(--mut)}
 
-.method-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--border);box-shadow:0 10px 26px rgba(15,23,42,0.03)}
+/* METHOD BOX */
+.method-card{
+  padding:12px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#fff,#fbfdff);
+  border:1px solid var(--border);
+  box-shadow:0 10px 26px rgba(15,23,42,0.03)
+}
+body.dark .method-card{
+  background:#0d1725;
+}
+
+/* METHOD BUTTON */
 .grid{display:flex;flex-wrap:wrap;gap:10px}
 
 .method{
   flex:1 1 calc(50% - 10px);
   height:44px;
-  min-height:44px;
   padding:10px 12px;
   border-radius:10px;
   background:#fff;
@@ -104,29 +150,32 @@ input:focus{
   font-weight:800;
   font-size:13px;
   color:var(--ink);
-  text-align:center;
-  cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
+  cursor:pointer;
   transition:transform .12s, box-shadow .12s, background .12s;
 }
+body.dark .method{
+  background:#0c1828;
+}
+
 .method:hover{transform:translateY(-4px)}
+
 .method.active{
   background: linear-gradient(90deg,var(--soft), #e8f3ff);
   color:var(--primary);
   border:1px solid rgba(37,99,235,0.12);
   box-shadow:0 16px 36px rgba(37,99,235,0.04);
 }
-
-.row-inline{display:flex;flex-direction:column;gap:8px}
-@media(min-width:920px){
-  .row-inline{flex-direction:row;align-items:center;gap:14px}
-  .row-inline label{width:160px;flex:0 0 160px;margin-bottom:0}
-  .row-inline .field{flex:1}
+body.dark .method.active{
+  background:rgba(37,99,235,0.15);
 }
 
+/* CTA AREA */
 .btn-area{position:relative;margin-top:8px}
+
+/* DEFAULT BUTTON STYLE */
 .btn{
   width:100%;
   padding:12px;
@@ -140,20 +189,35 @@ input:focus{
   justify-content:center;
   gap:10px;
 }
-/* Tombol utama mengikuti gaya tombol kecil lainnya */
+
+/* ============================================
+   FIX TOMBOL "BUAT & SALIN" BIAR TIDAK BIRU!
+   ============================================ */
 .btn.primary{
-  background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--border);
-  box-shadow: none;
+  background:transparent !important;
+  color:var(--ink) !important;
+  border:1px solid var(--border) !important;
+  box-shadow:none !important;
+  transition:transform .12s, box-shadow .12s, background .12s !important;
 }
 
 .btn.primary:hover{
-  background: var(--soft);
-  color: var(--primary);
-  transform: translateY(-2px);
+  background:var(--soft) !important;
+  transform:translateY(-2px);
+  color:var(--primary);
 }
 
+body.dark .btn.primary{
+  background:transparent !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  color:var(--ink) !important;
+}
+body.dark .btn.primary:hover{
+  background:rgba(37,99,235,0.15) !important;
+  color:var(--primary) !important;
+}
+
+/* SIDE PREVIEW */
 .side{display:flex;flex-direction:column;gap:12px}
 .preview{
   padding:22px 16px;
@@ -163,11 +227,12 @@ input:focus{
   font-family:ui-monospace;
   font-size:14px;
 }
+body.dark .preview{
+  background:#0c1828;
+  border:1px solid rgba(255,255,255,0.08);
+}
 
-/* ==============================
-   ➕ TAMBAHAN CSS DARI LU (FLOATING)
-   ============================== */
-
+/* FLOATING CTA (tetap) */
 .btn-area.sticky {
   position: fixed;
   left: 12px;
