@@ -204,6 +204,7 @@ body.dark .method.active{
 
 /* ============================================
    FIX TOMBOL "BUAT & SALIN": default seperti tombol lain
+   - Jadi BIRU hanya saat .active ditambahkan (oleh JS)
    ============================================ */
 .btn.primary{
   background:transparent;
@@ -265,7 +266,11 @@ body.dark .preview{
   border:1px solid rgba(255,255,255,0.08);
 }
 
-/* FLOATING CTA (tetap) */
+/* FLOATING CTA (optional, non-intrusive)
+   - container non-interaktif (pointer-events:none)
+   - tombol tetap interaktif (pointer-events:auto)
+   - kalau mau NON-AKTIF: hapus blok ini atau override ke static
+*/
 .btn-area.sticky {
   position: fixed;
   left: 12px;
