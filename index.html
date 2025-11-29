@@ -3,11 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Refined Layout</title>
+<title>Email Generator — Fix overflow & nicer inputs</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* Prevent horizontal scroll (fix sideways dragging) */
+  html,body{overflow-x:hidden;margin:0;padding:0;height:100%}
+
   :root{
-    --bg:#f5f7fb;
+    --bg:#f6f9ff;
     --card:#ffffff;
     --mut:#6b7280;
     --ink:#0b1220;
@@ -23,9 +26,7 @@
   }
 
   *{box-sizing:border-box}
-  html,body{height:100%}
   body{
-    margin:0;
     font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
     -webkit-font-smoothing:antialiased;
     background: linear-gradient(180deg,#f6f9ff,#eef4fb);
@@ -33,71 +34,75 @@
     padding:28px;
     display:flex;
     justify-content:center;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  /* Outer wrapper */
-  .wrap{width:100%;max-width:980px;padding:8px}
+  /* Wrap centers content and ensures it never overflows viewport */
+  .wrap{
+    width:100%;
+    max-width:980px;
+    padding:8px;
+    margin:0 auto;
+  }
 
-  /* card */
+  /* Card: use max-width calc to remain inside small viewports */
   .card{
     background:var(--card);
     border-radius:var(--radius);
-    padding:18px;
+    padding:20px;
     border:1px solid var(--border);
     box-shadow:var(--shadow-lg);
     overflow:visible;
     display:grid;
-    grid-template-columns: 1fr; /* mobile-first */
+    grid-template-columns: 1fr;
     gap:18px;
+    max-width: calc(100% - 16px); /* avoid pushing past viewport */
+    margin: 0 auto;
   }
 
-  /* On wider screens, use two-column layout: left form, right preview/info */
   @media(min-width:920px){
     .card{grid-template-columns: 1fr 360px; align-items:start;}
   }
 
-  /* Header */
-  .header{
-    display:flex;gap:12px;align-items:center;
-  }
-  .logo{
-    width:72px;height:72px;border-radius:14px;background:linear-gradient(180deg,#eef6ff,#f7fbff);
-    display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--primary);font-size:20px;border:1px solid var(--border);
-    box-shadow:0 12px 30px rgba(37,99,235,0.04);
-    flex:0 0 72px;
-  }
-  .titlewrap{display:flex;flex-direction:column;gap:6px}
-  .titlewrap h1{margin:0;font-size:20px}
-  .titlewrap p{margin:0;color:var(--mut);font-size:13px}
+  /* header */
+  .header{display:flex;gap:12px;align-items:center;margin-bottom:6px}
+  .logo{width:64px;height:64px;border-radius:14px;background:linear-gradient(180deg,#eef6ff,#f7fbff);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--primary);font-size:20px;border:1px solid var(--border);box-shadow:0 12px 30px rgba(37,99,235,0.04);flex:0 0 64px}
+  .title h1{margin:0;font-size:20px}
+  .title p{margin:6px 0 0;color:var(--mut);font-size:13px}
 
-  /* form column */
-  .form{
-    display:flex;flex-direction:column;gap:12px;
-  }
+  /* layout */
+  .col{display:flex;flex-direction:column;gap:12px}
 
   label{display:block;margin-bottom:6px;font-weight:700;color:var(--ink);font-size:14px}
+
+  /* Improved input styles: larger, clearer */
   input[type="text"], textarea{
-    width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);
-    background:linear-gradient(180deg,#fff,#fbfdff);font-size:14px;color:var(--ink);
-    box-shadow: 0 10px 20px rgba(16,24,40,0.03) inset;transition:box-shadow .12s, transform .08s;
+    width:100%;
+    padding:14px 14px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background: linear-gradient(180deg,#fff,#fbfdff);
+    color:var(--ink);
+    font-size:16px;           /* bigger font for easier tapping on mobile */
+    line-height:1.4;
+    box-shadow: 0 10px 20px rgba(16,24,40,0.03) inset;
+    transition:box-shadow .12s, transform .08s;
   }
-  input::placeholder{color:#9aa6bf}
+  input::placeholder, textarea::placeholder{color:#9aa6bf}
   input:focus, textarea:focus{box-shadow:0 16px 40px rgba(37,99,235,0.06);transform:translateY(-1px);outline:none}
 
   .hint{font-size:13px;color:var(--mut)}
 
-  /* methods: grouped with subtle card */
-  .method-card{
-    padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);
-    border:1px solid var(--border);
-    box-shadow:0 10px 26px rgba(15,23,42,0.03);
-  }
+  /* method card grouping */
+  .method-card{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--border);box-shadow:0 10px 26px rgba(15,23,42,0.03);overflow:hidden}
 
   .grid{display:flex;flex-wrap:wrap;gap:10px}
   .method{
-    flex:1 1 calc(50% - 10px);min-height:44px;padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border);
-    font-weight:800;font-size:13px;color:var(--ink);text-align:center;cursor:pointer;
-    transition:transform .12s, box-shadow .12s, background .12s;
+    flex:1 1 calc(50% - 10px);
+    min-height:48px;                /* slightly taller for tap comfort */
+    padding:12px;border-radius:12px;background:#fff;border:1px solid var(--border);
+    font-weight:800;font-size:14px;color:var(--ink);text-align:center;cursor:pointer;
+    transition:transform .12s,box-shadow .12s, background .12s;
   }
   .method:hover{transform:translateY(-4px)}
   .method.active{
@@ -106,7 +111,7 @@
     box-shadow:0 16px 36px rgba(37,99,235,0.04);
   }
 
-  /* small row: label + input inline on wide screens */
+  /* inline rows on wide screens */
   .row-inline{display:flex;flex-direction:column;gap:8px}
   @media(min-width:920px){
     .row-inline{flex-direction:row;align-items:center;gap:14px}
@@ -114,42 +119,21 @@
     .row-inline .field{flex:1}
   }
 
-  /* CTA area: keep padding height same as before but style improved */
-  .btn-area{position:relative;margin-top:8px}
-  .btn{
-    width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;font-size:14px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s,box-shadow .12s;
-  }
-  .btn.primary{
-    background: linear-gradient(90deg,var(--primary),var(--primary-2));
-    color:white;border:1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 18px 56px rgba(37,99,235,0.18), 0 0 0 6px rgba(31,126,251,0.02) inset;
-  }
-  .btn.primary .icon{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center}
-  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 26px 80px rgba(37,99,235,0.20)}
+  /* CTA - keep padding/height but style improved */
+  .btn-area{position:relative;margin-top:10px}
+  .btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s,box-shadow .12s}
+  .btn.primary{background: linear-gradient(90deg,var(--primary),var(--primary-2));color:white;border:1px solid rgba(255,255,255,0.06);box-shadow: 0 18px 56px rgba(37,99,235,0.18);border-radius:12px}
+  .btn.primary .btn-icon{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center}
+  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 28px 78px rgba(37,99,235,0.20)}
   .btn.primary:active{transform:translateY(1px)}
 
-  /* right column (preview + info) */
-  .side{
-    display:flex;flex-direction:column;gap:12px;
-  }
-  .preview{
-    padding:16px;border-radius:14px;background:linear-gradient(180deg,#fff,#fbfdff);
-    border:1px solid #eef6ff;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--ink);font-size:14px;
-    box-shadow:0 18px 40px rgba(16,24,40,0.04);
-  }
-  .meta{
-    padding:12px;border-radius:12px;background:linear-gradient(180deg,#fbfdff,#f7fbff);
-    border:1px solid var(--border);font-size:13px;color:var(--mut);
-  }
+  /* right column: preview + meta */
+  .side{display:flex;flex-direction:column;gap:12px}
+  .preview{padding:16px;border-radius:14px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid #eef6ff;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--ink);font-size:15px;box-shadow:0 18px 40px rgba(16,24,40,0.04)}
+  .meta{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fbfdff,#f7fbff);border:1px solid var(--border);font-size:13px;color:var(--mut)}
 
-  /* badge slide-in (right->left) */
-  .copy-badge{
-    position:absolute;top:-72px;right:0;transform:translateX(120%);opacity:0;
-    background:#fff;padding:10px 16px;border-radius:14px;display:flex;gap:12px;align-items:center;
-    border:1px solid var(--border);box-shadow:0 18px 40px rgba(15,23,42,0.06);
-    transition:transform .32s cubic-bezier(.22,.9,.25,1), opacity .22s ease;pointer-events:none;white-space:nowrap;font-weight:800;color:var(--ink);
-  }
+  /* copy badge: slide-in from right */
+  .copy-badge{position:absolute;top:-72px;right:0;transform:translateX(120%);opacity:0;background:#fff;padding:10px 16px;border-radius:14px;display:flex;gap:12px;align-items:center;border:1px solid var(--border);box-shadow:0 18px 40px rgba(15,23,42,0.06);transition:transform .32s cubic-bezier(.22,.9,.25,1), opacity .22s ease;pointer-events:none;white-space:nowrap;font-weight:800;color:var(--ink)}
   .copy-badge.show{transform:translateX(0);opacity:1}
   .copy-badge .check{width:30px;height:30px;border-radius:8px;background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:14px}
 
@@ -158,33 +142,34 @@
   @keyframes confettiFly{0%{opacity:1;transform:translate(0,0) rotate(0) scale(1)}60%{opacity:1}100%{opacity:0;transform:translate(var(--tx), var(--ty)) rotate(360deg) scale(.7)}}
 
   .error{display:none;margin-top:8px;padding:10px;border-radius:10px;background:#fff5f5;color:var(--danger);border:1px solid rgba(239,68,68,0.06);font-size:13px}
-
   .footer{margin-top:6px;text-align:center;color:var(--mut);font-size:13px}
 
-  /* small screens */
+  /* mobile adjustments */
   @media(max-width:919px){
-    .card{padding:18px}
+    .method{flex-basis:100%;min-height:50px}
     .logo{width:56px;height:56px}
-    .method{flex-basis:100%}
+    .copy-badge{top:-60px}
   }
+
+  button:focus,input:focus,textarea:focus{outline:3px solid rgba(37,99,235,0.10);outline-offset:3px}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card" role="application" aria-label="Email generator refined layout">
+    <div class="card" role="application" aria-label="Email generator - fixed layout">
 
       <!-- LEFT: header + form -->
       <div>
         <div class="header">
           <div class="logo" aria-hidden="true">EG</div>
-          <div class="titlewrap">
+          <div class="title">
             <h1>Email Generator</h1>
-            <p class="lead">Tata letak disegarkan: lebih rapi, kompak, dan modern — fitur tetap sama.</p>
+            <p class="lead">Layout diperbaiki: tidak lagi bisa digeser samping, input lebih besar & nyaman di mobile.</p>
           </div>
         </div>
 
-        <form class="form" onsubmit="return false;" aria-label="Form email generator">
-          <!-- username -->
+        <form class="col" onsubmit="return false;" aria-label="Form email generator">
+          <!-- Username (bigger input) -->
           <div class="row-inline">
             <label for="inpName">Username Email</label>
             <div class="field">
@@ -193,14 +178,14 @@
             </div>
           </div>
 
-          <!-- domain -->
+          <!-- Domain (bigger input) -->
           <div>
             <label for="inpDomain">Domain Email</label>
             <input id="inpDomain" value="gmail.com" />
             <div class="hint">Contoh: gmail.com — pilih Random Case bila ingin acak kapitalisasi domain.</div>
           </div>
 
-          <!-- methods -->
+          <!-- Methods -->
           <div class="method-card">
             <label>Metode Username (gabungkan sesuai kebutuhan)</label>
             <div id="methodsUser" class="grid" aria-hidden="false">
@@ -211,14 +196,14 @@
             </div>
           </div>
 
-          <!-- plus tag -->
+          <!-- Custom + tag (optional) -->
           <div>
             <label for="plusTag">Custom + tag <small style="color:var(--mut);font-weight:600">(opsional)</small></label>
             <input id="plusTag" placeholder="contoh: tokoku (tanpa +)" />
             <div class="hint">Jika kosong & Plus (+) aktif → generator menambahkan tag default <code>+idNN</code>.</div>
           </div>
 
-          <!-- domain methods -->
+          <!-- Domain method -->
           <div class="method-card">
             <label>Metode Domain</label>
             <div id="methodsDom" class="grid">
@@ -268,11 +253,11 @@
   </div>
 
 <script>
-/*
-  Behavior preserved & IDs unchanged:
-  - inpName, inpDomain, plusTag, methodsUser, methodsDom, btnCreate, previewText, counter, warnName, copyBadge, copyBadgeText, confettiWrap
-  - Copy-first-then-show, plusTag optional (+idNN auto if empty), Random Case domain optional
-  - Slide-in badge (right->left), confetti, counter increment
+/* Semua fungsi inti dan ID dipertahankan:
+ - inpName, inpDomain, plusTag, methodsUser, methodsDom, btnCreate, previewText, counter, warnName, copyBadge, copyBadgeText, confettiWrap
+ - Custom +tag opsional; jika kosong dan Plus aktif -> +idNN otomatis
+ - Hasil muncul setelah copy sukses
+ - Badge slide-in dari kanan, confetti, counter increment
 */
 
 (function(){
@@ -284,7 +269,6 @@
   const copyBadge = $('copyBadge'), copyBadgeText = $('copyBadgeText');
   const confettiWrap = $('confettiWrap');
 
-  // Toggles: multi-select for username methods, toggle for domain
   function wireToggle(container, radio=false){
     container.addEventListener('click', e=>{
       const btn = e.target.closest('button[data-method]');
@@ -301,7 +285,6 @@
   wireToggle(methodsUser, false);
   wireToggle(methodsDom, false);
 
-  // show/hide username warning
   inpName.addEventListener('input', () => {
     warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none';
   });
@@ -366,18 +349,10 @@
     }
     try{
       const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.focus(); ta.select();
-      const ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      return ok;
-    }catch(err){
-      console.warn('fallback copy failed', err);
-      return false;
-    }
+      ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      const ok = document.execCommand('copy'); document.body.removeChild(ta); return ok;
+    }catch(err){ console.warn('fallback copy failed', err); return false; }
   }
 
   function showCopyBadge(msg){
