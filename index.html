@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Smaller input text + Floating CTA</title>
+<title>Email Generator — Fixed buttons (no auto-press, no floating)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -46,7 +46,7 @@
   .form{display:flex;flex-direction:column;gap:12px}
   label{display:block;margin-top:8px;margin-bottom:6px;font-weight:700;color:var(--ink);font-size:14px}
 
-  /* === INPUTS === */
+  /* inputs */
   input[type="text"], textarea{
     width:100%; max-width:100%; padding:14px 16px; height:54px; border-radius:14px; border:1px solid var(--border);
     background:var(--card); font-size:16px; font-weight:500; color:var(--ink); box-shadow:none; transition:box-shadow .12s, transform .06s;
@@ -66,6 +66,7 @@
     font-weight:800;font-size:13px;color:var(--ink);text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s,box-shadow .12s,background .12s;
   }
   .method:hover{transform:translateY(-4px)}
+  /* active for methods */
   .method.active{background:var(--soft); color:var(--primary); border:1px solid rgba(37,99,235,0.12); box-shadow:0 8px 24px rgba(37,99,235,0.03)}
   body.dark .method.active{ background: rgba(84,184,255,0.02); box-shadow:none }
 
@@ -77,33 +78,15 @@
   }
 
   .btn-area{position:relative;margin-top:8px}
+  /* default button style (neutral) */
   .btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s,box-shadow .12s}
-  .btn.primary{background: linear-gradient(90deg,var(--primary),var(--primary-2)); color:white; border:1px solid rgba(255,255,255,0.06); box-shadow: 0 18px 56px rgba(37,99,235,0.18)}
-
-  /* === TAMBAHAN: sticky floating CTA CSS (letakkan di akhir style) === */
-  .btn-area.sticky {
-    position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    max-width: 980px;
-    margin: 0 auto;
-    z-index: 1200;
-    padding: 6px 12px;
-    background: transparent;
-    pointer-events: none;
-  }
-  .btn-area.sticky .btn {
-    pointer-events: auto;
-    box-shadow: 0 20px 48px rgba(37,99,235,0.12);
-  }
-  @supports(padding: max(0px)) {
-    .btn-area.sticky { bottom: max(12px, env(safe-area-inset-bottom)); }
-  }
+  /* make primary default neutral — will get .active added by JS on user click/copy */
+  .btn.primary{background:transparent;color:var(--ink);border:1px solid var(--border);box-shadow:none}
+  .btn.primary:hover{background:var(--soft);color:var(--primary);transform:translateY(-2px)}
+  .btn.primary.active{background:linear-gradient(90deg,var(--primary),var(--primary-2));color:#fff;border:1px solid rgba(255,255,255,0.06);box-shadow:0 18px 56px rgba(37,99,235,0.18)}
 
   .side{display:flex;flex-direction:column;gap:12px}
   .preview{padding:22px 16px;border-radius:14px;background:var(--card);border:1px solid var(--border);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--ink);font-size:14px;box-shadow:0 18px 40px rgba(16,24,40,0.04);min-width:0}
-  body.dark .preview{ background:#071426; border:1px solid rgba(255,255,255,0.02); box-shadow:none; }
   .preview .label{font-size:12px;color:var(--mut);margin-bottom:10px}
   .preview .emailTxt{font-size:15px;word-break:break-all}
 
@@ -163,14 +146,14 @@
             <div class="hint">Contoh: gmail.com — pilih Random Case bila ingin acak kapitalisasi domain.</div>
           </div>
 
-          <!-- methods -->
+          <!-- methods (NO default active in markup) -->
           <div class="method-card">
             <label>Metode Username (gabungkan sesuai kebutuhan)</label>
             <div id="methodsUser" class="grid" aria-hidden="false">
-              <button class="method active" data-method="plus" type="button">Plus (+)</button>
+              <button class="method" data-method="plus" type="button">Plus (+)</button>
               <button class="method" data-method="dot" type="button">Titik (.)</button>
               <button class="method" data-method="upper" type="button">UPPERCASE</button>
-              <button class="method active" data-method="lower" type="button">lowercase</button>
+              <button class="method" data-method="lower" type="button">lowercase</button>
             </div>
           </div>
 
@@ -189,7 +172,7 @@
             </div>
           </div>
 
-          <!-- CTA -->
+          <!-- CTA (normal, non-floating) -->
           <div class="btn-area">
             <div id="copyBadge" class="copy-badge" aria-hidden="true">
               <div class="check">✓</div>
@@ -231,7 +214,9 @@
   </div>
 
 <script>
-/* Behavior preserved + theme toggle + domain/username validation + copy */
+/* Main behaviour: theme + toggle buttons + validation + copy.
+   Important: cta gets .active only on real user click or successful copy.
+*/
 (function(){
   const $ = id => document.getElementById(id);
   const form = $('egForm');
@@ -245,45 +230,47 @@
 
   // Theme persistence
   const THEME_KEY = 'eg_theme';
-  function applyTheme(t){ if(t === 'dark') document.body.classList.add('dark'); else document.body.classList.remove('dark'); themeIcon.textContent = (t === 'dark') ? '🌙' : '☀️'; themeToggle.setAttribute('aria-pressed', t === 'dark'); }
-  function loadTheme(){ const s = localStorage.getItem(THEME_KEY); if(s) return s; return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function applyTheme(t){
+    if(t === 'dark') document.body.classList.add('dark');
+    else document.body.classList.remove('dark');
+    themeIcon.textContent = (t === 'dark') ? '🌙' : '☀️';
+    themeToggle.setAttribute('aria-pressed', t === 'dark');
+  }
+  function loadTheme(){
+    const s = localStorage.getItem(THEME_KEY);
+    if(s) return s;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
   function saveTheme(t){ localStorage.setItem(THEME_KEY, t); }
   applyTheme(loadTheme());
-  themeToggle.addEventListener('click', ()=>{ const now = document.body.classList.contains('dark') ? 'dark' : 'light'; const next = now === 'dark' ? 'light' : 'dark'; applyTheme(next); saveTheme(next); });
-
-  // prevent form submit
-  form.addEventListener('submit', e => { e.preventDefault(); return false; });
-  [inpName, inpDomain, plusTag].forEach(el=>{
-    if(!el) return;
-    el.addEventListener('keydown', e=>{
-      if(e.key === 'Enter'){ e.preventDefault();
-        const order = [inpName, inpDomain, plusTag];
-        const idx = order.indexOf(el);
-        if(idx >= 0 && idx < order.length - 1) order[idx+1].focus();
-      }
-    });
+  themeToggle.addEventListener('click', ()=>{
+    const now = document.body.classList.contains('dark') ? 'dark' : 'light';
+    const next = now === 'dark' ? 'light' : 'dark';
+    applyTheme(next); saveTheme(next);
   });
 
-  // toggle buttons
-  function wireToggle(container, radio=false){
+  // prevent form submit
+  if(form) form.addEventListener('submit', e => { e.preventDefault(); return false; });
+
+  // Toggle method buttons (allow multiple)
+  function wireToggle(container){
+    if(!container) return;
     container.addEventListener('click', e=>{
       const btn = e.target.closest('button[data-method]');
       if(!btn) return;
       e.preventDefault();
-      if(radio){
-        Array.from(container.querySelectorAll('button[data-method]')).forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-      } else btn.classList.toggle('active');
+      btn.classList.toggle('active');
     });
   }
-  wireToggle(methodsUser,false); wireToggle(methodsDom,false);
+  wireToggle(methodsUser); wireToggle(methodsDom);
 
-  inpName.addEventListener('input', ()=> warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none');
-  inpDomain.addEventListener('input', ()=> warnDomain.style.display = inpDomain.value.trim() === '' ? 'block' : 'none');
+  // validation warnings
+  if(inpName) inpName.addEventListener('input', ()=> warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none');
+  if(inpDomain) inpDomain.addEventListener('input', ()=> warnDomain.style.display = inpDomain.value.trim() === '' ? 'block' : 'none');
 
   function readOpts(container){
     const out = {};
-    Array.from(container.querySelectorAll('button[data-method]')).forEach(b => out[b.dataset.method] = b.classList.contains('active'));
+    Array.from((container || document).querySelectorAll('button[data-method]')).forEach(b => out[b.dataset.method] = b.classList.contains('active'));
     return out;
   }
   function applyDot(name){ if(name.length <= 2) return name.split('').join('.'); return name.slice(0,2) + '.' + name.slice(2); }
@@ -297,7 +284,7 @@
     else u = u.toLowerCase();
     return u.replace(/\s+/g, '.');
   }
-  function domainTransform(domain, domOpts){ if(domOpts.domRandom) return randomCase(domain); return domain; }
+  function domainTransform(domain, domOpts){ if(domOpts && domOpts.domRandom) return randomCase(domain); return domain; }
 
   function makeEmail(){
     const base = inpName.value.trim(); if(!base) return '';
@@ -309,113 +296,109 @@
 
   async function copyToClipboard(text){
     if(!text) return false;
-    try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; } }catch(e){ console.warn('clipboard API failed', e); }
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; }
+    }catch(e){ console.warn('clipboard API failed', e); }
     try{
       const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
-      document.body.appendChild(ta); ta.focus(); ta.select(); const ok = document.execCommand('copy'); document.body.removeChild(ta); return ok;
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      const ok = document.execCommand('copy'); document.body.removeChild(ta); return !!ok;
     }catch(err){ console.warn('fallback copy failed', err); return false; }
   }
 
-  function showCopyBadge(msg){ copyBadgeText.textContent = msg || 'Tersalin!'; copyBadge.classList.add('show'); copyBadge.setAttribute('aria-hidden','false'); clearTimeout(copyBadge._t); copyBadge._t = setTimeout(()=>{ copyBadge.classList.remove('show'); copyBadge.setAttribute('aria-hidden','true'); }, 1500); }
-  function spawnConfetti(){ while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild); const pieces = 10; const colors = ['#54b8ff','#3fb0ff','#06b6d4','#f59e0b','#7c3aed']; for(let i=0;i<pieces;i++){ const el = document.createElement('div'); el.className = 'confetti-piece'; el.style.background = colors[Math.floor(Math.random()*colors.length)]; const angle = (Math.random()*120 - 60); const dist = 50 + Math.random()*90; const tx = Math.cos(angle * Math.PI/180) * dist; const ty = Math.sin(angle * Math.PI/180) * dist + (30 + Math.random()*30); el.style.setProperty('--tx', tx.toFixed(1) + 'px'); el.style.setProperty('--ty', ty.toFixed(1) + 'px'); el.style.left = '0px'; el.style.top = '0px'; const delay = Math.random()*0.12; el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${delay}s forwards`; confettiWrap.appendChild(el); setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 1400 + delay*1000); } }
-  function pulseButton(btnEl){ btnEl.animate([{ transform:'scale(1)' },{ transform:'scale(1.02)' },{ transform:'scale(1)' }], {duration:420, easing:'cubic-bezier(.22,.9,.25,1)'}); }
-
-  let seq = 0;
-  btnCreate.addEventListener('click', async ()=>{
-    warnName.style.display = 'none'; warnDomain.style.display = 'none';
-    const nameVal = inpName.value.trim(); const domainVal = inpDomain.value.trim();
-    if(nameVal === ''){ warnName.style.display = 'block'; inpName.focus(); btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1}); return; }
-    if(domainVal === ''){ warnDomain.style.display = 'block'; inpDomain.focus(); btnCreate.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(6px)'},{transform:'translateY(0)'}], {duration:220,iterations:1}); return; }
-
-    const email = makeEmail(); if(!email){ warnName.style.display = 'block'; return; }
-
-    const ok = await copyToClipboard(email);
-    if(ok){ showCopyBadge('Tersalin!'); spawnConfetti(); pulseButton(btnCreate); } else { showCopyBadge('Salin manual'); }
-    seq += 1; counterEl.textContent = seq; previewText.textContent = email;
-  });
-
-  warnName.style.display = 'none'; warnDomain.style.display = 'none';
-})();
-
-/* Floating CTA behavior: tetap muncul di atas keyboard saat user fokus ke input.
-   - menambahkan/menghapus class 'sticky' pada .btn-area
-   - delay kecil supaya klik tombol masih terdeteksi setelah blur
-*/
-(function(){
-  const btnArea = document.querySelector('.btn-area');
-  if(!btnArea) return;
-  const inputs = Array.from(document.querySelectorAll('input[type="text"], textarea'));
-  let blurTimeout = null;
-
-  function setSticky(on){
-    if(on) btnArea.classList.add('sticky');
-    else btnArea.classList.remove('sticky');
+  function showCopyBadge(msg){
+    if(!copyBadge) return;
+    copyBadgeText.textContent = msg || 'Tersalin!';
+    copyBadge.classList.add('show');
+    copyBadge.setAttribute('aria-hidden','false');
+    clearTimeout(copyBadge._t);
+    copyBadge._t = setTimeout(()=>{ copyBadge.classList.remove('show'); copyBadge.setAttribute('aria-hidden','true'); }, 1500);
   }
 
-  // fokus -> tunjukkan sticky
-  inputs.forEach(inp => {
-    inp.addEventListener('focus', ()=> {
-      clearTimeout(blurTimeout);
-      setTimeout(()=> setSticky(true), 60);
-    });
-
-    // blur -> sembunyikan sticky setelah delay kecil
-    inp.addEventListener('blur', ()=> {
-      clearTimeout(blurTimeout);
-      blurTimeout = setTimeout(()=> setSticky(false), 250);
-    });
-  });
-
-  // detect keyboard via resize (mobile browsers usually fire resize)
-  let lastH = window.innerHeight;
-  window.addEventListener('resize', ()=> {
-    const h = window.innerHeight;
-    if(h < lastH - 120) {
-      setSticky(true);
-    } else if(h > lastH + 80) {
-      setSticky(false);
+  function spawnConfetti(){
+    if(!confettiWrap) return;
+    while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild);
+    const pieces = 10; const colors = ['#54b8ff','#3fb0ff','#06b6d4','#f59e0b','#7c3aed'];
+    for(let i=0;i<pieces;i++){
+      const el = document.createElement('div'); el.className = 'confetti-piece'; el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      const angle = (Math.random()*120 - 60); const dist = 50 + Math.random()*90;
+      const tx = Math.cos(angle * Math.PI/180) * dist; const ty = Math.sin(angle * Math.PI/180) * dist + (30 + Math.random()*30);
+      el.style.setProperty('--tx', tx.toFixed(1) + 'px'); el.style.setProperty('--ty', ty.toFixed(1) + 'px');
+      el.style.left = '0px'; el.style.top = '0px';
+      const delay = Math.random()*0.12;
+      el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${delay}s forwards`;
+      confettiWrap.appendChild(el);
+      setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 1400 + delay*1000);
     }
-    lastH = h;
-  });
+  }
+
+  function pulseButton(btnEl){
+    if(!btnEl || !btnEl.animate) return;
+    btnEl.animate([{ transform:'scale(1)' },{ transform:'scale(1.02)' },{ transform:'scale(1)' }], {duration:320, easing:'cubic-bezier(.22,.9,.25,1)'});
+  }
+
+  // core create button behaviour
+  let seq = 0;
+  if(btnCreate){
+    // make sure btn not visually active on load
+    btnCreate.classList.remove('active');
+
+    btnCreate.addEventListener('click', async (ev)=>{
+      // only visual-active on real user interaction (isTrusted)
+      // but do the logic always
+      if(ev && ev.isTrusted){
+        btnCreate.classList.add('active');
+        clearTimeout(btnCreate._rem);
+        btnCreate._rem = setTimeout(()=> btnCreate.classList.remove('active'), 1400);
+      }
+
+      warnName.style.display = 'none'; warnDomain.style.display = 'none';
+      const nameVal = inpName.value.trim(); const domainVal = inpDomain.value.trim();
+      if(nameVal === ''){ warnName.style.display = 'block'; inpName.focus(); btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1}); return; }
+      if(domainVal === ''){ warnDomain.style.display = 'block'; inpDomain.focus(); btnCreate.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(6px)'},{transform:'translateY(0)'}], {duration:220,iterations:1}); return; }
+
+      const email = makeEmail(); if(!email){ warnName.style.display = 'block'; return; }
+
+      const ok = await copyToClipboard(email);
+      if(ok){
+        showCopyBadge('Tersalin!'); spawnConfetti(); pulseButton(btnCreate);
+        // ensure visual active on success
+        btnCreate.classList.add('active');
+        clearTimeout(btnCreate._rem);
+        btnCreate._rem = setTimeout(()=> btnCreate.classList.remove('active'), 1400);
+      } else {
+        showCopyBadge('Salin manual');
+      }
+      seq += 1; counterEl.textContent = seq; previewText.textContent = email;
+    });
+  }
+
+  // hide warnings initially
+  if(warnName) warnName.style.display = 'none';
+  if(warnDomain) warnDomain.style.display = 'none';
+
+  // On pageshow / load: ensure no auto-pressed or focused state
+  function clearUIState(){
+    // remove any active from methods — user decides
+    document.querySelectorAll('#methodsUser .method, #methodsDom .method').forEach(b => b.classList.remove('active'));
+    // reset preview + counter
+    if(previewText) previewText.textContent = '-';
+    if(counterEl) counterEl.textContent = '0';
+    // remove visual active from CTA
+    if(btnCreate) btnCreate.classList.remove('active');
+    // blur focused buttons (some browsers restore focus)
+    if(document.activeElement && document.activeElement.tagName === 'BUTTON') try{ document.activeElement.blur(); }catch(e){}
+    // remove any inline autofocus (safety)
+    document.querySelectorAll('[autofocus]').forEach(el=>el.removeAttribute('autofocus'));
+    // safety flag for other scripts
+    window.__eg_no_autoclick = true;
+  }
+  window.addEventListener('pageshow', clearUIState);
+  window.addEventListener('load', clearUIState);
+  setTimeout(clearUIState, 40);
+
 })();
 </script>
-  <!-- Reset awal + hentikan auto-click setelah reload -->
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-  try {
-    // 1) Hapus semua kelas 'active' pada tombol metode (user akan memilih sendiri)
-    document.querySelectorAll('#methodsUser .method, #methodsDom .method').forEach(btn=>{
-      btn.classList.remove('active');
-      // hapus atribut autofocus jika ada
-      if(btn.hasAttribute && btn.hasAttribute('autofocus')) btn.removeAttribute('autofocus');
-    });
 
-    // 2) Reset preview & counter agar tampak fresh
-    const preview = document.getElementById('previewText');
-    const counter = document.getElementById('counter');
-    if(preview) preview.textContent = '-';
-    if(counter) counter.textContent = '0';
-
-    // 3) sembunyikan peringatan bila muncul
-    ['warnName','warnDomain'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.style.display = 'none';
-    });
-
-    // 4) pastikan form tidak melakukan submit default (double-safety)
-    const f = document.getElementById('egForm') || document.querySelector('form');
-    if(f) f.addEventListener('submit', function(e){ e.preventDefault(); return false; });
-
-    // 5) optional safety: remove any inline onclick="...click()" or auto dispatches
-    //    (tidak mengubah tombol, hanya mencegah pemicu click pada load)
-    //    - jika ada skrip lain yang memanggil .click() pada load, sulit deteksi otomatis.
-    //    - namun kita atur flag global agar script lain bisa cek: window.__eg_no_autoclick = true;
-    window.__eg_no_autoclick = true;
-
-  } catch(err) {
-    console.warn('Init reset failed', err);
-  }
-});
-</script>
 </body>
 </html>
