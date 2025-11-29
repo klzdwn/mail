@@ -3,131 +3,82 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Light / Dark Mode (solid dark)</title>
+<title>Email Generator — Smaller input text</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Light mode variables (default) */
-    --bg: #f6f9ff;
-    --card: #ffffff;
-    --mut: #6b7280;
-    --ink: #0b1220;
-    --primary: #2563eb;
-    --primary-2: #1f7efb;
-    --soft: #eef6ff;
-    --border: rgba(16,24,40,0.06);
-    --shadow-lg: 0 28px 70px rgba(15,23,42,0.08);
-    --radius: 16px;
-    --danger: #ef4444;
-    --success: #16a34a;
+    --bg:#f6f9ff; --card:#ffffff; --mut:#6b7280; --ink:#0b1220;
+    --primary:#2563eb; --primary-2:#1f7efb; --soft:#eef6ff;
+    --border: rgba(16,24,40,0.06); --shadow-lg: 0 28px 70px rgba(15,23,42,0.08);
+    --radius:16px; --danger:#ef4444; --success:#16a34a;
   }
-
-  /* Dark overrides: SOLID dark colors, NO bright gradients */
   body.dark{
-    --bg: #071022;        /* page background */
-    --card: #081426;      /* card background */
-    --mut: #9aa8bf;       /* muted text */
-    --ink: #e7eefc;       /* main text */
-    --primary: #54b8ff;   /* accent */
-    --primary-2: #3fb0ff;
-    --soft: rgba(84,184,255,0.06);
-    --border: rgba(255,255,255,0.06);
-    --shadow-lg: 0 28px 70px rgba(0,0,0,0.6);
+    --bg:#071022; --card:#081426; --mut:#9aa8bf; --ink:#e7eefc;
+    --primary:#54b8ff; --primary-2:#3fb0ff; --soft: rgba(84,184,255,0.06);
+    --border: rgba(255,255,255,0.06); --shadow-lg: 0 28px 70px rgba(0,0,0,0.6);
   }
 
-  *, *::before, *::after{box-sizing:border-box}
+  *,*::before,*::after{box-sizing:border-box}
   html,body{height:100%;margin:0;padding:0;overflow-x:hidden}
   body{
     font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
     -webkit-font-smoothing:antialiased;
-    background: var(--bg);
-    color:var(--ink);
-    padding:18px 12px;
-    display:flex;
-    justify-content:center;
-    transition: background .26s ease, color .18s ease;
+    background:var(--bg); color:var(--ink); padding:18px 12px; display:flex; justify-content:center;
+    transition:background .2s, color .2s;
   }
 
   .wrap{width:100%;max-width:980px;padding:8px}
   .card{
-    background:var(--card);
-    border-radius:var(--radius);
-    padding:18px;
-    border:1px solid var(--border);
-    box-shadow:var(--shadow-lg);
-    overflow:visible;
-    display:grid;
-    grid-template-columns:1fr;
-    gap:18px;
-    transition: background .26s ease, border-color .26s ease, box-shadow .26s ease;
-    min-width:0;
+    background:var(--card); border-radius:var(--radius); padding:18px; border:1px solid var(--border);
+    box-shadow:var(--shadow-lg); overflow:visible; display:grid; grid-template-columns:1fr; gap:18px; min-width:0;
   }
-  @media(min-width:920px){ .card{grid-template-columns:1fr 360px;align-items:start} }
+  @media(min-width:920px){ .card{grid-template-columns:1fr 360px; align-items:start} }
 
   .header{display:flex;gap:12px;align-items:center;justify-content:space-between}
   .header-left{display:flex;gap:12px;align-items:center}
-  .logo{
-    width:72px;height:72px;border-radius:14px;
-    display:flex;align-items:center;justify-content:center;font-weight:800;
-    color:var(--primary);font-size:20px;border:1px solid var(--border);
-    background:transparent;
-  }
-  .titlewrap{display:flex;flex-direction:column;gap:6px}
+  .logo{width:72px;height:72px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--primary);font-size:20px;border:1px solid var(--border);background:transparent}
   .titlewrap h1{margin:0;font-size:20px}
   .titlewrap p{margin:0;color:var(--mut);font-size:13px}
 
-  /* theme toggle button */
-  .theme-toggle{
-    display:flex;align-items:center;gap:8px;padding:8px;border-radius:12px;border:1px solid var(--border);background:transparent;cursor:pointer;
-  }
+  .theme-toggle{display:flex;align-items:center;gap:8px;padding:8px;border-radius:12px;border:1px solid var(--border);background:transparent;cursor:pointer}
   .theme-toggle .ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;background:transparent}
 
   .form{display:flex;flex-direction:column;gap:12px}
   label{display:block;margin-top:8px;margin-bottom:6px;font-weight:700;color:var(--ink);font-size:14px}
 
-  /* INPUTS: larger tap area with solid dark background in dark mode */
+  /* === INPUTS ===
+     ukuran teks di sini DISMALLER sesuai permintaan:
+     - Username, Domain, Custom+tag: font-size 16 (placeholder 15)
+     - Input height tetap nyaman, but not huge
+  */
   input[type="text"], textarea{
-    width:100%;max-width:100%;padding:16px 18px;height:56px;border-radius:14px;border:1px solid var(--border);
-    background: var(--card); font-size:18px;font-weight:500;color:var(--ink);
-    box-shadow: none; transition: box-shadow .12s, transform .06s; cursor:text; line-height:1.1;
+    width:100%; max-width:100%; padding:14px 16px; height:54px; border-radius:14px; border:1px solid var(--border);
+    background:var(--card); font-size:16px; font-weight:500; color:var(--ink); box-shadow:none; transition:box-shadow .12s, transform .06s;
+    cursor:text; line-height:1.15;
   }
-  /* In dark mode make inputs solid dark (no bright gradient) */
+  /* smaller placeholder text specifically */
+  input::placeholder, textarea::placeholder{
+    color:#9aa6bf; font-size:15px; opacity:1;
+  }
+  /* dark-mode: solid dark inputs (no bright gradient) */
   body.dark input[type="text"], body.dark textarea{
-    background: #071a2b;            /* solid input bg in dark */
-    border:1px solid rgba(255,255,255,0.04);
+    background:#071a2b; border:1px solid rgba(255,255,255,0.04);
   }
 
-  input::placeholder{color:#9aa6bf;font-size:18px;opacity:1}
-  input:focus, textarea:focus{box-shadow:0 10px 28px rgba(0,0,0,0.4);transform:translateY(-1px);outline:none}
+  input:focus, textarea:focus{box-shadow:0 14px 36px rgba(37,99,235,0.06);transform:translateY(-1px);outline:none}
 
   .hint{font-size:13px;color:var(--mut)}
-
-  /* method card: make background solid in dark mode */
-  .method-card{
-    padding:12px;border-radius:12px;background:var(--card);
-    border:1px solid var(--border);
-    box-shadow:0 10px 26px rgba(15,23,42,0.03);
-  }
-  body.dark .method-card{
-    background:#071426;
-    box-shadow:none;
-    border:1px solid rgba(255,255,255,0.02);
-  }
+  .method-card{padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--border);box-shadow:0 10px 26px rgba(15,23,42,0.03)}
+  body.dark .method-card{background:#071426;border:1px solid rgba(255,255,255,0.02);box-shadow:none}
 
   .grid{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
   .method{
-    flex:1 1 calc(50% - 10px);min-width:0;height:44px;padding:10px 12px;border-radius:10px;background:transparent;border:1px solid var(--border);
-    font-weight:800;font-size:13px;color:var(--ink);text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s, box-shadow .12s, background .12s;overflow:hidden;
+    flex:1 1 calc(50% - 10px); min-width:0; height:44px; padding:10px 12px;border-radius:10px;background:transparent;border:1px solid var(--border);
+    font-weight:800;font-size:13px;color:var(--ink);text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s,box-shadow .12s,background .12s;
   }
   .method:hover{transform:translateY(-4px)}
-  .method.active{
-    background: var(--soft);
-    color:var(--primary);border:1px solid rgba(37,99,235,0.12);box-shadow:0 8px 24px rgba(37,99,235,0.03);
-  }
-  body.dark .method.active{
-    background: rgba(84,184,255,0.02);
-    box-shadow:none;
-  }
+  .method.active{background:var(--soft); color:var(--primary); border:1px solid rgba(37,99,235,0.12); box-shadow:0 8px 24px rgba(37,99,235,0.03)}
+  body.dark .method.active{ background: rgba(84,184,255,0.02); box-shadow:none }
 
   .row-inline{display:flex;flex-direction:column;gap:8px}
   @media(min-width:920px){
@@ -138,16 +89,16 @@
 
   .btn-area{position:relative;margin-top:8px}
   .btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s,box-shadow .12s}
-  .btn.primary{background: linear-gradient(90deg,var(--primary),var(--primary-2));color:white;border:1px solid rgba(255,255,255,0.06);box-shadow: 0 18px 56px rgba(37,99,235,0.18);}
+  .btn.primary{background: linear-gradient(90deg,var(--primary),var(--primary-2)); color:white; border:1px solid rgba(255,255,255,0.06); box-shadow: 0 18px 56px rgba(37,99,235,0.18)}
 
   .side{display:flex;flex-direction:column;gap:12px}
-  .preview{padding:24px 16px;border-radius:14px;background:var(--card);border:1px solid var(--border);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--ink);font-size:14px;box-shadow:0 18px 40px rgba(16,24,40,0.04);min-width:0}
+  .preview{padding:22px 16px;border-radius:14px;background:var(--card);border:1px solid var(--border);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;color:var(--ink);font-size:14px;box-shadow:0 18px 40px rgba(16,24,40,0.04);min-width:0}
   body.dark .preview{ background:#071426; border:1px solid rgba(255,255,255,0.02); box-shadow:none; }
   .preview .label{font-size:12px;color:var(--mut);margin-bottom:10px}
   .preview .emailTxt{font-size:15px;word-break:break-all}
 
   .meta{padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--border);font-size:13px;color:var(--mut)}
-  body.dark .meta{ background:#071426; border:1px solid rgba(255,255,255,0.02); color:var(--mut); }
+  body.dark .meta{ background:#071426; border:1px solid rgba(255,255,255,0.02); color:var(--mut)}
 
   .copy-badge{position:absolute;top:-72px;right:0;transform:translateX(120%);opacity:0;background:var(--card);padding:10px 16px;border-radius:14px;display:flex;gap:12px;align-items:center;border:1px solid var(--border);box-shadow:0 18px 40px rgba(15,23,42,0.06);transition:transform .32s cubic-bezier(.22,.9,.25,1), opacity .22s ease;pointer-events:none;white-space:nowrap;font-weight:800;color:var(--ink)}
   .copy-badge.show{transform:translateX(0);opacity:1}
@@ -187,7 +138,6 @@
           </div>
         </div>
 
-        <!-- form -->
         <form id="egForm" class="form" onsubmit="return false;" aria-label="Form email generator">
           <!-- username -->
           <div class="row-inline">
@@ -274,7 +224,7 @@
   </div>
 
 <script>
-/* Behavior preserved + theme toggle (solid dark) */
+/* Behavior preserved + theme toggle + domain/username validation + copy */
 (function(){
   const $ = id => document.getElementById(id);
   const form = $('egForm');
@@ -286,30 +236,15 @@
   const confettiWrap = $('confettiWrap');
   const themeToggle = $('themeToggle'), themeIcon = $('themeIcon');
 
-  // Theme: load/save
-  const THEME_KEY = 'eg_theme'; // 'light' | 'dark'
-  function applyTheme(t){
-    if(t === 'dark') document.body.classList.add('dark');
-    else document.body.classList.remove('dark');
-    themeIcon.textContent = (t === 'dark') ? '🌙' : '☀️';
-    themeToggle.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
-  }
-  function loadTheme(){
-    const saved = localStorage.getItem(THEME_KEY);
-    if(saved) return saved;
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  }
+  // Theme persistence
+  const THEME_KEY = 'eg_theme';
+  function applyTheme(t){ if(t === 'dark') document.body.classList.add('dark'); else document.body.classList.remove('dark'); themeIcon.textContent = (t === 'dark') ? '🌙' : '☀️'; themeToggle.setAttribute('aria-pressed', t === 'dark'); }
+  function loadTheme(){ const s = localStorage.getItem(THEME_KEY); if(s) return s; return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
   function saveTheme(t){ localStorage.setItem(THEME_KEY, t); }
   applyTheme(loadTheme());
+  themeToggle.addEventListener('click', ()=>{ const now = document.body.classList.contains('dark') ? 'dark' : 'light'; const next = now === 'dark' ? 'light' : 'dark'; applyTheme(next); saveTheme(next); });
 
-  themeToggle.addEventListener('click', ()=>{
-    const now = document.body.classList.contains('dark') ? 'dark' : 'light';
-    const next = now === 'dark' ? 'light' : 'dark';
-    applyTheme(next);
-    saveTheme(next);
-  });
-
-  // prevent form submit & Enter default
+  // prevent form submit
   form.addEventListener('submit', e => { e.preventDefault(); return false; });
   [inpName, inpDomain, plusTag].forEach(el=>{
     if(!el) return;
@@ -322,7 +257,7 @@
     });
   });
 
-  // toggles for method buttons
+  // toggle buttons
   function wireToggle(container, radio=false){
     container.addEventListener('click', e=>{
       const btn = e.target.closest('button[data-method]');
@@ -331,46 +266,22 @@
       if(radio){
         Array.from(container.querySelectorAll('button[data-method]')).forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-      } else {
-        btn.classList.toggle('active');
-      }
+      } else btn.classList.toggle('active');
     });
   }
-  wireToggle(methodsUser, false);
-  wireToggle(methodsDom, false);
+  wireToggle(methodsUser,false); wireToggle(methodsDom,false);
 
-  // show/hide warnings
-  inpName.addEventListener('input', () => {
-    warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none';
-  });
-  inpDomain.addEventListener('input', () => {
-    warnDomain.style.display = inpDomain.value.trim() === '' ? 'block' : 'none';
-  });
+  inpName.addEventListener('input', ()=> warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none');
+  inpDomain.addEventListener('input', ()=> warnDomain.style.display = inpDomain.value.trim() === '' ? 'block' : 'none');
 
   function readOpts(container){
     const out = {};
     Array.from(container.querySelectorAll('button[data-method]')).forEach(b => out[b.dataset.method] = b.classList.contains('active'));
     return out;
   }
-
-  function applyDot(name){
-    if(name.length <= 2) return name.split('').join('.');
-    return name.slice(0,2) + '.' + name.slice(2);
-  }
-
-  function applyPlus(name, tag){
-    if(tag && tag.trim()){
-      const clean = tag.trim().replace(/^\+/, '');
-      return name + '+' + clean;
-    }
-    const nn = String(Math.floor(10 + Math.random()*90));
-    return name + '+id' + nn;
-  }
-
-  function randomCase(s){
-    return Array.from(s).map(ch => Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase()).join('');
-  }
-
+  function applyDot(name){ if(name.length <= 2) return name.split('').join('.'); return name.slice(0,2) + '.' + name.slice(2); }
+  function applyPlus(name, tag){ if(tag && tag.trim()){ const clean = tag.trim().replace(/^\+/, ''); return name + '+' + clean; } const nn = String(Math.floor(10 + Math.random()*90)); return name + '+id' + nn; }
+  function randomCase(s){ return Array.from(s).map(ch => Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase()).join(''); }
   function transformUsername(base, opts, tag){
     let u = base;
     if(opts.dot) u = applyDot(u);
@@ -379,17 +290,11 @@
     else u = u.toLowerCase();
     return u.replace(/\s+/g, '.');
   }
-
-  function domainTransform(domain, domOpts){
-    if(domOpts.domRandom) return randomCase(domain);
-    return domain;
-  }
+  function domainTransform(domain, domOpts){ if(domOpts.domRandom) return randomCase(domain); return domain; }
 
   function makeEmail(){
-    const base = inpName.value.trim();
-    if(!base) return '';
-    const uopts = readOpts(methodsUser);
-    const domOpts = readOpts(methodsDom);
+    const base = inpName.value.trim(); if(!base) return '';
+    const uopts = readOpts(methodsUser); const domOpts = readOpts(methodsDom);
     const username = transformUsername(base, uopts, plusTag ? plusTag.value : '');
     const domain = domainTransform((inpDomain.value.trim() || 'gmail.com'), domOpts);
     return username + '@' + domain;
@@ -397,112 +302,32 @@
 
   async function copyToClipboard(text){
     if(!text) return false;
+    try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; } }catch(e){ console.warn('clipboard API failed', e); }
     try{
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        await navigator.clipboard.writeText(text);
-        return true;
-      }
-    }catch(e){
-      console.warn('clipboard API failed', e);
-    }
-    try{
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.focus(); ta.select();
-      const ok = document.execCommand('copy');
-      document.body.removeChild(ta);
-      return ok;
-    }catch(err){
-      console.warn('fallback copy failed', err);
-      return false;
-    }
+      const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.focus(); ta.select(); const ok = document.execCommand('copy'); document.body.removeChild(ta); return ok;
+    }catch(err){ console.warn('fallback copy failed', err); return false; }
   }
 
-  function showCopyBadge(msg){
-    copyBadgeText.textContent = msg || 'Tersalin!';
-    copyBadge.classList.add('show');
-    copyBadge.setAttribute('aria-hidden','false');
-    clearTimeout(copyBadge._t);
-    copyBadge._t = setTimeout(()=>{ copyBadge.classList.remove('show'); copyBadge.setAttribute('aria-hidden','true'); }, 1500);
-  }
-
-  function spawnConfetti(){
-    while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild);
-    const pieces = 10;
-    const colors = ['#54b8ff','#3fb0ff','#06b6d4','#f59e0b','#7c3aed'];
-    for(let i=0;i<pieces;i++){
-      const el = document.createElement('div');
-      el.className = 'confetti-piece';
-      el.style.background = colors[Math.floor(Math.random()*colors.length)];
-      const angle = (Math.random()*120 - 60);
-      const dist = 50 + Math.random()*90;
-      const tx = Math.cos(angle * Math.PI/180) * dist;
-      const ty = Math.sin(angle * Math.PI/180) * dist + (30 + Math.random()*30);
-      el.style.setProperty('--tx', tx.toFixed(1) + 'px');
-      el.style.setProperty('--ty', ty.toFixed(1) + 'px');
-      el.style.left = '0px'; el.style.top = '0px';
-      const delay = Math.random()*0.12;
-      el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${delay}s forwards`;
-      confettiWrap.appendChild(el);
-      setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 1400 + delay*1000);
-    }
-  }
-
-  function pulseButton(btnEl){
-    btnEl.animate([
-      { transform:'scale(1)', boxShadow:'0 12px 36px rgba(14,74,173,0.12)' },
-      { transform:'scale(1.02)', boxShadow:'0 20px 64px rgba(14,74,173,0.16)' },
-      { transform:'scale(1)', boxShadow:'0 12px 36px rgba(14,74,173,0.12)' }
-    ], {duration:420, easing:'cubic-bezier(.22,.9,.25,1)'});
-  }
+  function showCopyBadge(msg){ copyBadgeText.textContent = msg || 'Tersalin!'; copyBadge.classList.add('show'); copyBadge.setAttribute('aria-hidden','false'); clearTimeout(copyBadge._t); copyBadge._t = setTimeout(()=>{ copyBadge.classList.remove('show'); copyBadge.setAttribute('aria-hidden','true'); }, 1500); }
+  function spawnConfetti(){ while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild); const pieces = 10; const colors = ['#54b8ff','#3fb0ff','#06b6d4','#f59e0b','#7c3aed']; for(let i=0;i<pieces;i++){ const el = document.createElement('div'); el.className = 'confetti-piece'; el.style.background = colors[Math.floor(Math.random()*colors.length)]; const angle = (Math.random()*120 - 60); const dist = 50 + Math.random()*90; const tx = Math.cos(angle * Math.PI/180) * dist; const ty = Math.sin(angle * Math.PI/180) * dist + (30 + Math.random()*30); el.style.setProperty('--tx', tx.toFixed(1) + 'px'); el.style.setProperty('--ty', ty.toFixed(1) + 'px'); el.style.left = '0px'; el.style.top = '0px'; const delay = Math.random()*0.12; el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${delay}s forwards`; confettiWrap.appendChild(el); setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 1400 + delay*1000); } }
+  function pulseButton(btnEl){ btnEl.animate([{ transform:'scale(1)' },{ transform:'scale(1.02)' },{ transform:'scale(1)' }], {duration:420, easing:'cubic-bezier(.22,.9,.25,1)'}); }
 
   let seq = 0;
   btnCreate.addEventListener('click', async ()=>{
-    warnName.style.display = 'none';
-    warnDomain.style.display = 'none';
+    warnName.style.display = 'none'; warnDomain.style.display = 'none';
+    const nameVal = inpName.value.trim(); const domainVal = inpDomain.value.trim();
+    if(nameVal === ''){ warnName.style.display = 'block'; inpName.focus(); btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1}); return; }
+    if(domainVal === ''){ warnDomain.style.display = 'block'; inpDomain.focus(); btnCreate.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(6px)'},{transform:'translateY(0)'}], {duration:220,iterations:1}); return; }
 
-    const nameVal = inpName.value.trim();
-    const domainVal = inpDomain.value.trim();
-
-    if(nameVal === ''){
-      warnName.style.display = 'block';
-      inpName.focus();
-      btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1});
-      return;
-    }
-    if(domainVal === ''){
-      warnDomain.style.display = 'block';
-      inpDomain.focus();
-      btnCreate.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(6px)'},{transform:'translateY(0)'}], {duration:220,iterations:1});
-      return;
-    }
-
-    const email = makeEmail();
-    if(!email){
-      warnName.style.display = 'block';
-      return;
-    }
+    const email = makeEmail(); if(!email){ warnName.style.display = 'block'; return; }
 
     const ok = await copyToClipboard(email);
-    if(ok){
-      showCopyBadge('Tersalin!');
-      spawnConfetti();
-      pulseButton(btnCreate);
-    } else {
-      showCopyBadge('Salin manual');
-    }
-
-    seq += 1;
-    counterEl.textContent = seq;
-    previewText.textContent = email;
+    if(ok){ showCopyBadge('Tersalin!'); spawnConfetti(); pulseButton(btnCreate); } else { showCopyBadge('Salin manual'); }
+    seq += 1; counterEl.textContent = seq; previewText.textContent = email;
   });
 
-  // init warnings hidden
-  warnName.style.display = 'none';
-  warnDomain.style.display = 'none';
+  warnName.style.display = 'none'; warnDomain.style.display = 'none';
 })();
 </script>
 </body>
