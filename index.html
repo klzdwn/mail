@@ -1,125 +1,135 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email Generator</title>
-
-  <!-- CSS eksternal -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Font -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Email Generator — Plus options</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
   <div class="wrap">
-    <div class="card">
+    <div class="card" role="application" aria-label="Email generator refined layout">
 
+      <!-- LEFT: header + form -->
       <div>
         <div class="header">
           <div class="header-left">
-            <div class="logo">EG</div>
+            <div class="logo" aria-hidden="true">EG</div>
             <div class="titlewrap">
               <h1>Email Generator</h1>
-              <p class="lead">Tata letak rapi, simpel, & modern — fitur tetap sama.</p>
+              <p class="lead">Tata letak disegarkan: lebih rapi, kompak, dan modern — fitur tetap sama.</p>
             </div>
           </div>
 
-          <button id="themeToggle" class="theme-toggle" type="button">
-            <div class="ico" id="themeIcon">🌙</div>
-          </button>
+          <!-- Theme toggle -->
+          <div>
+            <button id="themeToggle" class="theme-toggle" title="Toggle mode" aria-pressed="false" type="button">
+              <div class="ico" id="themeIcon">🌙</div>
+            </button>
+          </div>
         </div>
 
-        <form id="egForm" class="form" onsubmit="return false;">
-
-          <label for="inpName">Username Email</label>
-          <input id="inpName" type="text" placeholder="namaanda">
-          <div id="warnName" class="error">⚠️ Isi username terlebih dahulu.</div>
-
-          <label for="inpDomain">Domain Email</label>
-          <input id="inpDomain" type="text" placeholder="misal: gmail.com">
-          <div id="warnDomain" class="error">⚠️ Isi domain terlebih dahulu.</div>
-          <div class="hint">Contoh: gmail.com</div>
-
-          <!-- Methods -->
-          <div class="method-card">
-            <label>Metode Username</label>
-            <div id="methodsUser" class="grid">
-              <button class="method" data-method="plus" type="button">Plus (+)</button>
-              <button class="method" data-method="dot" type="button">Titik (.)</button>
-              <button class="method" data-method="upper" type="button">UPPERCASE</button>
-              <button class="method" data-method="lower" type="button">lowercase</button>
+        <form id="egForm" class="form" onsubmit="return false;" aria-label="Form email generator">
+          <!-- username -->
+          <div class="row-inline">
+            <label for="inpName">Username Email</label>
+            <div class="field">
+              <input id="inpName" type="text" placeholder="namaanda" autocomplete="off" />
+              <div id="warnName" class="error">⚠️ Isi Username terlebih dahulu sebelum klik Buat & Salin</div>
             </div>
           </div>
 
-          <!-- Plus Options -->
-          <div id="plusOptions">
-            <label>Mode Plus (+)</label>
-            <div class="modes">
+          <!-- domain (no automatic value, only placeholder) -->
+          <div>
+            <label for="inpDomain">Domain Email</label>
+            <input id="inpDomain" type="text" placeholder="gmail.com" />
+            <div id="warnDomain" class="error">⚠️ Isi Domain terlebih dahulu (mis. gmail.com).</div>
+            <div class="hint">Contoh: gmail.com — pilih Random Case bila ingin acak kapitalisasi domain.</div>
+          </div>
+
+          <!-- methods -->
+          <div class="method-card">
+            <label>Metode Username (gabungkan sesuai kebutuhan)</label>
+            <div id="methodsUser" class="grid" aria-hidden="false">
+              <button class="method" data-method="plus" type="button" aria-pressed="false">Plus (+)</button>
+              <button class="method" data-method="dot" type="button" aria-pressed="false">Titik (.)</button>
+              <button class="method" data-method="upper" type="button" aria-pressed="false">UPPERCASE</button>
+              <button class="method" data-method="lower" type="button" aria-pressed="false">lowercase</button>
+            </div>
+          </div>
+
+          <!-- plus options (hidden until Plus active) -->
+          <div id="plusOptions" aria-hidden="true">
+            <label style="font-weight:700;margin-bottom:8px;display:block">Mode Plus (+):</label>
+            <div class="modes" role="tablist" aria-label="Pilihan mode plus">
               <button type="button" data-plusmode="numbers">Angka</button>
               <button type="button" data-plusmode="letters">Huruf</button>
               <button type="button" data-plusmode="mix" class="active">Campur</button>
             </div>
-
+            <div style="font-size:13px;color:var(--mut);margin-bottom:8px">Panjang karakter untuk tag + (jika tag custom kosong)</div>
             <div class="rangeWrap">
-              <input id="plusLen" type="range" min="4" max="64" value="12">
-              <div id="plusLenVal" class="val">12</div>
+              <input id="plusLen" type="range" min="4" max="64" value="12" />
+              <div class="val" id="plusLenVal">12</div>
             </div>
           </div>
 
-          <!-- Custom Tag -->
-          <label for="plusTag">Custom + tag (opsional)</label>
-          <input id="plusTag" type="text" placeholder="tanpa tanda +">
+          <!-- plus tag (manual) -->
+          <div style="margin-top:8px">
+            <label for="plusTag">Custom + tag <small style="color:var(--mut);font-weight:600">(opsional)</small></label>
+            <input id="plusTag" type="text" placeholder="contoh: tokoku (tanpa +)" />
+            <div class="hint">Jika kosong & Plus (+) aktif → generator menambahkan tag sesuai mode & panjang di atas.</div>
+          </div>
 
-          <!-- Domain method -->
+          <!-- domain methods -->
           <div class="method-card">
             <label>Metode Domain</label>
             <div id="methodsDom" class="grid">
-              <button class="method" data-method="domRandom" type="button">Random Case</button>
+              <button class="method" data-method="domRandom" type="button">Random Case (acak besar/kecil)</button>
             </div>
           </div>
 
           <!-- CTA -->
           <div class="btn-area">
-            <div id="copyBadge" class="copy-badge">
+            <div id="copyBadge" class="copy-badge" aria-hidden="true">
               <div class="check">✓</div>
               <div id="copyBadgeText">Tersalin!</div>
             </div>
 
-            <div id="confettiWrap" class="confetti-wrap"></div>
+            <div id="confettiWrap" class="confetti-wrap" aria-hidden="true"></div>
 
-            <button id="btnCreate" class="btn primary" type="button">
-              📋 Buat & Salin
+            <button id="btnCreate" class="btn primary" title="Buat & Salin" type="button" aria-pressed="false">
+              <span class="btn-icon">📋</span>
+              Buat & Salin
             </button>
           </div>
-
         </form>
       </div>
 
-      <!-- Preview -->
-      <aside class="side">
-        <div class="preview">
+      <!-- RIGHT: preview + meta -->
+      <aside class="side" aria-label="Preview dan info">
+        <div class="preview" id="previewBox" aria-live="polite">
           <div class="label">Email Anda</div>
           <div id="previewText" class="emailTxt">-</div>
         </div>
 
         <div class="meta">
-          <strong>Petunjuk:</strong>
-          <p>Isi username & domain → pilih metode → klik Buat & Salin.</p>
+          <strong>Petunjuk singkat</strong>
+          <p style="margin:8px 0 0;color:var(--mut);font-size:13px">
+            1) Isi username & domain.<br>
+            2) Pilih metode username (bisa gabung).<br>
+            3) Tekan <strong>Buat & Salin</strong> → email disalin, lalu hasil ditampilkan.
+          </p>
         </div>
 
-        <div class="meta row">
-          <span>Nomor urut:</span>
-          <span id="counter">0</span>
+        <div class="meta" style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:13px;color:var(--mut)">Nomor urut</div>
+          <div style="font-weight:800;font-size:16px" id="counter">0</div>
         </div>
       </aside>
-
     </div>
   </div>
 
-  <!-- JS eksternal -->
   <script src="script.js"></script>
-
 </body>
 </html>
