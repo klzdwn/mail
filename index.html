@@ -3,45 +3,53 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Single file</title>
+<title>Email Generator — Styled</title>
 <style>
   :root{
-    --bg:#f3f6fb; --card:#ffffff; --muted:#64748b; --primary:#1e40af; --muted-2:#e6eefb;
-    --pill:#eef2ff; --accent:#2563eb;
+    --bg:#f6f8fb;
+    --card:#ffffff;
+    --mut:#6b7280;
+    --primary:#1e40af;
+    --accent:#2563eb;
+    --pill:#eef2ff;
+    --soft:#f1f5f9;
+    --shadow: 0 10px 30px rgba(15,23,42,0.06);
   }
   *{box-sizing:border-box}
-  body{font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial; margin:0; background:var(--bg); color:#0f172a; -webkit-font-smoothing:antialiased}
-  .wrap{max-width:520px;margin:18px auto;padding:16px}
-  .card{background:var(--card); border-radius:12px; padding:20px; box-shadow:0 8px 30px rgba(2,6,23,0.06)}
-  header{display:flex;align-items:center;flex-direction:column;gap:6px}
-  .icon{width:56px;height:56px;border-radius:999px;background:linear-gradient(180deg,#eff6ff,#e0f2fe);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:22px}
-  h1{margin:0;font-size:20px;color:#0b1220}
-  p.lead{margin:0;color:var(--muted);font-size:13px}
-  .tabs{display:flex;gap:8px;margin-top:14px}
-  .tab{padding:8px 14px;border-radius:10px;background:var(--pill);cursor:pointer;color:#334155;border:1px solid transparent}
-  .tab.active{background:var(--primary);color:white;box-shadow:0 6px 18px rgba(37,99,235,0.12)}
-  .field{margin-top:12px}
-  label{font-size:13px;color:#0f172a;display:block;margin-bottom:6px}
-  input[type="text"], textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef6;background:#fbfeff}
-  textarea{min-height:120px;resize:vertical}
-  .grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .method{padding:10px 12px;border-radius:10px;background:#f1f5f9;border:1px solid transparent;cursor:pointer;color:#0f172a;font-weight:600;font-size:13px}
-  .method.active{background:var(--primary);color:#fff;box-shadow:0 6px 18px rgba(37,99,235,0.12)}
-  .generate{margin-top:14px;display:flex;gap:10px}
-  .btn{flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;background:var(--primary);color:#fff;font-weight:700}
-  .btn.secondary{background:#fff;color:var(--primary);border:1px solid #e6eefb}
-  .preview{margin-top:14px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid #eef2ff;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace}
-  .small{font-size:12px;color:var(--muted);margin-top:8px}
-  .footer{margin-top:12px;text-align:center;color:var(--muted);font-size:12px}
-  .actions{display:flex;gap:8px;align-items:center}
-  .count{font-weight:700;margin-left:6px}
-  /* responsive */
-  @media (max-width:420px){ .wrap{padding:10px} .method{flex:1 1 45%} }
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#081229;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:520px;margin:18px auto;padding:14px}
+  .card{background:var(--card);border-radius:18px;padding:20px;box-shadow:var(--shadow);overflow:hidden}
+  header{display:flex;align-items:center;flex-direction:column;gap:8px;padding-bottom:6px}
+  .icon{width:56px;height:56px;border-radius:999px;background:linear-gradient(180deg,#eef6ff,#e6f0ff);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:22px}
+  h1{margin:0;font-size:20px;color:#0f172a}
+  p.lead{margin:0;color:var(--mut);font-size:13px}
+  .tabs{display:flex;gap:10px;margin-top:12px}
+  .tab{padding:10px 14px;border-radius:10px;background:var(--soft);cursor:pointer;color:#324151;border:1px solid transparent;font-weight:700}
+  .tab.active{background:var(--primary);color:#fff;box-shadow:0 8px 24px rgba(37,99,235,0.12)}
+  .section{margin-top:12px}
+  label.lbl{display:block;font-size:13px;color:#0f172a;margin-bottom:8px}
+  input[type="text"], textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #eef3fb;background:#fbfeff;font-size:15px}
+  .grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .method{padding:10px 14px;border-radius:10px;background:#f5f7fb;border:1px solid transparent;cursor:pointer;color:#0f172a;font-weight:700;font-size:14px}
+  .method.active{background:var(--accent);color:#fff;box-shadow:0 8px 20px rgba(37,99,235,0.12)}
+  .smalltxt{font-size:12px;color:var(--mut);margin-top:8px}
+  .actions-row{display:flex;gap:12px;margin-top:14px}
+  .btn{flex:1;padding:14px;border-radius:12px;border:none;cursor:pointer;font-weight:800;font-size:15px}
+  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 10px 28px rgba(37,99,235,0.12)}
+  .btn.primary.disabled{opacity:0.45;cursor:not-allowed;box-shadow:none}
+  .btn.ghost{background:#fff;border:1px solid #e6eefb;color:var(--accent)}
+  .preview{margin-top:14px;padding:12px;border-radius:10px;background:#fbfdff;border:1px solid #eef6ff;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace}
+  .footerbar{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:12px;border-top:1px solid #f0f4fb;color:var(--mut);font-size:13px}
+  .linkish{color:var(--accent);cursor:pointer;text-decoration:none}
+  /* make buttons block-like on small screens */
+  @media (max-width:420px){
+    .actions-row{flex-direction:column}
+  }
 </style>
 </head>
 <body>
   <main class="wrap">
-    <div class="card">
+    <div class="card" role="application">
       <header>
         <div class="icon">✉️</div>
         <h1>Email Generator</h1>
@@ -53,271 +61,269 @@
         <button id="tabBulk" class="tab" role="tab">Banyak</button>
       </div>
 
-      <div id="singlePane" style="margin-top:12px">
-        <div class="field">
-          <label>Username Email</label>
-          <input id="username" type="text" placeholder="mis. kalz" value="kalz" />
+      <!-- SINGLE -->
+      <div id="single" class="section" aria-hidden="false">
+        <div class="field" style="margin-top:6px">
+          <label class="lbl">Username Email</label>
+          <input id="inpName" type="text" placeholder="namaanda" autocomplete="off" />
         </div>
 
-        <div class="field">
-          <label>Domain Email (tanpa @)</label>
-          <input id="domain" type="text" placeholder="mis. gmail.com" value="gmail.com" />
+        <div class="field" style="margin-top:12px">
+          <label class="lbl">Domain Email</label>
+          <input id="inpDomain" type="text" placeholder="gmail.com" value="gmail.com" />
         </div>
 
-        <div class="field">
-          <label>Pilih Metode (bisa gabungan)</label>
-          <div class="grid" id="methodsUsername">
+        <div style="margin-top:12px">
+          <div class="lbl">Pilih Metode (bisa gabungan)</div>
+          <div style="font-size:13px;color:var(--mut);margin-top:6px">Metode Username:</div>
+          <div class="grid" id="methodsUser">
             <button data-method="plus" class="method">Plus (+)</button>
             <button data-method="dot" class="method">Titik (.)</button>
             <button data-method="upper" class="method">UPPERCASE</button>
             <button data-method="lower" class="method active">lowercase</button>
-            <button data-method="randomcase" class="method">RandomCase</button>
           </div>
         </div>
 
-        <div class="field">
-          <label>Metode Domain (setelah @)</label>
-          <div class="grid" id="methodsDomain">
-            <button data-method="domainRandomCase" class="method">Random Case (Upper + Lowercase)</button>
-            <button data-method="domainAsIs" class="method active">As-is</button>
+        <div style="margin-top:12px">
+          <div class="lbl">Metode Domain (setelah @):</div>
+          <div class="grid" id="methodsDom">
+            <button data-method="domRandom" class="method">Random Case (Uppercase + Lowercase)</button>
+            <button data-method="domAsIs" class="method active">As-is</button>
           </div>
         </div>
 
-        <div class="generate">
-          <button id="createCopy" class="btn">Buat & Salin</button>
-          <button id="previewBtn" class="btn secondary">Preview</button>
+        <div class="smalltxt">Tekan untuk aktifkan/nonaktifkan. Bisa pilih lebih dari satu di setiap bagian.</div>
+
+        <div class="actions-row">
+          <button id="btnCreate" class="btn primary disabled" disabled>
+            <span style="display:inline-block;margin-right:8px">📋</span> Buat & Salin
+          </button>
+          <button id="btnPreview" class="btn ghost">Preview</button>
         </div>
 
-        <div class="preview" id="previewBox" aria-live="polite" style="margin-top:12px">
-          Email yang dibuat: <div id="resultText" style="margin-top:8px">-</div>
+        <div class="preview" id="previewBox" aria-live="polite">
+          <div style="font-size:13px;color:var(--mut)">Email yang dibuat:</div>
+          <div id="previewText" style="margin-top:8px;font-size:15px;color:#0b1220">-</div>
         </div>
-
-        <div class="small">Tekan untuk aktifkan/nonaktifkan. Bisa pilih lebih dari satu di setiap bagian.</div>
       </div>
 
-      <div id="bulkPane" style="display:none; margin-top:12px">
-        <div class="field">
-          <label>Daftar base names (satu per baris)</label>
-          <textarea id="bulkList" placeholder="contoh:&#10;rizky&#10;andi&#10;gilang"></textarea>
+      <!-- BULK (hidden by default) -->
+      <div id="bulk" class="section" style="display:none">
+        <div>
+          <label class="lbl">Daftar base names (satu per baris)</label>
+          <textarea id="bulkList" placeholder="rizky\nandi\ngilang" style="width:100%;padding:12px;border-radius:10px;border:1px solid #eef3fb;background:#fbfeff"></textarea>
         </div>
 
-        <div class="field">
-          <label>Domain (default gmail.com)</label>
-          <input id="bulkDomain" type="text" placeholder="gmail.com" value="gmail.com" />
+        <div style="margin-top:12px">
+          <label class="lbl">Domain</label>
+          <input id="bulkDomain" type="text" value="gmail.com" />
         </div>
 
-        <div class="field">
-          <label>Pilih Metode (username)</label>
-          <div class="grid" id="methodsUsernameBulk">
+        <div style="margin-top:12px">
+          <div class="lbl">Metode Username:</div>
+          <div class="grid" id="methodsUserBulk">
             <button data-method="plus" class="method">Plus (+)</button>
             <button data-method="dot" class="method">Titik (.)</button>
             <button data-method="upper" class="method">UPPERCASE</button>
             <button data-method="lower" class="method active">lowercase</button>
-            <button data-method="randomcase" class="method">RandomCase</button>
           </div>
         </div>
 
-        <div class="generate">
-          <button id="createBulk" class="btn">Buat & Salin Semua</button>
-          <button id="downloadBulk" class="btn secondary">Download .txt</button>
+        <div class="actions-row" style="margin-top:12px">
+          <button id="btnCreateBulk" class="btn primary">Buat & Salin</button>
+          <button id="btnDownloadBulk" class="btn ghost">Download .txt</button>
         </div>
 
-        <div class="preview" id="bulkPreview" style="margin-top:12px; max-height:220px; overflow:auto">
-          <ol id="bulkResultList" style="padding-left:18px;margin:0;color:#0b1220"></ol>
+        <div class="preview" style="margin-top:12px;max-height:180px;overflow:auto">
+          <ol id="bulkOutput" style="padding-left:18px;margin:0"></ol>
         </div>
-
-        <div class="small">Hasil akan disalin ke clipboard (jika diizinkan) dan bisa di-download.</div>
       </div>
 
-      <div class="footer">Dibuat cepat — gunakan untuk saran username. Tidak untuk pendaftaran otomatis.</div>
+      <div class="footerbar">
+        <div>Nomor urut: <span id="counter">0</span></div>
+        <div><a id="resetLink" class="linkish">Reset</a></div>
+      </div>
+
     </div>
+
+    <div style="text-align:center;margin-top:12px;color:var(--mut);font-size:13px">Dibuat oleh Iqra</div>
   </main>
 
 <script>
 (function(){
-  // helpers
+  // util
   const $ = id => document.getElementById(id);
-  const toggleBtn = (btn) => btn.classList.toggle('active');
-  const isActive = (btn) => btn.classList.contains('active');
+  const toggle = el => el.classList.toggle('active');
+  const setActive = (el, on) => el.classList.toggle('active', !!on);
 
   // tabs
-  const tabSingle = $('tabSingle'), tabBulk = $('tabBulk'), singlePane = $('singlePane'), bulkPane = $('bulkPane');
-  tabSingle.addEventListener('click', ()=>{ tabSingle.classList.add('active'); tabBulk.classList.remove('active'); singlePane.style.display='block'; bulkPane.style.display='none'; });
-  tabBulk.addEventListener('click', ()=>{ tabBulk.classList.add('active'); tabSingle.classList.remove('active'); singlePane.style.display='none'; bulkPane.style.display='block'; });
-
-  // username methods (single)
-  const methodsUsername = document.getElementById('methodsUsername');
-  methodsUsername.addEventListener('click', e => {
-    if(e.target && e.target.dataset && e.target.dataset.method){
-      toggleBtn(e.target);
-    }
+  const tabSingle = $('tabSingle'), tabBulk = $('tabBulk');
+  const single = $('single'), bulk = $('bulk');
+  tabSingle.addEventListener('click', ()=>{
+    tabSingle.classList.add('active'); tabBulk.classList.remove('active');
+    single.style.display='block'; bulk.style.display='none';
+  });
+  tabBulk.addEventListener('click', ()=>{
+    tabBulk.classList.add('active'); tabSingle.classList.remove('active');
+    single.style.display='none'; bulk.style.display='block';
   });
 
-  // domain methods
-  const methodsDomain = document.getElementById('methodsDomain');
-  methodsDomain.addEventListener('click', e => {
-    if(e.target && e.target.dataset && e.target.dataset.method){
-      // make it behave like radio for domain (either As-is or RandomCase) but allow toggling
-      const all = methodsDomain.querySelectorAll('.method');
-      all.forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-    }
-  });
-
-  // bulk username methods
-  const methodsUsernameBulk = document.getElementById('methodsUsernameBulk');
-  methodsUsernameBulk.addEventListener('click', e=>{
-    if(e.target && e.target.dataset && e.target.dataset.method){
-      toggleBtn(e.target);
-    }
-  });
-
-  // core transforms
-  function applyDot(base){
-    if(!base) return base;
-    // simple: insert dot after second character if length>2, otherwise between chars
-    if(base.length <= 2) return base.split('').join('.');
-    return base.slice(0,2) + '.' + base.slice(2);
+  // method buttons (toggles)
+  function wireToggle(containerId){
+    const container = $(containerId);
+    container.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-method]');
+      if(!btn) return;
+      // for domain container, we want radio-like behaviour (domAsIs / domRandom)
+      if(containerId === 'methodsDom'){
+        Array.from(container.querySelectorAll('button[data-method]')).forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        return;
+      }
+      btn.classList.toggle('active');
+    });
   }
+  wireToggle('methodsUser'); wireToggle('methodsDom'); wireToggle('methodsUserBulk');
 
-  function applyPlus(base){
-    // append +random short tag (letters or numbers)
-    const tags = ['shop','id','official','x','web','mail'];
+  // inputs
+  const inpName = $('inpName'), inpDomain = $('inpDomain');
+  const previewText = $('previewText');
+  const btnCreate = $('btnCreate'), btnPreview = $('btnPreview');
+  const counterEl = $('counter'), resetLink = $('resetLink');
+
+  // helpers for transforms
+  function applyDot(name){
+    if(!name) return name;
+    if(name.length <= 2) return name.split('').join('.');
+    return name.slice(0,2) + '.' + name.slice(2);
+  }
+  function applyPlus(name){
+    const tags = ['shop','id','official','x','web'];
     const pick = tags[Math.floor(Math.random()*tags.length)];
-    const num = Math.floor(10 + Math.random()*990); // 2-3 digits
-    return base + '+' + pick + num;
+    const num = Math.floor(10 + Math.random()*990);
+    return name + '+' + pick + num;
+  }
+  function randomCase(s){
+    return Array.from(s).map(c => Math.random() < 0.5 ? c.toLowerCase() : c.toUpperCase()).join('');
   }
 
-  function applyRandomCase(str){
-    return Array.from(str).map(ch => Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase()).join('');
+  function readOptions(containerId){
+    const container = $(containerId);
+    const map = {};
+    container.querySelectorAll('button[data-method]').forEach(b=>{
+      map[b.dataset.method] = b.classList.contains('active');
+    });
+    return map;
   }
 
-  function transformUsername(base, opts){
-    if(!base) return '';
+  function transform(base, opts){
     let u = base;
-
-    // order: dot -> plus appended variants -> case transforms
     if(opts.dot) u = applyDot(u);
     if(opts.plus) u = applyPlus(u);
-
-    // case: if both upper and lower selected, prefer randomcase; if randomcase selected, use it
-    if(opts.randomcase) {
-      u = applyRandomCase(u);
-    } else if(opts.upper && !opts.lower) {
-      u = u.toUpperCase();
-    } else if(opts.lower && !opts.upper) {
-      u = u.toLowerCase();
-    } else if(opts.upper && opts.lower){
-      // conflicting: prefer lowercase (like screenshot shows lowercase active by default)
-      u = u.toLowerCase();
-    }
+    // casing
+    if(opts.upper && !opts.lower) u = u.toUpperCase();
+    else if(opts.lower && !opts.upper) u = u.toLowerCase();
+    else if(opts.upper && opts.lower) u = u.toLowerCase();
     return u;
   }
 
-  function transformDomain(domain, opts){
-    if(!domain) return '';
-    if(opts.domainRandomCase) return applyRandomCase(domain);
-    return domain;
+  function domainTransform(domainRaw){
+    const domOpts = readOptions('methodsDom');
+    if(domOpts.domRandom) return randomCase(domainRaw);
+    return domainRaw;
   }
 
-  // single create & copy
-  const createCopy = $('createCopy');
-  const previewBtn = $('previewBtn');
-  const usernameInput = $('username');
-  const domainInput = $('domain');
-  const resultText = $('resultText');
-
-  function readUsernameOpts(){
-    const map = {};
-    const buttons = methodsUsername.querySelectorAll('.method');
-    buttons.forEach(b => map[b.dataset.method] = b.classList.contains('active'));
-    return map;
-  }
-  function readDomainOpts(){
-    const buttons = methodsDomain.querySelectorAll('.method');
-    const map = {domainRandomCase:false, domainAsIs:false};
-    buttons.forEach(b => map[b.dataset.method] = b.classList.contains('active'));
-    return map;
+  function makeEmailOnce(){
+    const base = inpName.value.trim();
+    if(!base) return '';
+    const userOpts = readOptions('methodsUser');
+    const dom = inpDomain.value.trim() || 'gmail.com';
+    let user = transform(base, userOpts);
+    user = user.replace(/\s+/g, '.');
+    const domain = domainTransform(dom);
+    return user + '@' + domain;
   }
 
-  function makeOneEmail(){
-    const base = usernameInput.value.trim();
-    const domainRaw = domainInput.value.trim() || 'gmail.com';
-    const uopts = readUsernameOpts();
-    const dopts = readDomainOpts();
-    const username = transformUsername(base, uopts);
-    const domain = transformDomain(domainRaw, {domainRandomCase: dopts.domainRandomCase});
-    // clean: if username contains spaces, replace with dot
-    const finalUser = username.replace(/\s+/g, '.');
-    return finalUser + '@' + domain;
+  // preview & enable create button only when name exists
+  function updatePreview(){
+    const e = makeEmailOnce();
+    previewText.textContent = e || '-';
+    if(e){
+      btnCreate.classList.remove('disabled'); btnCreate.disabled = false;
+    } else {
+      btnCreate.classList.add('disabled'); btnCreate.disabled = true;
+    }
   }
+  inpName.addEventListener('input', updatePreview);
+  document.getElementById('methodsUser').addEventListener('click', updatePreview);
+  document.getElementById('methodsDom').addEventListener('click', updatePreview);
 
-  previewBtn.addEventListener('click', ()=>{
-    const email = makeOneEmail();
-    resultText.textContent = email;
-  });
+  btnPreview.addEventListener('click', updatePreview);
 
-  createCopy.addEventListener('click', async ()=>{
-    const email = makeOneEmail();
-    resultText.textContent = email;
+  // create & copy: increments counter, shows toast/alert and copies
+  let seq = 0;
+  btnCreate.addEventListener('click', async ()=>{
+    const email = makeEmailOnce();
+    if(!email) return;
+    seq += 1;
+    counterEl.textContent = seq;
+    previewText.textContent = email;
     try{
       await navigator.clipboard.writeText(email);
-      alert('Tersalin: ' + email);
+      // small visual feedback - brief alert-like
+      const old = btnCreate.textContent;
+      btnCreate.textContent = 'Tersalin ✓';
+      setTimeout(()=> btnCreate.textContent = old, 1200);
     }catch(e){
-      // fallback
       prompt('Salin manual:', email);
     }
   });
 
-  // bulk create
-  const createBulk = $('createBulk');
-  const downloadBulk = $('downloadBulk');
-  const bulkList = $('bulkList');
-  const bulkDomain = $('bulkDomain');
-  const bulkResultList = $('bulkResultList');
+  resetLink.addEventListener('click', ()=>{
+    seq = 0; counterEl.textContent = seq;
+    // reset preview/history
+    previewText.textContent = '-';
+  });
 
-  function readUsernameOptsBulk(){
-    const map = {};
-    const buttons = methodsUsernameBulk.querySelectorAll('.method');
-    buttons.forEach(b => map[b.dataset.method] = b.classList.contains('active'));
-    return map;
-  }
-
-  createBulk.addEventListener('click', async ()=>{
-    const lines = bulkList.value.split('\n').map(s=>s.trim()).filter(Boolean);
-    if(lines.length===0){ alert('Masukkan minimal satu nama di daftar.'); return; }
-    const domain = (bulkDomain.value || 'gmail.com').trim();
-    const uopts = readUsernameOptsBulk();
-    const results = [];
-    for(const base of lines){
-      const username = transformUsername(base, uopts);
-      results.push(username.replace(/\s+/g,'.') + '@' + domain);
-    }
-    // render
-    bulkResultList.innerHTML = '';
-    results.forEach(r => { const li = document.createElement('li'); li.textContent = r; bulkResultList.appendChild(li); });
-    // copy to clipboard
-    const text = results.join('\\n');
+  // BULK
+  const bulkList = $('bulkList'), bulkDomain = $('bulkDomain'), btnCreateBulk = $('btnCreateBulk'), btnDownloadBulk = $('btnDownloadBulk'), bulkOutput = $('bulkOutput');
+  btnCreateBulk.addEventListener('click', async ()=>{
+    const lines = bulkList.value.split('\\n').map(s=>s.trim()).filter(Boolean);
+    if(lines.length === 0){ alert('Masukkan minimal 1 nama di daftar.'); return; }
+    const opts = readOptions('methodsUserBulk');
+    const dom = (bulkDomain.value || 'gmail.com').trim();
+    const results = lines.map(base=>{
+      let u = base;
+      if(opts.dot) u = applyDot(u);
+      if(opts.plus) u = applyPlus(u);
+      if(opts.upper && !opts.lower) u = u.toUpperCase();
+      else if(opts.lower && !opts.upper) u = u.toLowerCase();
+      else if(opts.upper && opts.lower) u = u.toLowerCase();
+      u = u.replace(/\s+/g, '.');
+      return u + '@' + dom;
+    });
+    bulkOutput.innerHTML = '';
+    results.forEach(r => {
+      const li = document.createElement('li'); li.textContent = r; bulkOutput.appendChild(li);
+    });
     try{
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(results.join('\\n'));
       alert('Tersalin ' + results.length + ' alamat ke clipboard.');
     }catch(e){
-      // fallback: offer download
-      alert('Gagal salin otomatis — gunakan tombol Download .txt.');
+      alert('Gagal salin otomatis — gunakan tombol Download .txt');
     }
   });
 
-  downloadBulk.addEventListener('click', ()=>{
-    const items = Array.from(bulkResultList.querySelectorAll('li')).map(li => li.textContent);
-    if(items.length===0){ alert('Tidak ada hasil untuk di-download. Buat dulu.'); return; }
+  btnDownloadBulk.addEventListener('click', ()=>{
+    const items = Array.from(bulkOutput.querySelectorAll('li')).map(li=>li.textContent);
+    if(items.length === 0){ alert('Tidak ada hasil untuk didownload. Buat dulu.'); return; }
     const blob = new Blob([items.join('\\n')], {type:'text/plain'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = 'emails.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
   });
 
-  // initial preview
-  resultText.textContent = makeOneEmail();
-
+  // initial update
+  updatePreview();
 })();
 </script>
 </body>
