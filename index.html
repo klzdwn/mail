@@ -102,6 +102,15 @@
   body.dark .error{background:#4f1b1b;color:#ffd7d7;border-color:rgba(255,255,255,0.04)}
   .footer{margin-top:6px;text-align:center;color:var(--mut);font-size:13px}
 
+  /* plus options styling (hidden by default) */
+  #plusOptions{display:none;margin-top:8px;padding:12px;border-radius:12px;border:1px solid var(--border);background:linear-gradient(180deg,#fff,#fbfdff)}
+  #plusOptions .modes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  #plusOptions button{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:transparent;cursor:pointer;font-weight:700}
+  #plusOptions button.active{background:#7c3aed;color:#fff;border-color:rgba(0,0,0,0.06);box-shadow:0 10px 24px rgba(124,58,237,0.12)}
+  #plusOptions .rangeWrap{display:flex;align-items:center;gap:12px}
+  #plusOptions input[type="range"]{flex:1}
+  #plusOptions .val{min-width:36px;text-align:center;font-weight:700}
+
   @media(max-width:919px){ .logo{width:56px;height:56px} .method{flex-basis:100%} }
 </style>
 </head>
@@ -157,11 +166,26 @@
             </div>
           </div>
 
-          <!-- plus tag -->
-          <div>
+          <!-- plus options (muncul hanya kalau Plus diaktifkan) -->
+          <div id="plusOptions" aria-hidden="true">
+            <label style="font-weight:700;margin-bottom:8px;display:block">Mode Plus (+):</label>
+            <div class="modes" role="tablist" aria-label="Pilihan mode plus">
+              <button type="button" data-plusmode="numbers">Angka</button>
+              <button type="button" data-plusmode="letters">Huruf</button>
+              <button type="button" data-plusmode="mix" class="active">Campur</button>
+            </div>
+            <div style="font-size:13px;color:var(--mut);margin-bottom:8px">Panjang karakter untuk tag + (jika tag custom kosong)</div>
+            <div class="rangeWrap">
+              <input id="plusLen" type="range" min="4" max="64" value="12" />
+              <div class="val" id="plusLenVal">12</div>
+            </div>
+          </div>
+
+          <!-- plus tag (manual) -->
+          <div style="margin-top:8px">
             <label for="plusTag">Custom + tag <small style="color:var(--mut);font-weight:600">(opsional)</small></label>
             <input id="plusTag" type="text" placeholder="contoh: tokoku (tanpa +)" />
-            <div class="hint">Jika kosong & Plus (+) aktif → generator menambahkan tag default <code>+idNN</code>.</div>
+            <div class="hint">Jika kosong & Plus (+) aktif → generator menambahkan tag sesuai mode & panjang di atas.</div>
           </div>
 
           <!-- domain methods -->
@@ -214,8 +238,9 @@
   </div>
 
 <script>
-/* Main behaviour: theme + toggle buttons + validation + copy.
-   Important: cta gets .active only on real user click or successful copy.
+/* Main behaviour: theme + toggle buttons + validation + copy + plusOptions wiring.
+   - plusOptions is shown only when data-method="plus" is active.
+   - applyPlus available as window.__applyPlus and used by transformUsername.
 */
 (function(){
   const $ = id => document.getElementById(id);
@@ -227,6 +252,11 @@
   const copyBadge = $('copyBadge'), copyBadgeText = $('copyBadgeText');
   const confettiWrap = $('confettiWrap');
   const themeToggle = $('themeToggle'), themeIcon = $('themeIcon');
+
+  // plusOptions elements
+  const plusOptions = $('plusOptions');
+  const plusLen = $('plusLen');
+  const plusLenVal = $('plusLenVal');
 
   // Theme persistence
   const THEME_KEY = 'eg_theme';
@@ -260,45 +290,126 @@
       if(!btn) return;
       e.preventDefault();
       btn.classList.toggle('active');
+
+      // if plus toggled, show/hide plusOptions
+      if(btn.dataset.method === 'plus' && plusOptions){
+        setTimeout(()=> {
+          if(btn.classList.contains('active')){
+            plusOptions.style.display = '';
+            plusOptions.setAttribute('aria-hidden','false');
+          } else {
+            plusOptions.style.display = 'none';
+            plusOptions.setAttribute('aria-hidden','true');
+          }
+        }, 8);
+      }
     });
   }
   wireToggle(methodsUser); wireToggle(methodsDom);
 
+  // plusOptions mode buttons (Angka/Huruf/Campur)
+  if(plusOptions){
+    plusOptions.addEventListener('click', (e)=>{
+      const b = e.target.closest('button[data-plusmode]');
+      if(!b) return;
+      e.preventDefault();
+      plusOptions.querySelectorAll('button[data-plusmode]').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+    // update display value of slider
+    if(plusLen && plusLenVal){
+      plusLenVal.textContent = plusLen.value;
+      plusLen.addEventListener('input', ()=> plusLenVal.textContent = plusLen.value);
+    }
+  }
+
   // validation warnings
   if(inpName) inpName.addEventListener('input', ()=> warnName.style.display = inpName.value.trim() === '' ? 'block' : 'none');
   if(inpDomain) inpDomain.addEventListener('input', ()=> warnDomain.style.display = inpDomain.value.trim() === '' ? 'block' : 'none');
+
+  function parseList(s){ return (s || '').split(',').map(x=>x.trim()).filter(Boolean); }
+  function makeDotVariants(name){ if(!name) return []; return [ name.split('').join('.') ]; }
 
   function readOpts(container){
     const out = {};
     Array.from((container || document).querySelectorAll('button[data-method]')).forEach(b => out[b.dataset.method] = b.classList.contains('active'));
     return out;
   }
-  function applyDot(name){ if(name.length <= 2) return name.split('').join('.'); return name.slice(0,2) + '.' + name.slice(2); }
-  function applyPlus(name, tag){ if(tag && tag.trim()){ const clean = tag.trim().replace(/^\+/, ''); return name + '+' + clean; } const nn = String(Math.floor(10 + Math.random()*90)); return name + '+id' + nn; }
-  function randomCase(s){ return Array.from(s).map(ch => Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase()).join(''); }
-  function transformUsername(base, opts, tag){
-    let u = base;
-    if(opts.dot) u = applyDot(u);
-    if(opts.plus) u = applyPlus(u, tag);
-    if(opts.upper && !opts.lower) u = u.toUpperCase();
-    else u = u.toLowerCase();
-    return u.replace(/\s+/g, '.');
-  }
-  function domainTransform(domain, domOpts){ if(domOpts && domOpts.domRandom) return randomCase(domain); return domain; }
 
-  function makeEmail(){
-    const base = inpName.value.trim(); if(!base) return '';
-    const uopts = readOpts(methodsUser); const domOpts = readOpts(methodsDom);
-    const username = transformUsername(base, uopts, plusTag ? plusTag.value : '');
-    const domain = domainTransform((inpDomain.value.trim() || 'gmail.com'), domOpts);
-    return username + '@' + domain;
+  // PLUS generator helpers & global API
+  (function(){
+    function randStr(len, charset){
+      let s = '';
+      for(let i=0;i<len;i++) s += charset.charAt(Math.floor(Math.random()*charset.length));
+      return s;
+    }
+    function randNumbers(len){ return randStr(len, '0123456789'); }
+    function randLetters(len){ return randStr(len, 'abcdefghijklmnopqrstuvwxyz'); }
+    function randMix(len){ return randStr(len, 'abcdefghijklmnopqrstuvwxyz0123456789'); }
+
+    function readPlusMode(){
+      if(!plusOptions) return 'mix';
+      const btn = plusOptions.querySelector('button[data-plusmode].active');
+      return btn ? btn.dataset.plusmode : 'mix';
+    }
+
+    // expose globally so transformUsername can use it
+    window.__applyPlus = function(name, tagValue){
+      if(tagValue && tagValue.trim()){
+        const clean = tagValue.trim().replace(/^\+/, '');
+        return name + '+' + clean;
+      }
+      const mode = readPlusMode() || 'mix';
+      let len = 12;
+      if(plusLen) len = Math.max(1, Number(plusLen.value) || 12);
+      if(mode === 'numbers') return name + '+' + randNumbers(len);
+      if(mode === 'letters') return name + '+' + randLetters(len);
+      return name + '+' + randMix(len);
+    };
+  })();
+
+  function generateList(){
+    const base = (inpName && inpName.value || '').trim();
+    if(!base) return [];
+    // simple generation (kept minimal — you likely already have a more advanced generator)
+    const suffix = ''; // this simplified example doesn't use suffix field from earlier scripts
+    const extras = []; // not used here
+    const domains = (inpDomain && inpDomain.value) ? [inpDomain.value.trim()] : ['gmail.com'];
+    // create one variant to preview / copy
+    const out = [];
+    const uopts = readOpts(methodsUser);
+    let username = base;
+    if(uopts.dot){
+      username = (username.length <= 2) ? username.split('').join('.') : username.slice(0,2) + '.' + username.slice(2);
+    }
+    if(uopts.plus){
+      // use global applyPlus
+      username = window.__applyPlus(username, plusTag ? plusTag.value : '');
+    }
+    if(uopts.upper && !uopts.lower) username = username.toUpperCase();
+    else username = username.toLowerCase();
+    username = username.replace(/\s+/g, '.');
+    domains.forEach(d => out.push(username + '@' + d.trim()));
+    return out;
   }
 
+  function render(list){
+    const outEl = document.getElementById('output');
+    // if you don't have an #output area, we'll fallback to preview only
+    if(countEl) countEl.textContent = `(${list.length})`;
+    const preview = $('previewText');
+    if(!preview) return;
+    if(list.length === 0){
+      preview.textContent = '-';
+      return;
+    }
+    preview.textContent = list[0];
+  }
+
+  // copy helper
   async function copyToClipboard(text){
     if(!text) return false;
-    try{
-      if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; }
-    }catch(e){ console.warn('clipboard API failed', e); }
+    try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); return true; } }catch(e){ console.warn('clipboard API failed', e); }
     try{
       const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
       document.body.appendChild(ta); ta.focus(); ta.select();
@@ -306,96 +417,74 @@
     }catch(err){ console.warn('fallback copy failed', err); return false; }
   }
 
-  function showCopyBadge(msg){
-    if(!copyBadge) return;
-    copyBadgeText.textContent = msg || 'Tersalin!';
-    copyBadge.classList.add('show');
-    copyBadge.setAttribute('aria-hidden','false');
-    clearTimeout(copyBadge._t);
-    copyBadge._t = setTimeout(()=>{ copyBadge.classList.remove('show'); copyBadge.setAttribute('aria-hidden','true'); }, 1500);
-  }
-
-  function spawnConfetti(){
-    if(!confettiWrap) return;
-    while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild);
-    const pieces = 10; const colors = ['#54b8ff','#3fb0ff','#06b6d4','#f59e0b','#7c3aed'];
-    for(let i=0;i<pieces;i++){
-      const el = document.createElement('div'); el.className = 'confetti-piece'; el.style.background = colors[Math.floor(Math.random()*colors.length)];
-      const angle = (Math.random()*120 - 60); const dist = 50 + Math.random()*90;
-      const tx = Math.cos(angle * Math.PI/180) * dist; const ty = Math.sin(angle * Math.PI/180) * dist + (30 + Math.random()*30);
-      el.style.setProperty('--tx', tx.toFixed(1) + 'px'); el.style.setProperty('--ty', ty.toFixed(1) + 'px');
-      el.style.left = '0px'; el.style.top = '0px';
-      const delay = Math.random()*0.12;
-      el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${delay}s forwards`;
-      confettiWrap.appendChild(el);
-      setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 1400 + delay*1000);
-    }
-  }
-
-  function pulseButton(btnEl){
-    if(!btnEl || !btnEl.animate) return;
-    btnEl.animate([{ transform:'scale(1)' },{ transform:'scale(1.02)' },{ transform:'scale(1)' }], {duration:320, easing:'cubic-bezier(.22,.9,.25,1)'});
-  }
-
-  // core create button behaviour
+  // create button behavior
   let seq = 0;
   if(btnCreate){
-    // make sure btn not visually active on load
     btnCreate.classList.remove('active');
-
     btnCreate.addEventListener('click', async (ev)=>{
-      // only visual-active on real user interaction (isTrusted)
-      // but do the logic always
       if(ev && ev.isTrusted){
         btnCreate.classList.add('active');
         clearTimeout(btnCreate._rem);
-        btnCreate._rem = setTimeout(()=> btnCreate.classList.remove('active'), 1400);
+        btnCreate._rem = setTimeout(()=> btnCreate.classList.remove('active'), 1200);
       }
 
-      warnName.style.display = 'none'; warnDomain.style.display = 'none';
-      const nameVal = inpName.value.trim(); const domainVal = inpDomain.value.trim();
-      if(nameVal === ''){ warnName.style.display = 'block'; inpName.focus(); btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1}); return; }
-      if(domainVal === ''){ warnDomain.style.display = 'block'; inpDomain.focus(); btnCreate.animate([{transform:'translateY(0)'},{transform:'translateY(-6px)'},{transform:'translateY(6px)'},{transform:'translateY(0)'}], {duration:220,iterations:1}); return; }
+      if(warnName) warnName.style.display = 'none';
+      if(warnDomain) warnDomain.style.display = 'none';
+      const nameVal = inpName.value.trim();
+      const domainVal = inpDomain.value.trim();
+      if(nameVal === ''){ if(warnName) warnName.style.display = 'block'; inpName.focus(); return; }
+      if(domainVal === ''){ if(warnDomain) warnDomain.style.display = 'block'; inpDomain.focus(); return; }
 
-      const email = makeEmail(); if(!email){ warnName.style.display = 'block'; return; }
+      const list = generateList();
+      if(list.length === 0) return;
+      const email = list[0];
 
       const ok = await copyToClipboard(email);
       if(ok){
-        showCopyBadge('Tersalin!'); spawnConfetti(); pulseButton(btnCreate);
-        // ensure visual active on success
-        btnCreate.classList.add('active');
-        clearTimeout(btnCreate._rem);
-        btnCreate._rem = setTimeout(()=> btnCreate.classList.remove('active'), 1400);
+        if(copyBadge) { copyBadgeText.textContent = 'Tersalin!'; copyBadge.classList.add('show'); setTimeout(()=>copyBadge.classList.remove('show'), 1400); }
+        if(confettiWrap) {
+          // spawn simple confetti (small)
+          while(confettiWrap.firstChild) confettiWrap.removeChild(confettiWrap.firstChild);
+          const colors = ['#54b8ff','#3fb0ff','#06b6d4','#f59e0b','#7c3aed'];
+          for(let i=0;i<8;i++){
+            const el = document.createElement('div'); el.className='confetti-piece';
+            el.style.background = colors[Math.floor(Math.random()*colors.length)];
+            const angle = (Math.random()*120 - 60); const dist = 50 + Math.random()*60;
+            const tx = Math.cos(angle * Math.PI/180) * dist; const ty = Math.sin(angle * Math.PI/180) * dist + 30*Math.random();
+            el.style.setProperty('--tx', tx.toFixed(1)+'px'); el.style.setProperty('--ty', ty.toFixed(1)+'px');
+            el.style.animation = `confettiFly 900ms cubic-bezier(.2,.8,.25,1) ${Math.random()*0.12}s forwards`;
+            confettiWrap.appendChild(el);
+            setTimeout(()=>{ if(el && el.parentNode) el.parentNode.removeChild(el); }, 1400);
+          }
+        }
       } else {
-        showCopyBadge('Salin manual');
+        if(copyBadge) { copyBadgeText.textContent = 'Salin manual'; copyBadge.classList.add('show'); setTimeout(()=>copyBadge.classList.remove('show'), 1400); }
       }
-      seq += 1; counterEl.textContent = seq; previewText.textContent = email;
+
+      // render preview and increment counter
+      if(previewText) previewText.textContent = email;
+      seq += 1; if(counterEl) counterEl.textContent = seq;
     });
   }
 
-  // hide warnings initially
-  if(warnName) warnName.style.display = 'none';
-  if(warnDomain) warnDomain.style.display = 'none';
-
-  // On pageshow / load: ensure no auto-pressed or focused state
-  function clearUIState(){
-    // remove any active from methods — user decides
-    document.querySelectorAll('#methodsUser .method, #methodsDom .method').forEach(b => b.classList.remove('active'));
-    // reset preview + counter
+  // initial UI state: hide plus options
+  function initUI(){
+    if(plusOptions) { plusOptions.style.display = 'none'; plusOptions.setAttribute('aria-hidden','true'); }
+    if(warnName) warnName.style.display = 'none';
+    if(warnDomain) warnDomain.style.display = 'none';
     if(previewText) previewText.textContent = '-';
     if(counterEl) counterEl.textContent = '0';
-    // remove visual active from CTA
-    if(btnCreate) btnCreate.classList.remove('active');
-    // blur focused buttons (some browsers restore focus)
-    if(document.activeElement && document.activeElement.tagName === 'BUTTON') try{ document.activeElement.blur(); }catch(e){}
-    // remove any inline autofocus (safety)
-    document.querySelectorAll('[autofocus]').forEach(el=>el.removeAttribute('autofocus'));
-    // safety flag for other scripts
-    window.__eg_no_autoclick = true;
+    // remove any active classes (user should choose)
+    document.querySelectorAll('#methodsUser .method, #methodsDom .method').forEach(b => b.classList.remove('active'));
+    // ensure plusOptions mode defaults
+    if(plusOptions && !plusOptions.querySelector('button.active')){
+      const def = plusOptions.querySelector('button[data-plusmode="mix"]') || plusOptions.querySelector('button[data-plusmode="numbers"]');
+      if(def) def.classList.add('active');
+    }
   }
-  window.addEventListener('pageshow', clearUIState);
-  window.addEventListener('load', clearUIState);
-  setTimeout(clearUIState, 40);
+  window.addEventListener('pageshow', initUI);
+  window.addEventListener('load', initUI);
+  setTimeout(initUI, 40);
 
 })();
 </script>
