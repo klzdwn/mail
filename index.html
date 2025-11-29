@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Email Generator — Copy feedback</title>
+<title>Email Generator — Slide-in Copied</title>
 <style>
   :root{
     --bg:#f5f7fb;
@@ -15,273 +15,182 @@
     --shadow: 0 10px 22px rgba(15,23,42,0.05);
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
   body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:#05122a;-webkit-font-smoothing:antialiased}
   .wrap{max-width:560px;margin:12px auto;padding:8px}
-  .card{background:var(--card);border-radius:14px;padding:10px 10px 8px 10px;box-shadow:var(--shadow);overflow:hidden}
-  header{display:flex;align-items:center;flex-direction:column;gap:6px;padding-bottom:6px}
-  .icon{width:40px;height:40px;border-radius:999px;background:linear-gradient(180deg,#eef6ff,#e6f0ff);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:16px}
-  h1{margin:0;font-size:16px;color:#0f172a;font-weight:800}
-  p.lead{margin:0;color:var(--mut);font-size:12px}
-  .tabs{display:flex;gap:6px;margin-top:8px}
-  .tab{padding:6px 10px;border-radius:9px;background:transparent;cursor:pointer;color:#2b3440;border:1px solid transparent;font-weight:700;font-size:12px}
-  .tab.active{background:var(--accent);color:white;box-shadow:0 8px 20px rgba(37,99,235,0.10)}
-  .section{margin-top:10px}
-  label.lbl{display:block;font-size:12px;color:#0f172a;margin-bottom:6px;font-weight:700}
-  input[type="text"], textarea{width:100%;padding:8px;border-radius:9px;border:1px solid #eef3fb;background:#fbfeff;font-size:13px}
+  .card{background:var(--card);border-radius:14px;padding:10px;box-shadow:var(--shadow);overflow:hidden}
+  header{text-align:center}
+  .icon{width:42px;height:42px;margin:0 auto 6px;border-radius:50%;background:#eaf2ff;display:flex;align-items:center;justify-content:center;color:#1e40af}
+  h1{font-size:17px;margin:0;font-weight:800}
+  p.lead{font-size:12px;margin:4px 0;color:var(--mut)}
+  label{font-weight:700;font-size:12px;margin-bottom:4px;display:block;color:#111}
+  input,textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #dce3ee;font-size:13px}
   textarea{min-height:80px}
-  .grid{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-  .method{
-    padding:6px 10px;
-    min-height:40px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:9px;
-    background:var(--soft);
-    border:1px solid rgba(15,23,42,0.04);
-    cursor:pointer;
-    color:#0f172a;
-    font-weight:700;
-    font-size:12px;
-    transition:all .10s ease;
-    flex:1 1 48%;
-    box-sizing:border-box;
-  }
-  .method.active{background:var(--accent);color:#fff;box-shadow:0 8px 20px rgba(37,99,235,0.10);transform:translateY(-1px)}
-  .smalltxt{font-size:11px;color:var(--mut);margin-top:6px}
-  .btn{padding:8px;border-radius:9px;border:none;cursor:pointer;font-weight:800;font-size:13px;transition:all .12s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-  .btn.full{width:100%;display:block}
-  .btn.primary{
-    background:var(--accent);
+  .grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .method{flex:1 1 48%;padding:6px 10px;min-height:40px;background:#f3f6fc;border-radius:8px;border:1px solid #dfe6f3;font-size:12px;font-weight:700;cursor:pointer;text-align:center}
+  .method.active{background:var(--accent);color:white;border-color:var(--accent)}
+  .preview{background:#fbfdff;border:1px solid #e3e9f5;padding:8px;border-radius:8px;margin-top:10px;font-size:13px}
+  .footerbar{text-align:center;margin-top:12px;font-size:12px;color:#667085}
+
+  /* button area */
+  .btn{width:100%;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 10px 26px rgba(37,99,235,0.10)}
+  .btn.ghost{background:#fff;border:1px solid #dce3ee;color:var(--accent)}
+  .btn-area{position:relative;display:block} /* relative parent for sliding badge */
+
+  /* sliding badge (from right -> left) */
+  .copy-badge{
+    position:absolute;
+    top:-48px; /* appears above button */
+    right:0;
+    transform:translateX(110%); /* start off-screen right */
+    opacity:0;
+    background:linear-gradient(180deg,var(--accent-strong),var(--accent));
     color:#fff;
-    box-shadow:0 10px 26px rgba(37,99,235,0.10);
-    min-height:40px;
-    border-radius:9px;
-    font-size:13px;
-  }
-  .btn.primary.disabled{
-    background:#eaf2ff;color:#90a8d8;cursor:not-allowed;box-shadow:none;
-  }
-  .btn.ghost{background:#fff;border:1px solid #eef3fb;color:var(--accent);min-height:40px;border-radius:9px;font-size:13px}
-  .btn.copied{
-    background: linear-gradient(180deg,var(--accent-strong), var(--accent));
-    color: #fff;
+    padding:8px 12px;
+    border-radius:10px;
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
     box-shadow:0 12px 30px rgba(30,64,175,0.16);
-    transform: translateY(-1px);
+    transition:transform .32s cubic-bezier(.22,.9,.25,1), opacity .22s ease;
+    pointer-events:none;
+    white-space:nowrap;
+    font-weight:800;
+    font-size:14px;
   }
-  .copied-icon{
-    width:18px;height:18px;display:inline-block;border-radius:4px;line-height:18px;text-align:center;font-weight:800;
+  .copy-badge.show{
+    transform:translateX(0); /* slide into place */
+    opacity:1;
   }
-  .preview{margin-top:10px;padding:8px;border-radius:9px;background:#fbfdff;border:1px solid #eef6ff;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;font-size:13px}
-  .footerbar{display:flex;justify-content:center;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid #f0f4fb;color:var(--mut);font-size:12px}
-  .row{display:flex;gap:6px;align-items:center}
-  .muted{color:var(--mut)}
-  .note{font-size:11px;color:var(--mut);margin-top:6px}
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;background:#0f172a;color:#fff;padding:8px 12px;border-radius:8px;display:none;z-index:9999;font-size:13px}
-  @media (max-width:420px){ .wrap{padding:6px} .method{flex:1 1 48%} .icon{width:38px;height:38px} }
-  button:focus, input:focus, textarea:focus {outline:3px solid rgba(37,99,235,0.10);outline-offset:2px}
+  /* small check icon circle */
+  .copy-badge .check{
+    width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-weight:900;
+  }
+
+  /* for bulk button badge variant (reuse) */
+  .btn.small{padding:8px;font-size:13px}
+
+  @media (max-width:420px){
+    .copy-badge{top:-44px;font-size:13px;padding:6px 10px}
+  }
 </style>
 </head>
 <body>
-  <main class="wrap">
-    <div class="card" role="application" aria-label="Email generator card">
+  <div class="wrap">
+    <div class="card">
       <header>
-        <div class="icon" aria-hidden="true">✉️</div>
+        <div class="icon">✉️</div>
         <h1>Email Generator</h1>
         <p class="lead">Buat varian email dengan berbagai metode</p>
       </header>
 
-      <div class="tabs" role="tablist" aria-label="Mode">
-        <button id="tabSingle" class="tab active" role="tab" aria-selected="true">Satu</button>
-        <button id="tabBulk" class="tab" role="tab" aria-selected="false">Banyak</button>
+      <label>Username Email</label>
+      <input id="inpName" placeholder="namaanda">
+
+      <label style="margin-top:8px">Domain Email</label>
+      <input id="inpDomain" value="gmail.com">
+
+      <label style="margin-top:10px">Metode Username:</label>
+      <div class="grid" id="methodsUser">
+        <button class="method active" data-method="plus">Plus (+)</button>
+        <button class="method" data-method="dot">Titik (.)</button>
+        <button class="method" data-method="upper">UPPERCASE</button>
+        <button class="method active" data-method="lower">lowercase</button>
       </div>
 
-      <!-- SINGLE -->
-      <div id="single" class="section" aria-hidden="false">
-        <div class="field" style="margin-top:8px">
-          <label class="lbl">Username Email</label>
-          <input id="inpName" type="text" placeholder="namaanda" autocomplete="off" />
-        </div>
+      <label style="margin-top:8px">Custom + tag</label>
+      <input id="plusTag" placeholder="contoh: tokoku (tanpa +)">
 
-        <div class="field" style="margin-top:8px">
-          <label class="lbl">Domain Email</label>
-          <input id="inpDomain" type="text" placeholder="gmail.com" value="gmail.com" />
-        </div>
-
-        <div style="margin-top:8px">
-          <div class="lbl" style="font-size:13px">Pilih Metode (bisa gabungan)</div>
-          <div style="font-size:12px;color:var(--mut);margin-top:6px">Metode Username:</div>
-          <div class="grid" id="methodsUser">
-            <button data-method="plus" class="method active" aria-pressed="true">Plus (+)</button>
-            <button data-method="dot" class="method" aria-pressed="false">Titik (.)</button>
-            <button data-method="upper" class="method" aria-pressed="false">UPPERCASE</button>
-            <button data-method="lower" class="method active" aria-pressed="true">lowercase</button>
-          </div>
-
-          <div style="margin-top:6px" class="row">
-            <label class="lbl" style="flex:0 0 92px;margin:0;padding-right:6px;font-size:12px">Custom + tag</label>
-            <input id="plusTag" type="text" placeholder="contoh: tokoku (tanpa +)" style="flex:1;padding:6px;border-radius:9px;border:1px solid #eef3fb;font-size:13px" />
-          </div>
-        </div>
-
-        <div style="margin-top:8px">
-          <div class="lbl" style="font-size:13px">Metode Domain (setelah @):</div>
-          <div class="grid" id="methodsDom">
-            <button data-method="domRandom" class="method" aria-pressed="false">Random Case</button>
-            <button data-method="domAsIs" class="method active" aria-pressed="true">As-is</button>
-          </div>
-        </div>
-
-        <div class="note">Tekan untuk aktifkan/nonaktifkan. Hasil hanya muncul setelah klik <strong>Buat & Salin</strong>.</div>
-
-        <div style="margin-top:10px">
-          <button id="btnCreate" class="btn primary full btn-primary" aria-disabled="false" title="Buat & Salin">
-            <span id="btnCreateIcon">📋</span>
-            <span id="btnCreateLabel">Buat & Salin</span>
-          </button>
-        </div>
-
-        <div class="preview" id="previewBox" aria-live="polite" aria-atomic="true">
-          <div style="font-size:12px;color:var(--mut)">Email yang dibuat:</div>
-          <div id="previewText" style="margin-top:6px;font-size:13px;color:#0b1220">-</div>
-        </div>
+      <label style="margin-top:10px">Metode Domain:</label>
+      <div class="grid" id="methodsDom">
+        <button class="method" data-method="domRandom">Random Case</button>
+        <button class="method active" data-method="domAsIs">As-is</button>
       </div>
 
-      <!-- BULK -->
-      <div id="bulk" class="section" style="display:none">
-        <div>
-          <label class="lbl">Daftar base names (satu per baris)</label>
-          <textarea id="bulkList" placeholder="rizky\nandi\ngilang" style="width:100%;padding:8px;border-radius:9px;border:1px solid #eef3fb;background:#fbfeff;font-size:13px"></textarea>
+      <!-- button area with badge -->
+      <div class="btn-area" style="margin-top:14px">
+        <div id="copyBadge" class="copy-badge" aria-hidden="true">
+          <span class="check">✔</span>
+          <span id="copyBadgeText">Tersalin!</span>
         </div>
 
-        <div style="margin-top:8px">
-          <label class="lbl">Domain</label>
-          <input id="bulkDomain" type="text" value="gmail.com" />
-        </div>
-
-        <div style="margin-top:8px">
-          <div class="lbl">Metode Username:</div>
-          <div class="grid" id="methodsUserBulk">
-            <button data-method="plus" class="method">Plus (+)</button>
-            <button data-method="dot" class="method">Titik (.)</button>
-            <button data-method="upper" class="method">UPPERCASE</button>
-            <button data-method="lower" class="method active">lowercase</button>
-          </div>
-        </div>
-
-        <div style="margin-top:6px" class="row">
-          <label class="lbl" style="flex:0 0 92px;margin:0;padding-right:6px;font-size:12px">Custom + tag</label>
-          <input id="bulkPlusTag" type="text" placeholder="contoh: tokoku" style="flex:1;padding:6px;border-radius:9px;border:1px solid #eef3fb;font-size:13px" />
-        </div>
-
-        <div style="margin-top:10px">
-          <button id="btnCreateBulk" class="btn primary full">Buat & Salin</button>
-          <div style="height:8px"></div>
-          <button id="btnDownloadBulk" class="btn ghost full">Download .txt</button>
-        </div>
-
-        <div class="preview" style="margin-top:10px;max-height:200px;overflow:auto">
-          <ol id="bulkOutput" style="padding-left:18px;margin:0;font-size:13px;color:#0b1220"></ol>
-        </div>
+        <button id="btnCreate" class="btn primary" title="Buat & Salin">📋 Buat & Salin</button>
       </div>
 
-      <div class="footerbar">
-        <div id="counterWrap">Nomor urut: <strong id="counter">0</strong></div>
+      <div class="preview" style="margin-top:12px">
+        <div style="font-size:12px;color:#667085">Email yang dibuat:</div>
+        <div id="previewText" style="margin-top:6px">-</div>
       </div>
 
+      <div class="footerbar" style="margin-top:12px">Nomor urut: <b id="counter">0</b></div>
     </div>
-    <div style="text-align:center;margin-top:8px;color:var(--mut);font-size:12px">Dibuat oleh Iqra — Compact</div>
-  </main>
-
-  <div id="toast" class="toast" role="status" aria-live="polite">Tersalin ke clipboard</div>
+  </div>
 
 <script>
 (function(){
   const $ = id => document.getElementById(id);
+  const inpName = $('inpName'), inpDomain = $('inpDomain'), plusTag = $('plusTag');
+  const methodsUser = document.getElementById('methodsUser'), methodsDom = document.getElementById('methodsDom');
+  const btnCreate = $('btnCreate'), previewText = $('previewText'), counterEl = $('counter');
+  const copyBadge = $('copyBadge'), copyBadgeText = $('copyBadgeText');
 
-  // Tabs
-  const tabSingle = $('tabSingle'), tabBulk = $('tabBulk'), single = $('single'), bulk = $('bulk');
-  tabSingle.addEventListener('click', ()=>{ tabSingle.classList.add('active'); tabBulk.classList.remove('active'); single.style.display='block'; bulk.style.display='none'; });
-  tabBulk.addEventListener('click', ()=>{ tabBulk.classList.add('active'); tabSingle.classList.remove('active'); single.style.display='none'; bulk.style.display='block'; });
-
-  // Toggle helper (buttons)
-  function wireToggle(containerId, radio=false){
-    const cont = $(containerId);
-    cont.addEventListener('click', e=>{
+  // toggle helpers
+  function wireToggle(container, radio=false){
+    container.addEventListener('click', e=>{
       const btn = e.target.closest('button[data-method]');
       if(!btn) return;
       if(radio){
-        Array.from(cont.querySelectorAll('button[data-method]')).forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
-        btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
+        Array.from(container.querySelectorAll('button[data-method]')).forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
       } else {
-        const active = btn.classList.toggle('active');
-        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        btn.classList.toggle('active');
       }
     });
   }
-  wireToggle('methodsUser', false);
-  wireToggle('methodsDom', true);
-  wireToggle('methodsUserBulk', false);
+  wireToggle(methodsUser, false);
+  wireToggle(methodsDom, true);
 
-  // Elements
-  const inpName = $('inpName'), inpDomain = $('inpDomain'), plusTag = $('plusTag');
-  const previewText = $('previewText'), btnCreate = $('btnCreate'), btnCreateIcon = $('btnCreateIcon'), btnCreateLabel = $('btnCreateLabel');
-  const counterEl = $('counter'), toast = $('toast');
-  const bulkList = $('bulkList'), bulkDomain = $('bulkDomain'), bulkPlusTag = $('bulkPlusTag');
-  const btnCreateBulk = $('btnCreateBulk'), btnDownloadBulk = $('btnDownloadBulk'), bulkOutput = $('bulkOutput');
-
-  // Options reader
-  function readOpts(containerId){
-    const map = {};
-    const cont = $(containerId);
-    Array.from(cont.querySelectorAll('button[data-method]')).forEach(b => map[b.dataset.method] = b.classList.contains('active'));
-    return map;
+  function readOpts(container){
+    const out = {};
+    Array.from(container.querySelectorAll('button[data-method]')).forEach(b=>{
+      out[b.dataset.method] = b.classList.contains('active');
+    });
+    return out;
   }
 
-  // transforms
-  function applyDot(name){ if(!name) return name; if(name.length <= 2) return name.split('').join('.'); return name.slice(0,2) + '.' + name.slice(2); }
-  function applyPlus(name, tag){ if(tag && tag.trim()){ const t = tag.trim().replace(/^\+/, ''); return name + '+' + t; } const tags = ['shop','id','official','x','web']; const pick = tags[Math.floor(Math.random()*tags.length)]; const num = Math.floor(10 + Math.random()*990); return name + '+' + pick + num; }
-  function randomCase(s){ return Array.from(s).map(ch => Math.random() < 0.5 ? ch.toLowerCase() : ch.toUpperCase()).join(''); }
-
+  function applyDot(n){ if(n.length<=2) return n.split('').join('.'); return n.slice(0,2)+'.'+n.slice(2); }
+  function applyPlus(n, tag){ if(tag && tag.trim()!=='') return n + '+' + tag.trim().replace(/^\+/, ''); return n + '+id'; }
+  function randomCase(s){ return [...s].map(c => Math.random()<0.5 ? c.toLowerCase() : c.toUpperCase()).join(''); }
   function transformUsername(base, opts, tag){
     let u = base;
     if(opts.dot) u = applyDot(u);
     if(opts.plus) u = applyPlus(u, tag);
     if(opts.upper && !opts.lower) u = u.toUpperCase();
     else u = u.toLowerCase();
-    return u.replace(/\s+/g, '.');
+    return u.replace(/\s+/g,'.');
   }
+  function domainTransform(domain, domOpts){ if(domOpts.domRandom) return randomCase(domain); return domain; }
 
-  function domainTransform(domainRaw){
-    const domOpts = readOpts('methodsDom');
-    if(domOpts.domRandom) return randomCase(domainRaw);
-    return domainRaw;
-  }
-
-  // Build one email (but DO NOT auto-show it)
-  function makeEmailOnce(){
-    const base = inpName.value.trim();
-    if(!base) return '';
-    const uopts = readOpts('methodsUser');
-    const dom = (inpDomain.value.trim() || 'gmail.com');
-    const username = transformUsername(base, uopts, plusTag.value);
-    const domain = domainTransform(dom);
+  function makeEmail(){
+    const name = inpName.value.trim();
+    if(!name) return '';
+    const opts = readOpts(methodsUser);
+    const domOpts = readOpts(methodsDom);
+    const username = transformUsername(name, opts, plusTag.value);
+    const domain = domainTransform((inpDomain.value.trim()||'gmail.com'), domOpts);
     return username + '@' + domain;
   }
 
-  // robust copy: clipboard API then fallback
+  // robust copy
   async function copyToClipboard(text){
     if(!text) return false;
-    try{
+    try {
       if(navigator.clipboard && navigator.clipboard.writeText){
         await navigator.clipboard.writeText(text);
         return true;
       }
-    }catch(e){
-      console.warn('navigator.clipboard failed', e);
-    }
-    try{
+    } catch(e){ console.warn('navigator.clipboard failed', e); }
+    try {
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.style.position = 'fixed';
@@ -292,120 +201,43 @@
       const ok = document.execCommand('copy');
       document.body.removeChild(ta);
       return ok;
-    }catch(err){
-      console.warn('execCommand fallback failed', err);
-      return false;
-    }
+    } catch(e) { console.warn('fallback copy failed', e); return false; }
   }
 
-  function showToast(msg){
-    toast.textContent = msg;
-    toast.style.display = 'block';
-    clearTimeout(toast._t);
-    toast._t = setTimeout(()=>{ toast.style.display = 'none'; }, 1200);
-  }
-
-  // UI change to "Tersalin!" state then auto-revert
-  function setButtonCopied(buttonEl, iconEl, labelEl){
-    // store original
-    const origIcon = iconEl.innerHTML;
-    const origLabel = labelEl.textContent;
-    // set copied appearance
-    buttonEl.classList.add('copied');
-    iconEl.innerHTML = '✔';
-    labelEl.textContent = 'Tersalin!';
-    // revert after 1500ms
-    clearTimeout(buttonEl._t);
-    buttonEl._t = setTimeout(()=>{
-      buttonEl.classList.remove('copied');
-      iconEl.innerHTML = origIcon;
-      labelEl.textContent = origLabel;
+  // show slide-in badge from right -> left, then hide
+  function showCopyBadge(text){
+    copyBadgeText.textContent = text || 'Tersalin!';
+    copyBadge.classList.add('show');
+    copyBadge.setAttribute('aria-hidden','false');
+    clearTimeout(copyBadge._t);
+    copyBadge._t = setTimeout(()=> {
+      copyBadge.classList.remove('show');
+      copyBadge.setAttribute('aria-hidden','true');
     }, 1500);
   }
 
-  // IMPORTANT: do NOT auto-update preview on input — preview only after clicking create
-
-  // Create & Copy (single)
-  let seq = 0;
+  // button click: copy then show preview & increment
+  let count = 0;
   btnCreate.addEventListener('click', async ()=>{
-    const email = makeEmailOnce();
+    const email = makeEmail();
     if(!email){
-      showToast('Isi Username dulu');
+      // quick shake (optional) or alert
+      btnCreate.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:220,iterations:1});
       return;
     }
-
-    // Attempt to copy first, then show result and increment counter
     const ok = await copyToClipboard(email);
+    // show badge slide-in regardless of ok (but message differs)
     if(ok){
-      seq += 1;
-      counterEl.textContent = seq;
-      previewText.textContent = email;
-      setButtonCopied(btnCreate, btnCreateIcon, btnCreateLabel);
-      showToast('Tersalin: ' + email);
+      showCopyBadge('Tersalin!');
     } else {
-      // fallback prompt manual copy and still show result
-      seq += 1;
-      counterEl.textContent = seq;
-      previewText.textContent = email;
-      const manual = prompt('Salin manual jika clipboard diblokir:', email);
-      if(manual !== null) showToast('Gunakan paste untuk menempel');
+      showCopyBadge('Salin manual');
     }
+    // then update preview & counter
+    count += 1;
+    counterEl.textContent = count;
+    previewText.textContent = email;
   });
 
-  // Bulk: create & copy all, then show results and copied state
-  btnCreateBulk.addEventListener('click', async ()=>{
-    const lines = bulkList.value.split('\n').map(s=>s.trim()).filter(Boolean);
-    if(lines.length === 0){ alert('Masukkan minimal 1 nama di daftar.'); return; }
-    const opts = readOpts('methodsUserBulk');
-    const dom = (bulkDomain.value.trim() || 'gmail.com');
-    const tag = bulkPlusTag.value;
-    const results = lines.map(base => transformUsername(base, opts, tag) + '@' + dom);
-
-    // copy first
-    const ok = await copyToClipboard(results.join('\n'));
-    // render list anyway
-    bulkOutput.innerHTML = '';
-    results.forEach(r => {
-      const li = document.createElement('li'); li.textContent = r; bulkOutput.appendChild(li);
-    });
-
-    if(ok){
-      // show copied style on bulk button briefly
-      btnCreateBulk.classList.add('copied');
-      const old = btnCreateBulk.innerHTML;
-      btnCreateBulk.innerHTML = '✔ Tersalin!';
-      clearTimeout(btnCreateBulk._t);
-      btnCreateBulk._t = setTimeout(()=>{ btnCreateBulk.classList.remove('copied'); btnCreateBulk.innerHTML = old; }, 1500);
-
-      showToast('Tersalin ' + results.length + ' alamat');
-    } else {
-      alert('Gagal salin otomatis — gunakan Download .txt atau salin manual.');
-    }
-  });
-
-  btnDownloadBulk.addEventListener('click', ()=>{
-    const items = Array.from(bulkOutput.querySelectorAll('li')).map(li=>li.textContent);
-    if(items.length === 0){ alert('Tidak ada hasil untuk di-download. Buat dulu.'); return; }
-    const blob = new Blob([items.join('\n')], {type:'text/plain'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'emails.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  });
-
-  // double-click footer to reset
-  const resetFn = ()=> {
-    seq = 0; counterEl.textContent = seq;
-    inpName.value = ''; inpDomain.value = 'gmail.com'; plusTag.value = '';
-    document.querySelectorAll('#methodsUser .method').forEach(b=>b.classList.remove('active'));
-    document.querySelector('#methodsUser button[data-method="plus"]').classList.add('active');
-    document.querySelector('#methodsUser button[data-method="lower"]').classList.add('active');
-    document.querySelectorAll('#methodsDom .method').forEach(b=>b.classList.remove('active'));
-    document.querySelector('#methodsDom button[data-method="domAsIs"]').classList.add('active');
-    // clear preview
-    previewText.textContent = '-';
-  };
-  document.querySelector('.footerbar').addEventListener('dblclick', resetFn);
-
-  // init: preview stays '-' until user clicks create
 })();
 </script>
 </body>
